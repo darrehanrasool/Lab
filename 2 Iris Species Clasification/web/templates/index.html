@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iris Classifier | Dark</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🌸 Iris Flower Classifier</h1>
+        <p>Enter the measurements to predict the species</p>
+      </header>
+
+      <main class="card">
+        <form id="prediction-form">
+          <div class="form-group">
+            <label>Sepal Length (cm)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="sepal_length"
+              placeholder="e.g. 5.1"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Sepal Width (cm)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="sepal_width"
+              placeholder="e.g. 3.5"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Petal Length (cm)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="petal_length"
+              placeholder="e.g. 1.4"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Petal Width (cm)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="petal_width"
+              placeholder="e.g. 0.2"
+              required
+            />
+          </div>
+          <button type="submit" id="predict-btn">Predict</button>
+        </form>
+
+        <div id="result" class="result hidden">
+          <h2>Prediction: <span id="predicted-species"></span></h2>
+          <div class="probability-bars">
+            <div class="bar-container">
+              <span>Setosa</span>
+              <div class="bar"><div class="fill" id="prob-setosa"></div></div>
+              <span id="prob-setosa-text">0%</span>
+            </div>
+            <div class="bar-container">
+              <span>Versicolor</span>
+              <div class="bar">
+                <div class="fill" id="prob-versicolor"></div>
+              </div>
+              <span id="prob-versicolor-text">0%</span>
+            </div>
+            <div class="bar-container">
+              <span>Virginica</span>
+              <div class="bar">
+                <div class="fill" id="prob-virginica"></div>
+              </div>
+              <span id="prob-virginica-text">0%</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Powered by Logistic Regression • Iris Dataset</p>
+      </footer>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+  </body>
+</html>
