@@ -1,0 +1,9 @@
+# Iris Classification Project - Fully Pinned
+# Generated with: pip freeze > requirements.txt
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+joblib
+flask

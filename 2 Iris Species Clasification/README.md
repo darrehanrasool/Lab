@@ -79,7 +79,7 @@ iris-classification/
 
 ![Output Prediction](reports/figures/05_roc_curves.png)
 
-### Preciision Recall Curve
+### Precision Recall Curve
 
 ![Output Prediction](reports/figures/06_precision_recall_curves.png)
 
