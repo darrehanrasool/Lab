@@ -63,20 +63,38 @@ iris-classification/
 
 ## 📊 Evaluation Graphs
 
-### Feature Distributions
+### Model Prediction
 
 ![Output Prediction](reports/figures/Prediction.png)
 
-![Feature Distributions](reports/figures/01_feature_distributions.png)
+### Pair Plot
+
+![Output Prediction](reports/figures/02_pairplot.png)
 
 ### Confusion Matrix
 
-![Confusion Matrix](reports/figures/04_confusion_matrix.png)
+![Output Prediction](reports/figures/04_confusion_matrix.png)
 
-### ROC Curves
+### Roc Curve
 
-![ROC Curves](reports/figures/05_roc_curves.png)
+![Output Prediction](reports/figures/05_roc_curves.png)
 
-## License
+### Preciision Recall Curve
 
-MIT
+![Output Prediction](reports/figures/06_precision_recall_curves.png)
+
+### Heat Map
+
+![Output Prediction](reports/figures/03_correlation_heatmap.png)
+
+### Learning Curve
+
+![Output Prediction](reports/figures/07_learning_curve.png)
+
+### Cross Validation
+
+![Output Prediction](reports/figures/08_cross_validation.png)
+
+### Feature Distributions
+
+![Feature Distributions](reports/figures/01_feature_distributions.png)
