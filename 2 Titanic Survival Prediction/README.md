@@ -92,3 +92,7 @@ titanic-survival/
 ### Learning Curve
 
 ![Learning Curve](reports/figures/learning_curve.png)
+
+### Cross Validation
+
+![Cross Validation](reports/figures/cross_validation.png)
