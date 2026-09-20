@@ -1,0 +1,23 @@
+BOSTON HOUSING PRICE PREDICTION - PROJECT GUIDE
+===============================================
+
+1. SETUP VIRTUAL ENVIRONMENT
+   python -m venv venv
+   source venv/bin/activate  (For Mac/Linux)
+   venv\Scripts\activate     (For Windows)
+   pip install -r requirements.txt
+
+2. RUN DATA PIPELINE
+   python src/data/make_dataset.py
+   python src/features/build_features.py
+
+3. TRAIN MODEL
+   python src/models/train_model.py
+
+4. GENERATE ALL EDA AND EVALUATION GRAPHS
+   python src/visualization/visualize.py
+
+5. RUN WEB APP
+   cd web
+   python app.py
+   Open browser to http://127.0.0.1:5002
