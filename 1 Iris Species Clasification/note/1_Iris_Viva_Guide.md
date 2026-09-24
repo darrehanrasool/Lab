@@ -1,6 +1,6 @@
 # VIVA PREP GUIDE — Project 1: Iris Species Classification
 
-### Algorithm: Logistic Regression | Task: Multiclass Classification
+## Algorithm: Logistic Regression | Task: Multiclass Classification
 
 This document is built directly from your repo (`darrehanrasool/Lab`), reading the project's README, `train_model.py`, and related files. Nothing here is guessed — it's explained from your actual code.
 
@@ -8,7 +8,7 @@ This document is built directly from your repo (`darrehanrasool/Lab`), reading t
 
 ---
 
-# SECTION A — Core ML Concepts You Must Know Cold
+## SECTION A — Core ML Concepts You Must Know Cold
 
 These concepts repeat across all three projects. If you understand this section, 80% of viva questions become easy regardless of which project is asked about.
 
@@ -147,7 +147,7 @@ A grid of scatter plots, one for every pair of features, with histograms/KDE cur
 
 ---
 
-# SECTION B — Project Walkthrough: Iris Species Classification
+## SECTION B — Project Walkthrough: Iris Species Classification
 
 ## 1.1 Overview
 
@@ -488,7 +488,7 @@ Serializes the trained model and the fitted scaler to disk so the Flask web app 
 
 ## -e
 
-# SECTION C — Rapid-Fire Definitions (memorize these one-liners)
+## SECTION C — Rapid-Fire Definitions (memorize these one-liners)
 
 - **Feature**: an input variable used to make a prediction.
 - **Label/Target**: the value you're trying to predict.
