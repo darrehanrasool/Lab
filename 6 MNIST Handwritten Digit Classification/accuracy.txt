@@ -1,0 +1,34 @@
+MNIST Handwritten Digit Classification Performance
+=====================================================
+Model Architecture: Multi-Layer Perceptron (MLP / ANN)
+Input Layer: 784 Units (28x28 Grayscale Pixels)
+Hidden Layer 1: 128 Units (ReLU)
+Hidden Layer 2: 64 Units (ReLU)
+Output Layer: 10 Units (Softmax)
+Optimizer: Adam (Adaptive Moment Estimation)
+
+Validation Set Accuracy: 0.9467 (94.67%)
+Test Set Accuracy:       0.9391 (93.91%)
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+           0     0.9518    0.9644    0.9581       225
+           1     0.9778    0.9778    0.9778       225
+           2     0.9462    0.9378    0.9420       225
+           3     0.9103    0.9467    0.9281       225
+           4     0.9248    0.9289    0.9268       225
+           5     0.9378    0.9378    0.9378       225
+           6     0.9593    0.9422    0.9507       225
+           7     0.9270    0.9600    0.9432       225
+           8     0.9299    0.8844    0.9066       225
+           9     0.9276    0.9111    0.9193       225
+
+    accuracy                         0.9391      2250
+   macro avg     0.9392    0.9391    0.9390      2250
+weighted avg     0.9392    0.9391    0.9390      2250
+
+
+5-Fold Cross-Validation Accuracy:
+  - Fold Scores: [np.float64(0.88), np.float64(0.915), np.float64(0.9083), np.float64(0.92), np.float64(0.8967)]
+  - Mean Accuracy: 0.9040 (+/- 0.0143)

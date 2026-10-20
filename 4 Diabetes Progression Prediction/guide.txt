@@ -1,0 +1,26 @@
+Project 4: Diabetes Progression Prediction
+==========================================
+End-to-End Workflow Guide:
+
+1. Download and extract raw dataset to local disk:
+   python src/data/make_dataset.py
+   (Saves data/raw/diabetes.csv)
+
+2. Build Train (70%), Validation (15%), and Test (15%) feature matrices:
+   python src/features/build_features.py
+   (Generates data/processed/X_train.csv, X_val.csv, X_test.csv, y_train.csv, y_val.csv, y_test.csv, and scaler.joblib)
+
+3. Train Random Forest Regression model and evaluate metrics:
+   python src/models/train_model.py
+   (Saves models/diabetes_model.joblib and generates accuracy.txt)
+
+4. Generate full suite of Exploratory Data Analysis & Evaluation Graphs:
+   python src/visualization/visualize.py
+   (Saves 8 figures to reports/figures/)
+
+5. Run sample CLI prediction:
+   python src/models/predict_model.py
+
+6. Launch the interactive web user interface:
+   cd web && python app.py
+   Access in browser at: http://127.0.0.1:5003

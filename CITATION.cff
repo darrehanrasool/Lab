@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you utilize this Machine Learning laboratory practical repository, models, or viva guides in your academic work, please cite it as below."
+title: "Machine Learning Laboratory Practicals & Comprehensive Viva Guide (CAI504C)"
+authors:
+  - family-names: "Rasool"
+    given-names: "Dar Rehan"
+    affiliation: "Islamic University of Science and Technology (IUST)"
+version: "1.0.0"
+date-released: "2026-10-20"
+repository-code: "https://github.com/darrehanrasool/Lab"
+keywords:
+  - "machine-learning"
+  - "scikit-learn"
+  - "logistic-regression"
+  - "random-forest"
+  - "naive-bayes"
+  - "neural-networks"
+  - "collaborative-filtering"
+  - "time-series"
+  - "data-science-curriculum"
+license: "MIT"

@@ -1,0 +1,26 @@
+Project 5: Spam Email Detection
+================================
+End-to-End Pipeline Guide:
+
+1. Download raw SMS / Email Spam dataset directly to disk:
+   python src/data/make_dataset.py
+   (Downloads and saves data/raw/spam.csv)
+
+2. Perform text normalization, train/val/test splitting, and TF-IDF extraction:
+   python src/features/build_features.py
+   (Saves data/processed/X_train.csv, X_val.csv, X_test.csv, y_train.csv, y_val.csv, y_test.csv, and vectorizer.joblib)
+
+3. Train Multinomial Naive Bayes model and log evaluation metrics:
+   python src/models/train_model.py
+   (Saves models/spam_model.joblib and generates accuracy.txt)
+
+4. Generate full evaluation and exploratory diagnostics:
+   python src/visualization/visualize.py
+   (Saves 8 figures to reports/figures/)
+
+5. Test interactive sample classification via CLI:
+   python src/models/predict_model.py
+
+6. Run web application:
+   cd web && python app.py
+   Access in browser: http://127.0.0.1:5004

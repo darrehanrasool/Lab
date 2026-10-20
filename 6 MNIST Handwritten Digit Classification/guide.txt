@@ -1,0 +1,26 @@
+Project 6: MNIST Handwritten Digit Classification
+================================================
+End-to-End Pipeline Guide:
+
+1. Download raw MNIST dataset directly to disk:
+   python src/data/make_dataset.py
+   (Downloads, samples balanced 15,000 images, and saves to data/raw/mnist.csv)
+
+2. Perform pixel normalization, train/val/test splitting:
+   python src/features/build_features.py
+   (Saves data/processed/X_train.csv, X_val.csv, X_test.csv, y_train.csv, y_val.csv, y_test.csv, and scaler.joblib)
+
+3. Train Multi-Layer Perceptron (Neural Network) model:
+   python src/models/train_model.py
+   (Saves models/mnist_model.joblib and generates accuracy.txt)
+
+4. Generate full evaluation and image visual diagnostics:
+   python src/visualization/visualize.py
+   (Saves 8 figures to reports/figures/)
+
+5. Test interactive sample classification via CLI:
+   python src/models/predict_model.py
+
+6. Run interactive web drawing application:
+   cd web && python app.py
+   Access in browser: http://127.0.0.1:5005

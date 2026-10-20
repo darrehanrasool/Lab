@@ -1,0 +1,243 @@
+:root {
+    --bg-color: #080d1a;
+    --card-bg: #111827;
+    --card-border: #1f2937;
+    --primary: #38bdf8;
+    --primary-hover: #0284c7;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --buy: #10b981;
+    --sell: #ef4444;
+    --hold: #f59e0b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    padding: 2.5rem 1rem;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--primary);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #38bdf8, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 850px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+.card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.form-group input {
+    background: #080d1a;
+    border: 1px solid var(--card-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--primary);
+    color: #080d1a;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+.forecast-box {
+    background: #080d1a;
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.forecast-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.forecast-val {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.signal-badge {
+    display: inline-block;
+    padding: 0.4rem 1.1rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.signal-buy {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--buy);
+    border: 1px solid var(--buy);
+}
+
+.signal-sell {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--sell);
+    border: 1px solid var(--sell);
+}
+
+.signal-hold {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--hold);
+    border: 1px solid var(--hold);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.m-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.m-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.text-green {
+    color: var(--buy);
+}
+
+.text-red {
+    color: var(--sell);
+}
+
+.placeholder-box {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: var(--text-muted);
+}
+
+.placeholder-box .icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}

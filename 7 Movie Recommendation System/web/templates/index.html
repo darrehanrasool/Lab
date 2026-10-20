@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation Engine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Recommender Systems</div>
+            <h1>Movie Recommendation Engine</h1>
+            <p class="subtitle">Latent Matrix Factorization via TruncatedSVD and Item-Based Cosine Similarity trained on the MovieLens 100k Dataset.</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card search-card">
+                <h2>Find Recommendations</h2>
+                <form method="POST" action="/">
+                    <div class="form-group">
+                        <label for="movie_title">Search Movie Title in Catalog</label>
+                        <input type="text" id="movie_title" name="movie_title" value="{{ query_title }}" placeholder="e.g. Matrix, Toy Story, Pulp Fiction" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Generate Recommendations</button>
+                </form>
+
+                <div class="quick-picks">
+                    <span class="quick-label">Or choose popular film:</span>
+                    <div class="chips-container">
+                        {% for sm in sample_movies %}
+                            <button type="button" class="chip" onclick="pickMovie('{{ sm }}')">{{ sm.split(' (')[0] }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if selected_movie %}
+                    <div class="selected-box">
+                        <div class="selected-label">Selected Query Movie:</div>
+                        <div class="selected-title">{{ selected_movie['title'] }}</div>
+                        <div class="selected-genres">{{ selected_movie['genres'] }}</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="card result-card">
+                <h2>Top 10 Similar Recommendations</h2>
+                <div class="rec-list">
+                    {% for rec in recommendations %}
+                        <div class="rec-item">
+                            <div class="rec-header">
+                                <span class="rec-rank">#{{ loop.index }}</span>
+                                <span class="rec-title">{{ rec.title }}</span>
+                                <span class="rec-match">{{ rec.match_pct }}</span>
+                            </div>
+                            <div class="rec-genres">{{ rec.genres }}</div>
+                            <div class="match-track">
+                                <div class="match-fill" style="width: {{ rec.match_pct }};"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function pickMovie(title) {
+            document.getElementById('movie_title').value = title;
+            document.forms[0].submit();
+        }
+    </script>
+</body>
+</html>

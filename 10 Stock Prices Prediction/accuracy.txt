@@ -1,0 +1,19 @@
+Stock Prices Prediction Model Performance
+===========================================
+Algorithm: Random Forest Regressor (n_estimators=100, max_depth=6) with Technical Indicators
+
+Validation Set Evaluation:
+  - R² Score: 0.8782
+  - Root Mean Squared Error (RMSE): $1.78
+
+Test Set Evaluation (Held-Out Future Window):
+  - R² Score:                       0.9245
+  - Root Mean Squared Error (RMSE): $2.10
+  - Mean Absolute Error (MAE):       $1.43
+  - Mean Absolute % Error (MAPE):   1.19%
+  - Actual Price Mean:              $117.51
+  - Predicted Price Mean:           $116.54
+
+Time Series Cross-Validation (TimeSeriesSplit Expanding Window R²):
+  - Fold Scores: [-0.2348, 0.4818, -0.086, 0.7231, 0.5867]
+  - Mean Temporal R²: 0.2942 (+/- 0.3819)

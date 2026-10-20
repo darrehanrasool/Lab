@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Predictor & Quant Signal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Quantitative Finance & Time Series</div>
+            <h1>Stock Price Prediction & Trend Signal</h1>
+            <p class="subtitle">Random Forest regression engine analyzing daily OHLCV market features, moving averages, and momentum indicators to forecast next-day closing prices.</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card form-card">
+                <h2>Market Session Inputs</h2>
+                <form method="POST" action="/">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="open_p">Open Price ($)</label>
+                            <input type="number" step="0.01" id="open_p" name="open_p" value="{{ input_data['open_p'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="high_p">Session High ($)</label>
+                            <input type="number" step="0.01" id="high_p" name="high_p" value="{{ input_data['high_p'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="low_p">Session Low ($)</label>
+                            <input type="number" step="0.01" id="low_p" name="low_p" value="{{ input_data['low_p'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="close_p">Current Close ($)</label>
+                            <input type="number" step="0.01" id="close_p" name="close_p" value="{{ input_data['close_p'] }}" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="volume">Trading Volume (Shares)</label>
+                            <input type="number" step="1000" id="volume" name="volume" value="{{ input_data['volume'] }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Forecast Next Close</button>
+                </form>
+            </div>
+
+            <div class="card result-card">
+                <h2>Quantitative Forecast</h2>
+                {% if prediction %}
+                    <div class="forecast-box">
+                        <div class="forecast-label">Forecasted Next-Day Close</div>
+                        <div class="forecast-val">{{ prediction }}</div>
+                        <div class="signal-badge {{ 'signal-buy' if 'BUY' in trading_signal else ('signal-sell' if 'SELL' in trading_signal else 'signal-hold') }}">
+                            {{ trading_signal }}
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="m-label">Current Close</span>
+                            <span class="m-val">${{ "%.2f"|format(current_close) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="m-label">Expected Return</span>
+                            <span class="m-val {{ 'text-green' if '+' in expected_pct else 'text-red' }}">{{ expected_pct }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="m-label">Price Delta</span>
+                            <span class="m-val {{ 'text-green' if '+' in expected_change else 'text-red' }}">${{ expected_change }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="placeholder-box">
+                        <div class="icon">📈</div>
+                        <p>Enter current market session parameters and click <strong>Forecast Next Close</strong> to view predicted price and quant signals.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

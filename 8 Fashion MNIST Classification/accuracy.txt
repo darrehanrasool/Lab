@@ -1,0 +1,34 @@
+Fashion-MNIST Classification Performance
+=========================================
+Model Architecture: Multi-Layer Perceptron (Neural Network)
+Input Layer: 784 Units (28x28 Grayscale Clothing Pixels)
+Hidden Layer 1: 128 Units (ReLU)
+Hidden Layer 2: 64 Units (ReLU)
+Output Layer: 10 Units (Softmax)
+Optimizer: Adam (Adaptive Moment Estimation)
+
+Validation Set Accuracy: 0.8578 (85.78%)
+Test Set Accuracy:       0.8582 (85.82%)
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+ T-shirt/top     0.7733    0.7733    0.7733       225
+     Trouser     0.9697    0.9956    0.9825       225
+    Pullover     0.7686    0.7822    0.7753       225
+       Dress     0.9282    0.8622    0.8940       225
+        Coat     0.7788    0.7822    0.7805       225
+      Sandal     0.9021    0.9422    0.9217       225
+       Shirt     0.6213    0.6489    0.6348       225
+     Sneaker     0.9095    0.9378    0.9234       225
+         Bag     0.9815    0.9422    0.9615       225
+  Ankle boot     0.9717    0.9156    0.9428       225
+
+    accuracy                         0.8582      2250
+   macro avg     0.8605    0.8582    0.8590      2250
+weighted avg     0.8605    0.8582    0.8590      2250
+
+
+5-Fold Cross-Validation Accuracy:
+  - Fold Scores: [np.float64(0.8367), np.float64(0.8283), np.float64(0.8167), np.float64(0.7983), np.float64(0.8417)]
+  - Mean Accuracy: 0.8243 (+/- 0.0155)

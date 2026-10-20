@@ -1,0 +1,26 @@
+Project 7: Movie Recommendation System
+======================================
+End-to-End Pipeline Guide:
+
+1. Download MovieLens dataset and extract locally:
+   python src/data/make_dataset.py
+   (Downloads and saves data/raw/movies.csv and data/raw/ratings.csv)
+
+2. Build Train (70%), Validation (15%), and Test (15%) splits & User-Item matrix:
+   python src/features/build_features.py
+   (Saves data/processed/user_item_matrix.joblib, movie_metadata.joblib, and split CSVs)
+
+3. Train TruncatedSVD Matrix Factorization model and evaluate metrics:
+   python src/models/train_model.py
+   (Saves models/recommender_pipeline.joblib and generates accuracy.txt)
+
+4. Generate full evaluation and latent space diagnostics:
+   python src/visualization/visualize.py
+   (Saves 8 figures to reports/figures/)
+
+5. Test interactive movie recommendation in CLI:
+   python src/models/predict_model.py
+
+6. Run web application:
+   cd web && python app.py
+   Access in browser: http://127.0.0.1:5006

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Natural Language Processing</div>
+            <h1>Sentiment Analysis Engine</h1>
+            <p class="subtitle">Logistic Regression classifier with Sublinear TF-IDF n-gram vectorization evaluating polarity and emotional valence of natural text.</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card form-card">
+                <h2>Analyze Text Sentiment</h2>
+                <form method="POST" action="/">
+                    <div class="form-group">
+                        <label for="review">Enter Movie Review, Social Tweet, or Product Feedback</label>
+                        <textarea id="review" name="review" rows="7" placeholder="Write or paste your review here..." required>{{ review_text }}</textarea>
+                    </div>
+                    <div class="sample-buttons">
+                        <span class="sample-label">Try sample:</span>
+                        <button type="button" class="btn-sample" onclick="loadSample(1)">Sample Positive</button>
+                        <button type="button" class="btn-sample" onclick="loadSample(2)">Sample Negative</button>
+                    </div>
+                    <button type="submit" class="btn-primary">Evaluate Sentiment</button>
+                </form>
+            </div>
+
+            <div class="card result-card">
+                <h2>Diagnostic Verdict</h2>
+                {% if prediction %}
+                    <div class="verdict-box {{ 'verdict-pos' if prediction == 'POSITIVE' else 'verdict-neg' }}">
+                        <div class="verdict-tag">{{ 'SATISFIED / ACCLAIMED' if prediction == 'POSITIVE' else 'CRITICAL / DISSATISFIED' }}</div>
+                        <div class="verdict-title">{{ prediction }}</div>
+                        <div class="meta-stats">
+                            <div class="meta-item">
+                                <span class="meta-label">Confidence:</span>
+                                <span class="meta-val">{{ confidence }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Polarity:</span>
+                                <span class="meta-val">{{ polarity_score }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Probability Breakdown</h3>
+                    <div class="prob-bars">
+                        <div class="prob-row">
+                            <span class="sentiment-label">Positive</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-pos" style="width: {{ pos_prob }};"></div>
+                            </div>
+                            <span class="prob-num">{{ pos_prob }}</span>
+                        </div>
+                        <div class="prob-row">
+                            <span class="sentiment-label">Negative</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-neg" style="width: {{ neg_prob }};"></div>
+                            </div>
+                            <span class="prob-num">{{ neg_prob }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="placeholder-box">
+                        <div class="icon">💬</div>
+                        <p>Enter any sentence or review to view its predicted sentiment, confidence level, and positive/negative polarity breakdown.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadSample(type) {
+            const textarea = document.getElementById('review');
+            if (type === 1) {
+                textarea.value = "An extraordinary cinematic masterpiece! The emotional depth of the performances, breathtaking directing, and musical score left me spellbound. Easily one of the finest films of the decade.";
+            } else {
+                textarea.value = "An absolute disaster and utter waste of time. The script is hopelessly cliched, the pacing is agonizingly slow, and the performances are wooden and completely unconvincing. Avoid at all costs.";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion-MNIST Neural Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Computer Vision & E-Commerce AI</div>
+            <h1>Fashion-MNIST Classifier</h1>
+            <p class="subtitle">Multi-Layer Perceptron neural network classifying clothing articles into 10 fashion categories in real time.</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card canvas-card">
+                <h2>Interactive Fashion Canvas</h2>
+                <p class="hint">Draw an article of clothing (e.g., T-shirt, shoe, bag, trousers) or load a dataset sample:</p>
+                <div class="canvas-wrapper">
+                    <canvas id="fashionCanvas" width="280" height="280"></canvas>
+                </div>
+                <div class="canvas-controls">
+                    <button class="btn-secondary" onclick="clearCanvas()">Clear</button>
+                    <button class="btn-primary" onclick="classifyDrawing()">Classify Garment</button>
+                </div>
+                <div class="samples-section">
+                    <span class="sample-label">Or load dataset sample:</span>
+                    <div class="category-chips">
+                        {% for i in range(10) %}
+                            <button class="chip" onclick="loadSampleCategory({{ i }})">{{ class_names[i] }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card result-card">
+                <h2>Diagnostic Output</h2>
+                <div id="verdictBox" class="verdict-box">
+                    <div class="verdict-label">Recognized Garment</div>
+                    <div id="predictedCategory" class="predicted-category">-</div>
+                    <div id="confidenceVal" class="confidence-val">Draw or pick a garment</div>
+                </div>
+
+                <h3>Category Probabilities</h3>
+                <div id="probBars" class="prob-bars">
+                    {% for i in range(10) %}
+                        <div class="prob-row">
+                            <span class="cat-label">{{ class_names[i] }}</span>
+                            <div class="bar-track">
+                                <div id="bar-{{ i }}" class="bar-fill" style="width: 0%;"></div>
+                            </div>
+                            <span id="prob-{{ i }}" class="prob-num">0%</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

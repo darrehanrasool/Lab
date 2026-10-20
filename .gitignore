@@ -164,6 +164,10 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
+# Generated processed datasets
+6 MNIST Handwritten Digit Classification/data/processed/X_train.csv
+8 Fashion MNIST Classification/data/processed/X_train.csv
+
 # mkdocs documentation
 /site
 

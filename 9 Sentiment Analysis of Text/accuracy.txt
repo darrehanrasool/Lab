@@ -1,0 +1,29 @@
+Sentiment Analysis of Text Model Performance
+==============================================
+Algorithm: Logistic Regression (C=1.0) with Sublinear TF-IDF (4,000 features, n-grams=(1,2))
+
+Validation Set Metrics:
+  - Accuracy: 0.8700 (87.00%)
+  - F1-Score: 0.8716
+
+Test Set Evaluation:
+  - Accuracy:  0.8689 (86.89%)
+  - Precision: 0.8550
+  - Recall:    0.8857
+  - F1-Score:  0.8700
+  - ROC-AUC:   0.9426
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+    Negative     0.8836    0.8524    0.8677       454
+    Positive     0.8550    0.8857    0.8700       446
+
+    accuracy                         0.8689       900
+   macro avg     0.8693    0.8690    0.8689       900
+weighted avg     0.8694    0.8689    0.8689       900
+
+
+5-Fold Cross-Validation Accuracy on Training Data:
+  - Fold Scores: [np.float64(0.8571), np.float64(0.8595), np.float64(0.8393), np.float64(0.8452), np.float64(0.8595)]
+  - Mean Accuracy: 0.8521 (+/- 0.0083)

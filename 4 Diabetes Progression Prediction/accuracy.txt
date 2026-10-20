@@ -1,0 +1,18 @@
+Diabetes Progression Prediction Model Performance
+===================================================
+Algorithm: Random Forest Regressor (n_estimators=100, max_depth=6)
+
+Validation Set Metrics:
+  - R² Score: 0.4707
+  - Mean Squared Error (MSE): 2706.5224
+  - Root Mean Squared Error (RMSE): 52.0242
+
+Test Set Metrics:
+  - R² Score: 0.4871
+  - Mean Squared Error (MSE): 2912.0097
+  - Root Mean Squared Error (RMSE): 53.9630
+  - Mean Absolute Error (MAE): 45.5805
+
+5-Fold Cross-Validation (R² on Training Set):
+  - Fold Scores: [np.float64(0.4755), np.float64(0.0298), np.float64(0.5167), np.float64(0.5848), np.float64(0.4018)]
+  - Mean R²: 0.4017 (+/- 0.1952)

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Email / SMS Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">NLP Security Suite</div>
+            <h1>Spam Email & SMS Detection</h1>
+            <p class="subtitle">Multinomial Naive Bayes classifier trained with TF-IDF n-gram vectorization to detect phishing, fraudulent spam, and marketing scams.</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card form-card">
+                <h2>Analyze Incoming Message</h2>
+                <form method="POST" action="/">
+                    <div class="form-group">
+                        <label for="message">Enter Email Body or SMS Message Text</label>
+                        <textarea id="message" name="message" rows="8" placeholder="e.g. URGENT! You have won a 1-week holiday to the Bahamas! Claim your voucher by replying to this SMS now..." required>{{ message_text }}</textarea>
+                    </div>
+                    <div class="sample-buttons">
+                        <span class="sample-label">Try sample:</span>
+                        <button type="button" class="btn-sample" onclick="loadSample(1)">Sample Spam</button>
+                        <button type="button" class="btn-sample" onclick="loadSample(2)">Sample Legitimate</button>
+                    </div>
+                    <button type="submit" class="btn-primary">Scan Message</button>
+                </form>
+            </div>
+
+            <div class="card result-card">
+                <h2>Classification Verdict</h2>
+                {% if prediction %}
+                    <div class="verdict-box {{ 'verdict-spam' if 'SPAM' in prediction else 'verdict-ham' }}">
+                        <div class="verdict-tag">{{ 'MALICIOUS / SPAM' if 'SPAM' in prediction else 'VERIFIED LEGITIMATE' }}</div>
+                        <div class="verdict-title">{{ prediction }}</div>
+                        <div class="meta-stats">
+                            <div class="meta-item">
+                                <span class="meta-label">Confidence:</span>
+                                <span class="meta-val">{{ confidence }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Spam Probability:</span>
+                                <span class="meta-val">{{ spam_prob }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nlp-note">
+                        <p><strong>Heuristic Check:</strong> Spam tokens are scored using Laplace-smoothed log-likelihood ratios. High-frequency trigger tokens (e.g. <em>win, cash, prize, free, claim</em>) rapidly shift posterior odds toward spam classification.</p>
+                    </div>
+                {% else %}
+                    <div class="placeholder-box">
+                        <div class="icon">🛡️</div>
+                        <p>Paste any suspicious email or SMS text into the left field to check its classification, probability breakdown, and Bayesian risk score.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadSample(type) {
+            const textarea = document.getElementById('message');
+            if (type === 1) {
+                textarea.value = "URGENT! We are trying to contact you regarding your unclaimed $1000 cash reward. Call 08000930705 NOW to claim your prize! T&C apply.";
+            } else {
+                textarea.value = "Hi professor, I have uploaded the completed lab report for Project 4 on GitHub. Could you please review it when you get a chance?";
+            }
+        }
+    </script>
+</body>
+</html>

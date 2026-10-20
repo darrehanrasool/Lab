@@ -110,6 +110,18 @@ def main():
     plt.savefig('reports/figures/cross_validation.png')
     plt.close()
 
+    # Feature Importance Plot
+    if hasattr(model, 'feature_importances_'):
+        feature_names = [c for c in X_train.columns if c != 'MEDV']
+        importances = pd.Series(model.feature_importances_, index=feature_names).sort_values(ascending=True)
+        plt.figure(figsize=(10, 8))
+        importances.plot(kind='barh', color='steelblue')
+        plt.title('Random Forest Feature Importances (MDI)')
+        plt.xlabel('Importance')
+        plt.tight_layout()
+        plt.savefig('reports/figures/feature_importances.png')
+        plt.close()
+
     print("SUCCESS! All graphs generated in 'reports/figures/' folder.")
 
 if __name__ == '__main__':

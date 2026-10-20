@@ -1,0 +1,17 @@
+Movie Recommendation System Model Performance
+===================================================
+Algorithm: Latent Matrix Factorization via TruncatedSVD & Cosine Similarity
+Latent Components (k): 20
+Cumulative Explained Variance: 0.3115 (31.15%)
+
+Evaluated Test Ratings (Observed Pairs): 9731
+  - Root Mean Squared Error (RMSE): 2.8146
+  - Mean Absolute Error (MAE):       2.6068
+  - Mean Observed Rating:           3.64
+  - Mean Predicted Rating:          1.04
+
+Latent Space Characteristics:
+  - Total Catalog Movies Factorized: 1223
+  - Total Active Users:              610
+  - Movie Latent Representation:     (1223, 20)
+  - User Latent Representation:      (610, 20)
