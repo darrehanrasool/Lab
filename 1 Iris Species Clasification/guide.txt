@@ -1,0 +1,22 @@
+Project 1: Iris Flower Classification
+=====================================
+Quick-Start Pipeline Commands:
+
+1. Download and save raw data:
+   python src/data/make_dataset.py
+
+2. Build train/val/test splits and feature scalers:
+   python src/features/build_features.py
+
+3. Train model, run cross-validation and save metrics:
+   python src/models/train_model.py
+
+4. Generate all figures:
+   python src/visualization/visualize.py
+
+5. Run sample command line prediction:
+   python src/models/predict_model.py
+
+6. Launch web interface:
+   python web/app.py
+   Open browser at http://127.0.0.1:5000
