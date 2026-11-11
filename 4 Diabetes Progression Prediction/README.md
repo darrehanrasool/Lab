@@ -86,11 +86,14 @@ The dataset consists of 442 diabetes patients, recorded by Efron et al. (2004):
    python src/models/train_model.py
    python src/visualization/visualize.py
    ```
-5. Launch the web application:
+5. Launch the interactive clinical web dashboard:
    ```bash
    python web/app.py
    ```
    Open `http://127.0.0.1:5003` in your browser.
+   - **Audio-Visual Triage Beacon:** Green light with harmonic chime for stable progression ($< 150$); Pulsing red alert with diagnostic double-beep alarm for high-risk acceleration ($\ge 150$).
+   - **KaTeX Mathematical Rendering:** Crisp vector math for Random Forest ensemble equations and interaction features.
+   - **Personalized Clinical Care Plan:** Tailored lifestyle prescriptions across Nutrition, Physical Conditioning, and Clinical Pharmacotherapy.
 
 ---
 
@@ -109,37 +112,49 @@ The dataset consists of 442 diabetes patients, recorded by Efron et al. (2004):
 
 All figures are automatically generated and saved in `reports/figures/`:
 
-### 1. Feature Distributions
-KDE and histogram distributions across patient age, BMI, blood pressure, lipid panels (s1, s5), and disease progression.
-![Feature Distributions](reports/figures/feature_distributions.png)
+### 1. Target Disease Progression Distribution
+KDE and histogram depicting disease progression (scale: 25 - 346) with clinical risk triage zones (Mild, Moderate, Severe).
+![Target Distribution](reports/figures/01_target_progression_distribution.png)
 
-### 2. Pairwise Relationships
-Pairplot demonstrating positive correlations between BMI, Serum Triglycerides ($s5$), and Diabetes Progression.
-![Pairplot](reports/figures/pairplot.png)
+### 2. Clinical Feature Distributions
+Distributions of authentic unscaled physiological vitals (Age in years, BMI in kg/m², BP in mmHg, Lipids, Glucose in mg/dL).
+![Feature Distributions](reports/figures/02_clinical_feature_distributions.png)
 
-### 3. Correlation Heatmap
-Pearson correlation matrix identifying multicollinearity among blood serum measurements ($s1$–$s6$) and clinical drivers of progression.
-![Correlation Heatmap](reports/figures/heatmap.png)
+### 3. Correlation Heatmap & Multicollinearity
+Pearson correlation matrix identifying multicollinearity among blood serum measurements ($S_1$ vs $S_2$, $r = 0.897$).
+![Correlation Heatmap](reports/figures/03_correlation_heatmap_multicollinearity.png)
 
-### 4. Actual vs Predicted Values
+### 4. Primary Physiological Driver: BMI vs Progression
+Joint regression plot showing the strong positive relationship between Body Mass Index and 1-year progression ($r = +0.59$).
+![BMI vs Progression](reports/figures/04_bmi_vs_progression_jointplot.png)
+
+### 5. Pairwise Biomarker Interactions
+Pairplot demonstrating clustering across clinical risk severity groups.
+![Pairplot](reports/figures/05_pairplot_key_biomarkers.png)
+
+### 6. Actual vs Predicted Values
 Scatter plot of actual patient progression versus model predictions, with red dashed diagonal line ($y = x$) representing perfect predictions.
-![Actual vs Predicted](reports/figures/actual_vs_predicted.png)
+![Actual vs Predicted](reports/figures/06_actual_vs_predicted_regression.png)
 
-### 5. Residual Plot
-Residuals ($y - \hat{y}$) plotted against predicted progression verifying homoscedasticity and absence of non-linear bias.
-![Residual Plot](reports/figures/residual_plot.png)
+### 7. Residual Diagnostics
+Residuals ($y - \hat{y}$) plotted against predicted progression and Normal Q-Q plot verifying homoscedasticity.
+![Residual Plot](reports/figures/07_residual_diagnostics_homoscedasticity.png)
 
-### 6. Learning Curve
-Diagnostic curve depicting training vs cross-validation $R^2$ scores across increasing training sample sizes to assess bias and variance.
-![Learning Curve](reports/figures/learning_curve.png)
+### 8. Learning Curve
+Diagnostic curve depicting training vs cross-validation $R^2$ scores across increasing training sample sizes.
+![Learning Curve](reports/figures/08_learning_curve_bias_variance.png)
 
-### 7. Cross-Validation Scores
-Bar chart of 5-fold cross-validation showing stability and generalization across distinct patient splits.
-![Cross Validation](reports/figures/cross_validation.png)
+### 9. Cross-Validation Scores
+Bar chart of 5-fold cross-validation showing stability across distinct patient splits.
+![Cross Validation](reports/figures/09_cross_validation_5fold_stability.png)
 
-### 8. Feature Importances
-Random Forest Mean Decrease in Impurity (MDI) ranking, verifying Body Mass Index (BMI) and Log Serum Triglycerides ($s5$) as the dominant prognostic markers.
-![Feature Importances](reports/figures/feature_importances.png)
+### 10. Feature Importances
+Random Forest Mean Decrease in Impurity (MDI) ranking, verifying BMI, Log Triglycerides, and enriched features.
+![Feature Importances](reports/figures/10_feature_importances_ranking.png)
+
+### 11. Dual Diagnostic: Clinical Risk Confusion Matrix
+Confusion matrix for binary clinical triage ($y \ge 150$) showing 82.2% Accuracy and 78.3% Sensitivity.
+![Confusion Matrix](reports/figures/11_clinical_risk_confusion_matrix.png)
 
 ---
 

@@ -1,18 +1,35 @@
-Diabetes Progression Prediction Model Performance
-===================================================
-Algorithm: Random Forest Regressor (n_estimators=100, max_depth=6)
+Diabetes Progression Prediction Performance Report
+======================================================
+Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
+Dataset: 442 Diabetes Patients • Split: 70% Train (309), 20% Val (88), 10% Test (45)
 
-Validation Set Metrics:
-  - R² Score: 0.4707
-  - Mean Squared Error (MSE): 2706.5224
-  - Root Mean Squared Error (RMSE): 52.0242
+1. REGRESSION BENCHMARK COMPARISON ON TEST SET (N=45):
+---------------------------------------------------------------------------------------------------
+Algorithm                                Test R²     Test RMSE     Test MAE     Mean 5-Fold CV R²
+---------------------------------------------------------------------------------------------------
+Multiple Linear Regression (OLS)          0.4079      58.88         49.72        0.4536 (±0.1311)
+Ridge Regression (L2, alpha=1.0)          0.3906      59.74         50.42        0.4562 (±0.1253)
+Linear Support Vector Regression (SVR)    0.3312      62.58         52.42        0.4501 (±0.0992)
+Random Forest Regressor (max_depth=5)     0.4227      58.14         48.67        0.4206 (±0.1741)
+---------------------------------------------------------------------------------------------------
 
-Test Set Metrics:
-  - R² Score: 0.4871
-  - Mean Squared Error (MSE): 2912.0097
-  - Root Mean Squared Error (RMSE): 53.9630
-  - Mean Absolute Error (MAE): 45.5805
+Primary Model Selected for Serving: Random Forest Regressor (max_depth=5)
+  - Test R² Score: 0.4227
+  - Test RMSE:     58.14
+  - Test MAE:      48.67
 
-5-Fold Cross-Validation (R² on Training Set):
-  - Fold Scores: [np.float64(0.4755), np.float64(0.0298), np.float64(0.5167), np.float64(0.5848), np.float64(0.4018)]
-  - Mean R²: 0.4017 (+/- 0.1952)
+2. DUAL CLINICAL RISK CLASSIFICATION (High Risk >= 150 vs Controlled < 150):
+---------------------------------------------------------------------------------------------------
+  - Clinical Accuracy:   82.22%
+  - Clinical Sensitivity: 78.26% (High-risk patients correctly identified)
+  - Clinical Specificity: 86.36% (Controlled patients correctly cleared)
+  - Clinical Precision:   85.71%
+  - Clinical F1-Score:    0.8182
+  - Confusion Matrix:
+      [TN=19  FP= 3]
+      [FN= 5  TP=18]
+
+3. 5-FOLD CROSS-VALIDATION BREAKDOWN (Random Forest Regressor (max_depth=5)):
+---------------------------------------------------------------------------------------------------
+  - Fold Scores: [np.float64(0.5111), np.float64(0.1132), np.float64(0.5688), np.float64(0.5658), np.float64(0.3443)]
+  - Mean R²:     0.4206 (+/- 0.1741)

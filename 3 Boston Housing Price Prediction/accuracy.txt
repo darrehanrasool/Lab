@@ -1,2 +1,22 @@
-R2 Score: 0.8271
-Mean Squared Error: 13.7420
+Boston Housing Price Prediction Performance
+==============================================
+Algorithms: Multiple Linear Regression (OLS) & Linear SVR (No Kernels, No Regularization)
+
+Simple Linear Regression (RM -> MEDV):
+  - R2 Score: 0.4288
+  - MSE:      58.7166
+
+Multiple Linear Regression (OLS - All 13 Features):
+  - Validation R2:   0.7079
+  - Validation MSE:  17.5397
+  - Test R2 Score:   0.7140 (71.40% Variance Explained)
+  - Test MSE:        29.3949
+  - Test RMSE:       $5,421.71
+  - Test MAE:        $3,390.46
+
+Linear Support Vector Regression (Linear SVR, C=1.0, eps=0.2):
+  - Test R2 Score:   0.6634
+  - Test MSE:        34.6027
+
+5-Fold Cross-Validation (R2 on Training Set):
+  - Mean CV R2:      0.6880 (+/- 0.1860)

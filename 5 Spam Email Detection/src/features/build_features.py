@@ -24,12 +24,13 @@ def main():
     X = df['clean_message']
     y = df['label_num']
     
-    # 70% Train, 15% Val, 15% Test with stratification
+    # 70% Train, 20% Val, 10% Test with stratification (Professor Requirement: 70/20/10)
     X_train_text, X_temp_text, y_train, y_temp = train_test_split(
         X, y, test_size=0.30, random_state=42, stratify=y
     )
+    # Out of 30% temp: 2/3 (20% of total) goes to Validation, 1/3 (10% of total) goes to Test
     X_val_text, X_test_text, y_val, y_test = train_test_split(
-        X_temp_text, y_temp, test_size=0.50, random_state=42, stratify=y_temp
+        X_temp_text, y_temp, test_size=(1.0 / 3.0), random_state=42, stratify=y_temp
     )
     
     # Fit TF-IDF Vectorizer ONLY on training set

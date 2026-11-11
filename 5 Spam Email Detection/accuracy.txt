@@ -1,29 +1,38 @@
-Spam Email Detection Model Performance
-========================================
-Algorithm: Multinomial Naive Bayes (alpha=0.1) with TF-IDF Vectorizer (3,000 features, n-grams=(1,2))
+Spam Email Detection Model Performance (Syllabus: Naive Bayes, Logistic Regression, Linear SVM)
+=============================================================================================
+Dataset Imbalance: 86.6% Ham (Legitimate) vs 13.4% Spam (70/20/10 Split)
 
-Validation Set Metrics:
-  - Accuracy: 0.9785
-  - F1 Score: 0.9143
+1. Multinomial Naive Bayes (Laplace alpha=0.1):
+   - Validation Accuracy: 0.9811 | Validation F1: 0.9263
+   - Test Accuracy:       0.9785 (97.85%)
+   - Test Precision:      0.9701
+   - Test Recall:         0.8667
+   - Test F1-Score:       0.9155
+   - ROC-AUC:             0.9834
 
-Test Set Evaluation:
-  - Accuracy: 0.9821 (98.21%)
-  - Precision: 0.9619
-  - Recall: 0.9018
-  - F1-Score: 0.9309
-  - ROC-AUC: 0.9865
+2. Logistic Regression (Sigmoid Link, Log-Loss):
+   - Test Accuracy:       0.9659 (96.59%)
+   - Test Precision:      1.0000
+   - Test Recall:         0.7467
+   - Test F1-Score:       0.8550
 
-Detailed Classification Report:
+3. Linear Support Vector Machine (Linear SVC, C=1.0, No Kernels):
+   - Test Accuracy:       0.9803 (98.03%)
+   - Test Precision:      0.9706
+   - Test Recall:         0.8800
+   - Test F1-Score:       0.9231
+
+Detailed Classification Report (Multinomial Naive Bayes):
                   precision    recall  f1-score   support
 
-Ham (Legitimate)       0.98      0.99      0.99       724
-            Spam       0.96      0.90      0.93       112
+Ham (Legitimate)       0.98      1.00      0.99       483
+            Spam       0.97      0.87      0.92        75
 
-        accuracy                           0.98       836
-       macro avg       0.97      0.95      0.96       836
-    weighted avg       0.98      0.98      0.98       836
+        accuracy                           0.98       558
+       macro avg       0.97      0.93      0.95       558
+    weighted avg       0.98      0.98      0.98       558
 
 
 5-Fold Cross-Validation (F1-Score on Training Data):
   - Fold Scores: [np.float64(0.9261), np.float64(0.9463), np.float64(0.8932), np.float64(0.9307), np.float64(0.9458)]
-  - Mean F1: 0.9284 (+/- 0.0194)
+  - Mean F1:     0.9284 (+/- 0.0194)

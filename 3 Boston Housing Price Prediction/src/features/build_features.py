@@ -10,12 +10,13 @@ def main():
     X = df.drop('MEDV', axis=1)
     y = df['MEDV']
     
-    # 70% train, 15% val, 15% test
+    # 70% train, 20% val, 10% test (Professor Requirement: 70/20/10)
     X_train, X_temp, y_train, y_temp = train_test_split(
         X, y, test_size=0.30, random_state=42
     )
+    # Out of 30% temp: 2/3 (20% of total) goes to Validation, 1/3 (10% of total) goes to Test
     X_val, X_test, y_val, y_test = train_test_split(
-        X_temp, y_temp, test_size=0.50, random_state=42
+        X_temp, y_temp, test_size=(1.0 / 3.0), random_state=42
     )
     
     scaler = StandardScaler()

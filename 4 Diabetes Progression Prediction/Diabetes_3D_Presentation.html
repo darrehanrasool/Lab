@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Diabetes Progression: ML Pipeline Defense</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg: #f4f7ff;
+            --card: rgba(255, 255, 255, .95);
+            --tx: #0f172a;
+            --mu: #475569;
+            --bd: rgba(15, 23, 42, .10);
+            --fm: #f1f5ff;
+            --sh: rgba(30, 41, 90, .28);
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        :root[data-theme=dark] {
+            --bg: #0b1020;
+            --card: rgba(20, 27, 50, .94);
+            --tx: #f1f5f9;
+            --mu: #a9b6cc;
+            --bd: rgba(255, 255, 255, .12);
+            --fm: rgba(255, 255, 255, .06);
+            --sh: rgba(0, 0, 0, .6)
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0
+        }
+
+        html,
+        body {
+            height: 100%;
+            color: var(--tx);
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+            overflow: hidden
+        }
+
+        body {
+            background: radial-gradient(1200px 700px at 15% 10%, rgba(99, 102, 241, .18), transparent 60%), radial-gradient(1000px 700px at 90% 90%, rgba(236, 72, 153, .14), transparent 60%), var(--bg)
+        }
+
+        #bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0
+        }
+
+        #app {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: .9rem 1.6rem
+        }
+
+        #steps {
+            display: flex;
+            gap: .35rem;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .st {
+            font-size: clamp(9px, .9vw, 13px);
+            font-weight: 600;
+            padding: .28rem .7rem;
+            border-radius: 99px;
+            background: var(--card);
+            border: 1px solid var(--bd);
+            color: var(--mu);
+            transition: .4s
+        }
+
+        .st.on {
+            color: #fff;
+            background: var(--c);
+            border-color: var(--c);
+            box-shadow: 0 8px 22px -6px var(--c);
+            transform: translateY(-3px) scale(1.08)
+        }
+
+        #stage {
+            flex: 1;
+            position: relative;
+            perspective: 1600px;
+            margin: .8rem 0
+        }
+
+        .sl {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateZ(-600px) rotateY(50deg);
+            transition: all .9s cubic-bezier(.2, .8, .2, 1);
+            transform-style: preserve-3d
+        }
+
+        .sl.on {
+            opacity: 1;
+            pointer-events: auto;
+            transform: none
+        }
+
+        .sl.pv {
+            transform: translateZ(-600px) rotateY(-50deg)
+        }
+
+        .cd {
+            margin: auto;
+            width: min(1180px, 100%);
+            max-height: 100%;
+            overflow: auto;
+            background: var(--card);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--bd);
+            border-top: 7px solid var(--c);
+            border-radius: 28px;
+            padding: clamp(1rem, 2.4vw, 2.2rem);
+            box-shadow: 0 45px 90px -35px var(--sh), 0 0 0 1px rgba(255, 255, 255, .4) inset;
+            font-size: clamp(13px, 1.3vw, 19px);
+            line-height: 1.5;
+            transition: transform .25s
+        }
+
+        .tg {
+            display: inline-block;
+            font-size: .58em;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: #fff;
+            background: var(--c);
+            padding: .25rem .8rem;
+            border-radius: 99px;
+            margin-bottom: .7rem
+        }
+
+        h2 {
+            font-size: 1.85em;
+            line-height: 1.15;
+            margin-bottom: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -.01em
+        }
+
+        h2:after {
+            content: "";
+            display: block;
+            width: 72px;
+            height: 5px;
+            border-radius: 9px;
+            background: var(--c);
+            margin-top: .5rem
+        }
+
+        .gr {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 1.6rem
+        }
+
+        @media(max-width:800px) {
+            .gr {
+                grid-template-columns: 1fr
+            }
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            counter-reset: n
+        }
+
+        li {
+            padding: .5rem 0 .5rem 2.2rem;
+            position: relative;
+            counter-increment: n
+        }
+
+        li:before {
+            content: counter(n);
+            position: absolute;
+            left: 0;
+            top: .55em;
+            width: 1.5em;
+            height: 1.5em;
+            border-radius: 50%;
+            background: var(--c);
+            color: #fff;
+            font-size: .72em;
+            font-weight: 700;
+            display: grid;
+            place-items: center
+        }
+
+        .fm {
+            font-family: Cambria, "Times New Roman", serif;
+            font-size: 1.1em;
+            background: var(--fm);
+            border: 1px solid var(--bd);
+            border-left: 5px solid var(--c);
+            border-radius: 14px;
+            padding: .7rem 1rem;
+            margin-bottom: .65rem;
+            animation: up .6s both
+        }
+
+        .fm i {
+            font-style: italic
+        }
+
+        .sy {
+            margin-top: 1rem;
+            padding: .8rem 1.1rem;
+            border-radius: 16px;
+            background: color-mix(in srgb, var(--c) 12%, transparent);
+            border-left: 6px solid var(--c);
+            color: var(--tx);
+            font-size: .92em
+        }
+
+        .sy b {
+            color: var(--c)
+        }
+
+        .pp {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: .8rem;
+            margin: .8rem 0;
+            perspective: 900px
+        }
+
+        .nd {
+            padding: .8rem;
+            border-radius: 18px;
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-bottom: 5px solid var(--c);
+            box-shadow: 0 14px 30px -18px var(--sh);
+            transform: rotateX(14deg);
+            animation: pl 6s infinite both;
+            animation-delay: calc(var(--i)*.5s)
+        }
+
+        .nd b {
+            display: block;
+            color: var(--c)
+        }
+
+        .nd span {
+            font-size: .8em;
+            color: var(--mu)
+        }
+
+        @keyframes pl {
+
+            0%,
+            18%,
+            100% {
+                transform: rotateX(14deg)
+            }
+
+            6% {
+                transform: rotateX(0) translateZ(50px) scale(1.07);
+                box-shadow: 0 26px 40px -14px var(--c)
+            }
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: .6rem;
+            font-size: .85em;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--bd)
+        }
+
+        th {
+            background: var(--c);
+            color: #fff
+        }
+
+        th,
+        td {
+            padding: .55rem;
+            border-bottom: 1px solid var(--bd);
+            text-align: center
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 14px;
+            padding: 1rem;
+            font-size: .62em;
+            overflow: auto;
+            line-height: 1.5
+        }
+
+        .bar {
+            display: flex;
+            height: 2.6rem;
+            border-radius: 14px;
+            overflow: hidden;
+            margin: .7rem 0;
+            font-size: .7em;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .bar div {
+            display: grid;
+            place-items: center;
+            transform-origin: left;
+            animation: gw 1.2s both
+        }
+
+        @keyframes gw {
+            from {
+                transform: scaleX(0)
+            }
+        }
+
+        #ft {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--mu);
+            font-size: .9rem;
+            font-weight: 600
+        }
+
+        button {
+            background: var(--card);
+            color: var(--tx);
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            padding: .5rem 1.1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 8px 18px -12px var(--sh)
+        }
+
+        button:hover {
+            background: var(--c, #6366f1);
+            color: #fff
+        }
+
+        .big {
+            font-size: 1.25em
+        }
+
+        .ttl h2 {
+            font-size: 2.9em
+        }
+
+        .vz {
+            margin: .9rem 0 .2rem;
+            padding: .8rem 1rem;
+            border-radius: 16px;
+            background: var(--fm);
+            border: 1px solid var(--bd)
+        }
+
+        .vz small {
+            display: block;
+            color: var(--mu);
+            margin-top: .4rem;
+            font-size: .8em
+        }
+
+        .eu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .8rem;
+            margin-top: .9rem
+        }
+
+        @media(max-width:800px) {
+            .eu {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .eu>div {
+            padding: .7rem .9rem;
+            border-radius: 14px;
+            border: 1px solid var(--bd);
+            font-size: .93em
+        }
+
+        .eu b {
+            display: block;
+            font-size: .65em;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--c);
+            margin-bottom: .15rem
+        }
+
+        .ex {
+            background: color-mix(in srgb, #f59e0b 13%, transparent)
+        }
+
+        .us {
+            background: color-mix(in srgb, #22c55e 13%, transparent)
+        }
+
+        .hb {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin: .35rem 0;
+            font-size: .85em
+        }
+
+        .hb span {
+            width: 11em;
+            flex: none
+        }
+
+        .hb div {
+            flex: 1;
+            height: 14px;
+            border-radius: 9px;
+            background: var(--bd);
+            position: relative;
+            overflow: hidden
+        }
+
+        .hb u {
+            display: block;
+            height: 100%;
+            background: var(--c);
+            border-radius: 9px;
+            transition: width .3s;
+            animation: gw 1s both;
+            transform-origin: left
+        }
+
+        .hb em {
+            width: 7em;
+            font-style: normal;
+            font-weight: 700
+        }
+
+        .c2 u {
+            position: absolute;
+            top: 0
+        }
+
+        .c2:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--mu)
+        }
+
+        .gb {
+            position: relative;
+            height: 20px;
+            border-radius: 12px;
+            margin: .9rem 0 .3rem;
+            background: linear-gradient(90deg, #22c55e, #f59e0b 55%, #ef4444)
+        }
+
+        .gb i {
+            position: absolute;
+            top: -6px;
+            bottom: -6px;
+            width: 3px;
+            background: var(--tx)
+        }
+
+        .gb em {
+            position: absolute;
+            top: -1.7em;
+            transform: translateX(-50%);
+            font-style: normal;
+            font-weight: 800;
+            background: var(--c);
+            color: #fff;
+            padding: 0 .5em;
+            border-radius: 8px;
+            font-size: .85em
+        }
+
+        .gl {
+            display: flex;
+            justify-content: space-between;
+            font-size: .75em;
+            color: var(--mu)
+        }
+
+        .seg {
+            display: flex;
+            height: 2.4rem;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: .5rem 0;
+            color: #fff;
+            font-weight: 700;
+            font-size: .78em
+        }
+
+        .seg div {
+            display: grid;
+            place-items: center
+        }
+
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
+
+        .vb {
+            display: flex;
+            gap: .7rem;
+            align-items: flex-end;
+            margin-top: .6rem;
+            min-height: 110px
+        }
+
+        .vb>div {
+            text-align: center;
+            font-size: .75em
+        }
+
+        .vb u {
+            display: block;
+            width: 46px;
+            margin: 0 auto .2rem;
+            background: var(--c);
+            border-radius: 8px 8px 0 0;
+            animation: grow .9s both;
+            transform-origin: bottom
+        }
+
+        .vb .avg u {
+            background: #22c55e
+        }
+
+        @keyframes grow {
+            from {
+                transform: scaleY(0)
+            }
+        }
+
+        .cmx {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 4px;
+            margin-top: .5rem;
+            text-align: center;
+            font-size: .8em
+        }
+
+        .cmx i {
+            font-style: normal;
+            font-weight: 700;
+            padding: .4rem;
+            background: var(--bd);
+            border-radius: 8px
+        }
+
+        .cmx u {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 800;
+            padding: .7rem .3rem;
+            border-radius: 8px
+        }
+    </style>
+</head>
+
+<body><canvas id="bg"></canvas>
+    <div id="app">
+        <div id="steps"></div>
+        <div id="stage"></div>
+        <div id="ft"><button id="pv">← Prev</button><span id="ct"></span><button id="th">◐ Theme</button><button
+                id="nx">Next →</button></div>
+    </div>
+    <script>
+        const D = { "stages": ["Problem", "Data", "Explore", "Clean", "Features", "Split", "Scale", "Train", "Validate", "Test", "Deploy"], "slides": [{ "k": "title", "st": 0, "sp": "Both", "t": "Diabetes Progression Prediction", "plain": ["End-to-end Machine Learning pipeline", "M.Tech AI · CAI504C Machine Learning Lab · Experiment 4 · IUST Kashmir", "Speaker 1: Data Engineering · Speaker 2: Modeling & Deployment", "Techniques: OLS · Ridge · Linear SVR · Random Forest"], "math": [], "say": "Press → to start. Problem first, then every pipeline step with its maths.", "c": "#f43f5e", "n": 1 }, { "st": 0, "sp": "Speaker 1", "t": "The Problem: Who will get worse fastest?", "plain": ["A doctor sees 10 basic numbers per diabetic patient: age, sex, BMI, blood pressure and 6 blood tests.", "Some patients stay stable. Others deteriorate within 12 months (kidney, eye, nerve damage).", "Predict too <b>low</b> → treatment is delayed, damage may be irreversible. Most dangerous.", "Predict too <b>high</b> → stable patient may get medicine they do not need."], "math": ["Input: <i>x</i> = [age, sex, bmi, bp, s1 … s6]", "Output: <i>y</i> = progression score (25 to 346)", "Goal: <i>f</i>(<i>x</i>) ≈ <i>y</i>, minimise MSE = (1/<i>N</i>) Σ(<i>y</i> − <i>f</i>(<i>x</i>))²", "Extra rule: score ≥ 150 → High-Risk, else Controlled"], "say": "<b>Supervised regression</b> (answer is a number) plus a <b>triage threshold</b>. One model, two outputs.", "c": "#f43f5e", "n": 2, "ex": "Patient: age 59, BMI 32.1, BP 101 … → model says <b>196</b>. That is above 150, so the patient is flagged for early treatment.", "use": "Helping doctors decide who needs closer follow-up first.", "vz": "gauge" }, { "k": "pipe", "st": 0, "sp": "Speaker 1", "t": "The ML Pipeline: our roadmap", "plain": ["A pipeline is a fixed chain of steps. Each step feeds the next.", "<b>Four techniques, each with a job:</b> OLS = baseline. Ridge = fixes unstable weights. Linear SVR = robust to outliers. Random Forest = captures non-linear effects.", "The stage bar at the top shows where we are on every slide."], "math": [], "say": "Linear models first, then a non-linear one, so we can see whether complexity actually helps.", "c": "#f43f5e", "n": 3, "ex": "Like cooking: buy ingredients (data), wash (clean), chop (features), cook (train), taste (test), serve (web app).", "use": "Shows the order of work so no step is skipped.", "vz": null }, { "st": 1, "sp": "Speaker 1", "t": "Step 1: The Dataset", "plain": ["Efron, Hastie, Johnstone, Tibshirani (2004): 442 diabetes patients followed for 1 year.", "We use <b>real medical units</b> (age in years, BMI in kg/m², BP in mmHg, blood tests in mg/dL), not pre-scaled decimals.", "Why this data? Real clinical data, small and fast, has collinear features (needs Ridge) and non-linear effects (needs Forest).", "Raw file is <b>read-only</b>. We check shape (442, 11) and zero nulls."], "math": ["<i>N</i> = 442, <i>p</i> = 10 (13 after enrichment)", "Target mean 152.13, std 77.09"], "say": "Read-only raw data means no later bug can destroy the original evidence.", "c": "#38bdf8", "n": 4, "ex": "One row = one patient: age, sex, BMI, BP, six blood tests, and the known progression score.", "use": "Gives the model solved examples to learn from.", "vz": null }, { "st": 2, "sp": "Speaker 1", "t": "Step 2: Explore the Data (EDA)", "plain": ["Mean 152.1 is above median 140.5: a few very sick patients pull the average up (mild right skew).", "Distribution is one hill, no artificial cap. Regression is appropriate.", "<b>Imbalance?</b> At the 150 threshold: 238 Controlled (53.85%) and 204 High-Risk (46.15%). Almost 1:1, so no oversampling.", "Zones: Mild 25 to 100, Moderate 100 to 200, Severe above 200."], "math": ["Q1 = 87.0, Q3 = 211.5, IQR = 124.5", "Skewness = +0.44"], "say": "EDA means: look first, model later.", "c": "#a855f7", "n": 5, "ex": "Mean 152 vs median 140: a few very sick patients drag the average up, like one billionaire raising a town's average income.", "use": "Spotting skew and class balance before choosing a model.", "vz": "eda" }, { "st": 2, "sp": "Speaker 1", "t": "Step 3: Multicollinearity in Blood Fats", "plain": ["S1 (total cholesterol) and S2 (LDL) have <b>r = +0.897</b>. They carry almost the same information.", "OLS cannot decide who deserves the credit, so their weights become huge and opposite.", "Predictions stay fine. Interpretation and stability suffer.", "Remedies in this project: <b>Ridge</b> and <b>Random Forest</b>."], "math": ["<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>", "Var(<i>ŵ</i>) = σ²(<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup> → very large when S1 ≈ S2", "Also: r(S3, S4) = −0.738, r(S1, S4) = +0.542"], "say": "Two friends shouting the same advice: you cannot tell who is responsible.", "c": "#a855f7", "n": 6, "ex": "LDL is most of total cholesterol, so knowing S1 already tells you most of S2.", "use": "Deciding to use Ridge and Random Forest.", "vz": "mc" }, { "st": 3, "sp": "Speaker 1", "t": "Step 4: Clean and Validate", "plain": ["0 missing values in all 11 columns.", "Assertions stop the program if a value is physically impossible.", "The same bounds are reused later by the web app."], "math": ["BMI 18.5 ≤ BMI ≤ 60 (observed 18.5 to 42.2)", "BP ∈ [62, 133] mmHg · Glucose ∈ [58, 124], never 0", "Sex ∈ {1, 2}", "MAP = DBP + ⅓(SBP − DBP)"], "say": "assert df.isnull().sum().sum() == 0", "c": "#10b981", "n": 7, "ex": "BMI = 200 or glucose = 0 is impossible, so the program stops instead of learning from it.", "use": "Protecting the model from bad data.", "vz": null }, { "st": 4, "sp": "Speaker 1", "t": "Step 5: Feature Engineering", "plain": ["A linear model only adds features. It cannot multiply or divide them.", "So we add 3 medical combinations: <b>insulin resistance</b>, <b>artery risk ratio</b>, <b>metabolic syndrome triad</b>.", "Total: 10 original + 3 new = <b>13 features</b>."], "math": ["insulin_res_proxy = BMI × S6 (r = +0.59)", "atherogenic_ratio = S2 / (S3 + 10<sup>−5</sup>)", "metabolic_risk_triad = (BMI × BP) / (S3 + 10<sup>−5</sup>)"], "say": "The tiny 10⁻⁵ prevents division by zero.", "c": "#f59e0b", "n": 8, "ex": "BMI 32.1 × glucose 87 = <b>2793</b>. BMI 22 × glucose 80 = <b>1760</b>. The product separates the two patients far more sharply.", "use": "Giving linear models combined clues.", "vz": null }, { "k": "split", "st": 5, "sp": "Speaker 1", "t": "Step 6: Split 70% / 20% / 10%", "plain": ["<b>Train 309:</b> the model learns weights here.", "<b>Validation 88:</b> compare models, tune α, C, ε, depth.", "<b>Test 45:</b> opened once for the final honest score.", "Tuning on the test set would leak information (snooping bias)."], "math": ["DoF = 309 − 13 − 1 = 295", "≈ 24 patients per weight (rule: ≥ 10)", "test_size = 45/133 for the second split"], "say": "Homework (train), mock test (validation), real exam (test).", "c": "#06b6d4", "n": 9, "ex": "309 patients to learn, 88 to compare models, 45 hidden until the very end.", "use": "Honest scoring that is not fooled by tuning.", "vz": null }, { "st": 6, "sp": "Speaker 1", "t": "Step 7: Scaling and Zero Leakage", "plain": ["Columns live on different scales: cholesterol spans 204, log-triglycerides 2.86.", "Ridge and SVR penalise weights, so unscaled columns are treated unfairly.", "<b>X_train_scaled</b> = X_train after z-score using <b>train</b> mean and std.", "Validation and test are transformed with the same train numbers. Never fit on them."], "math": ["<i>z</i> = (<i>x</i> − μ<sub>train</sub>) / σ<sub>train</sub>", "Ridge penalty: α Σ <i>w</i><sub>j</sub>²", "SVR penalty: ½‖<i>w</i>‖²"], "say": "fit_transform on train. transform only on val and test. Forest does not need scaling.", "c": "#ec4899", "n": 10, "ex": "Age 59, train mean 48.5, std 13 → z = (59 − 48.5)/13 = <b>+0.81</b>, about 0.8 standard deviations above average.", "use": "Fair penalties in Ridge and SVR; one common ruler for all columns.", "vz": "sc" }, { "st": 7, "sp": "Speaker 2", "t": "Model 1: OLS (Multiple Linear Regression)", "plain": ["The baseline: one flat surface through all 13 features.", "Choose weights that make squared errors smallest.", "Slope of cost = 0 gives one exact formula, the Normal Equation.", "Test R² 0.4079 · RMSE 58.88 · CV 0.4536 ± 0.1311."], "math": ["<i>J</i>(<i>w</i>) = (1/2<i>N</i>)(<i>y</i> − <i>Xw</i>)<sup>T</sup>(<i>y</i> − <i>Xw</i>)", "∇<i>J</i> = (1/<i>N</i>)(−<i>X</i><sup>T</sup><i>y</i> + <i>X</i><sup>T</sup><i>Xw</i>) = 0", "<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>"], "say": "Why not gradient descent? Only 14 weights, so the exact answer is instant.", "c": "#8b5cf6", "n": 11, "ex": "Points (1,2), (2,3), (3,5): slope = 3/2 = <b>1.5</b>, intercept = 0.33, so at x = 4 the line predicts <b>6.33</b>.", "use": "The baseline: each weight says how much one feature moves the score. Easy to explain to a doctor.", "vz": "ols" }, { "st": 7, "sp": "Speaker 2", "t": "Model 2: Ridge Regression", "plain": ["OLS with a leash on the weights.", "The penalty α keeps S1 and S2 weights moderate and stable.", "α = 1.0, chosen on the validation set.", "Test R² 0.3906 · Validation 0.5164 · CV 0.4562 ± 0.1253."], "math": ["<i>J</i><sub>Ridge</sub> = (1/2<i>N</i>)‖<i>y</i> − <i>Xw</i>‖² + (α/2)‖<i>w</i>‖²", "<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i> + α<i>I</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>", "Eigenvalues become λ + α, so det &gt; 0"], "say": "Adding αI lifts every eigenvalue, so the matrix is always invertible.", "c": "#8b5cf6", "n": 12, "ex": "Without Ridge: S1 = +9 and S2 = −8 cancel each other. With a larger α both shrink to small stable values (move the slider).", "use": "Stable weights when features are correlated.", "vz": "ridge" }, { "st": 7, "sp": "Speaker 2", "t": "Model 3: Linear SVR", "plain": ["Errors smaller than ε cost nothing (the tube).", "Outside the tube, penalty grows <b>linearly</b>, not squared. Outliers pull less.", "C = 10 (strictness), ε = 5, linear kernel only.", "Test R² 0.3312 · Validation 0.4947 · CV 0.4501 ± 0.0992 (most stable)."], "math": ["<i>L</i><sub>ε</sub> = max(0, |<i>y</i> − ŷ| − ε)", "min ½‖<i>w</i>‖² + <i>C</i> Σ(ξ<sub>i</sub> + ξ<sub>i</sub>*)", "Error 40: SVR loss 35, OLS loss 1600"], "say": "ξ (slack) is how far a point sits outside the tube.", "c": "#8b5cf6", "n": 13, "ex": "ε = 5: error 3 → cost 0, error 12 → cost 7, error 40 → cost 35. OLS would charge 9, 144 and 1600.", "use": "Predictions that a few odd patients cannot drag around (move the ε slider).", "vz": "svr" }, { "st": 7, "sp": "Speaker 2", "t": "Model 4: Random Forest", "plain": ["Many shallow decision trees, each trained on a bootstrap sample, then averaged.", "Trees split on thresholds, so they capture non-linear effects like BMI × glucose.", "100 trees, max_depth 5, min_samples_split 6 to avoid memorising 309 patients.", "Test R² 0.4227 · RMSE 58.14 · MAE 48.67 · CV 0.4206 ± 0.1741."], "math": ["ŷ = (1/<i>B</i>) Σ <i>T</i><sub>b</sub>(<i>x</i>),  <i>B</i> = 100", "ΔH = H(R) − [ |R<sub>L</sub>|/|R| · H(R<sub>L</sub>) + |R<sub>R</sub>|/|R| · H(R<sub>R</sub>) ]", "H(R) = variance of <i>y</i> inside the group"], "say": "Averaging many different trees lowers variance.", "c": "#8b5cf6", "n": 14, "ex": "5 trees predict 180, 150, 210, 170, 190. The forest answer is the average: <b>180</b>.", "use": "Catching patterns like 'BMI high AND glucose high' that straight lines miss.", "vz": "rf" }, { "st": 8, "sp": "Speaker 2", "t": "Step 8: 5-Fold Cross-Validation", "plain": ["Train on 4 parts, test on 1, rotate 5 times.", "Forest fold R²: 0.5111, 0.1132 (noisy), 0.5688, 0.5658, 0.3443.", "The mean is close to test R², so the result is not just a lucky split.", "The learning curve flattens as data grows: low variance, no serious over-fitting."], "math": ["Mean = (0.5111 + 0.1132 + 0.5688 + 0.5658 + 0.3443)/5 = 0.4206", "Std ≈ 0.174"], "say": "CV tells us how stable a model is.", "c": "#22c55e", "n": 15, "ex": "Like 5 mini-exams instead of one. Scores of 0.51, 0.11, 0.57, 0.57, 0.34 show one fold is much harder than the rest.", "use": "Checking stability and choosing settings without touching the test set.", "vz": "cv" }, { "k": "table", "st": 9, "sp": "Speaker 2", "t": "Step 9: Test Results and Clinical Triage", "plain": ["45 unseen patients, opened once.", "<b>Random Forest</b> has the best test R², RMSE and MAE.", "Honest note: gaps between models are smaller than the CV spread. Linear models are comparable.", "R² ≈ 0.4 to 0.5 is the realistic ceiling: lifestyle and genes are not in the data."], "math": ["Triage at 150: Accuracy 82.22% (37/45)", "Sensitivity 78.26% (18/23) · Specificity 86.36% (19/22)", "Precision 85.71% · F1 0.8182", "TN 19 · FP 3 · FN 5 · TP 18"], "table": [["Model", "R²", "RMSE", "MAE", "CV mean"], ["Random Forest", "0.4227", "58.14", "48.67", "0.4206"], ["OLS", "0.4079", "58.88", "49.72", "0.4536"], ["Ridge", "0.3906", "59.74", "50.42", "0.4562"], ["Linear SVR", "0.3312", "62.58", "52.42", "0.4501"]], "say": "Sensitivity matters most: a missed high-risk patient is worse than a false alarm.", "c": "#f97316", "n": 16, "ex": "Of 23 truly high-risk patients we flagged 18 (78%). 5 were missed. Of 22 controlled patients, 3 got a false alarm.", "use": "Choosing which model to deploy and how far to trust it.", "vz": "cm" }, { "k": "code", "st": 9, "sp": "Speaker 1", "t": "Code Walkthrough", "plain": ["Load real-unit data and assert shape and nulls.", "Add the 3 engineered features.", "70/20/10 split, scaler fitted on train only.", "Train Random Forest, score on test, save model and scaler."], "math": [], "code": "df = load_diabetes(scaled=False, as_frame=True).frame\nassert df.shape == (442, 11) and not df.isnull().any().any()\ndf['insulin_res_proxy'] = df['bmi'] * df['s6']\ndf['atherogenic_ratio'] = df['s2'] / (df['s3'] + 1e-5)\nX_tr, X_tmp, y_tr, y_tmp = train_test_split(X, y, test_size=0.30, random_state=42)\nX_val, X_te, y_val, y_te = train_test_split(X_tmp, y_tmp, test_size=45/133, random_state=42)\nsc = StandardScaler()\nX_tr_s = sc.fit_transform(X_tr)   # train only\nX_te_s = sc.transform(X_te)\nrf = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=6, random_state=42)\nrf.fit(X_tr_s, y_tr)\njoblib.dump(rf, 'models/diabetes_model.joblib'); joblib.dump(sc, 'models/scaler.joblib')", "say": "Save the scaler too, or new patients would be scaled differently.", "c": "#f97316", "n": 17, "ex": "fit() learns from train. predict() uses what was learned. The saved scaler travels with the model.", "use": "Making the whole pipeline repeatable.", "vz": null }, { "st": 10, "sp": "Speaker 2", "t": "Step 10: Web App (Flask API)", "plain": ["Request: browser sends 10 numbers as JSON to POST /predict (port 5003).", "Server validates ranges, <b>builds the 3 engineered features</b>, scales with the saved scaler, predicts.", "Response: score, risk tier, and the 150-threshold class.", "About 1.12 ms per request, 800+ per second per worker. Production: Docker + Gunicorn + NGINX."], "math": ["Example: score 196.16 → tier Moderate (100 to 200)", "but ≥ 150 → triage: High Risk", "Tier is display; threshold is the clinical rule"], "say": "Same scaler and same column order in training and production.", "c": "#3b82f6", "n": 18, "ex": "Send BMI 32.1, BP 101 … → server returns 196.16 → High Risk (≥ 150).", "use": "Letting any app or website use the model in about 1 ms.", "vz": "gauge" }, { "st": 10, "sp": "Speaker 2", "t": "Step 11: Monitoring — Drift", "plain": ["<b>Data drift:</b> new patient types, for example teenagers while we trained on ages 19 to 79. Monitor inputs with PSI monthly.", "<b>Concept drift:</b> new drugs (GLP-1, SGLT2) change how risk factors lead to progression. Quarterly audits, retrain on sliding 12-month data."], "math": ["Data drift: P(<i>x</i>) changes", "Concept drift: P(<i>y</i> | <i>x</i>) changes", "PSI = Σ(a − e)·ln(a/e);  &gt; 0.25 = major shift"], "say": "Thank you. Questions?", "c": "#3b82f6", "n": 19, "ex": "A teenage clinic has different glucose levels, so predictions can be wrong without any error message.", "use": "Knowing when the model is getting old and must be retrained.", "vz": null }], "pipe": [["1 Problem", "Predict disease progression"], ["2 Data", "442 patients, 10 inputs"], ["3 Explore", "Target shape, class balance"], ["4 Clean", "Assert nulls and ranges"], ["5 Features", "Add 3 metabolic features"], ["6 Split", "70 / 20 / 10"], ["7 Scale", "Z-score, fit on train only"], ["8 Train", "OLS · Ridge · SVR · Forest"], ["9 Validate", "5-fold CV, tune settings"], ["10 Test", "R², RMSE, triage metrics"], ["11 Deploy", "Flask API + drift watch"]] }, S = D.slides, C = ["#f43f5e", "#38bdf8", "#a855f7", "#10b981", "#f59e0b", "#06b6d4", "#ec4899", "#8b5cf6", "#22c55e", "#f97316", "#3b82f6"];
+        const $ = id => document.getElementById(id); let cur = 0; const VZ = {
+            gauge: () => `<div class="gq"><b>Progression scale</b><div class="gb"><i style="left:${150 / 346 * 100}%"></i><em style="left:${196 / 346 * 100}%">196</em></div><div class="gl"><span>25 mild</span><span>150 = triage line</span><span>346 severe</span></div></div>`,
+            eda: () => `<b>Controlled vs High-Risk patients (threshold 150)</b><div class="seg"><div style="flex:53.85;background:#22c55e">Controlled 238 · 53.85%</div><div style="flex:46.15;background:#ef4444">High-Risk 204 · 46.15%</div></div><small>Almost 1 : 1, so no oversampling needed.</small>`,
+            mc: () => `<b>How strongly pairs move together (|r|)</b>${[["S1 total vs S2 LDL", "0.897", .897], ["S3 HDL vs S4 ratio", "0.738 (negative)", .738], ["S1 vs S4", "0.542", .542]].map(r => `<div class="hb"><span>${r[0]}</span><div><u style="width:${r[2] * 100}%"></u></div><em>${r[1]}</em></div>`).join("")}`,
+            sc: () => `<div class="two"><div><b>Before: raw ranges</b>${[["Cholesterol 204", 100], ["Glucose 66", 32], ["log-TG 2.9", 3]].map(r => `<div class="hb"><span>${r[0]}</span><div><u style="width:${r[1]}%;background:#ef4444"></u></div></div>`).join("")}</div><div><b>After: z-scores, same ruler</b>${["Cholesterol", "Glucose", "log-TG"].map(r => `<div class="hb"><span>${r}</span><div><u style="width:60%;background:#22c55e"></u></div></div>`).join("")}</div></div>`,
+            ols: () => { const X = x => 40 + x * 70, Y = y => 130 - y * 22, f = x => .33 + 1.5 * x, P = [[1, 2], [2, 3], [3, 5]]; return `<svg viewBox="0 0 330 150" width="100%" style="max-height:190px"><line x1="30" y1="135" x2="320" y2="135" stroke="currentColor" opacity=".3"/><line x1="${X(.4)}" y1="${Y(f(.4))}" x2="${X(3.6)}" y2="${Y(f(3.6))}" style="stroke:var(--c)" stroke-width="3"/>${P.map(p => `<line x1="${X(p[0])}" y1="${Y(p[1])}" x2="${X(p[0])}" y2="${Y(f(p[0]))}" stroke="#ef4444" stroke-dasharray="3"/><circle cx="${X(p[0])}" cy="${Y(p[1])}" r="6" fill="#2563eb"/>`).join("")}<text x="150" y="26" fill="currentColor" font-size="11">Blue = patients · red = errors · line ŷ = 0.33 + 1.5x</text></svg>` },
+            ridge: () => `<b>Slide α: <span id="ra">0.0</span></b><input type="range" min="0" max="10" step=".1" value="0" style="width:100%" oninput="rg(this.value)"><div id="rb"></div>`,
+            svr: () => `<b id="sb"></b><input type="range" min="0" max="40" value="5" style="width:100%" oninput="sv(this.value)"><div id="sa"></div>`,
+            rf: () => `<b>Each tree votes, the forest averages</b><div class="vb">${[180, 150, 210, 170, 190].map((v, i) => `<div><u style="height:${v / 2.2}px"></u><small>Tree ${i + 1}<br>${v}</small></div>`).join("")}<div class="avg"><u style="height:${180 / 2.2}px"></u><small>Forest<br><b>180</b></small></div></div>`,
+            cv: () => `<b>R² in each of the 5 folds (mean 0.42)</b><div class="vb">${[.5111, .1132, .5688, .5658, .3443].map((v, i) => `<div><u style="height:${v * 170}px"></u><small>Fold ${i + 1}<br>${v}</small></div>`).join("")}</div>`,
+            cm: () => `<b>Triage result on 45 test patients</b><div class="cmx"><span></span><i>Pred. Controlled</i><i>Pred. High-Risk</i><i>Actual Controlled</i><u style="background:#16a34a">19 correct</u><u style="background:#f59e0b">3 false alarms</u><i>Actual High-Risk</i><u style="background:#dc2626">5 missed</u><u style="background:#16a34a">18 caught</u></div>`
+        };
+        function rg(a) { a = +a; $("ra").textContent = a.toFixed(1); $("rb").innerHTML = [["S1 weight", 9], ["S2 weight", -8]].map(n => { const v = n[1] / (1 + a * .8); return `<div class="hb"><span>${n[0]}</span><div class="c2"><u style="${v < 0 ? "right:50%;background:#ef4444" : "left:50%"};width:${Math.abs(v) * 5}%"></u></div><em>${v.toFixed(1)}</em></div>` }).join("") + "<small>Illustration: collinear weights shrink toward small, stable values as α grows.</small>" }
+        function sv(e) { e = +e; const R = [-30, -18, -9, -4, 2, 6, 12, 20, 33, -26]; let pen = 0, ins = 0; const dots = R.map((r, i) => { const o = Math.abs(r) > e; if (o) pen += Math.abs(r) - e; else ins++; return `<circle cx="${25 + i * 30}" cy="${50 - r}" r="5" fill="${o ? "#ef4444" : "#2563eb"}"/>` }).join(""); $("sa").innerHTML = `<svg viewBox="0 0 320 100" width="100%" style="max-height:140px"><rect x="10" y="${50 - e}" width="300" height="${Math.max(2 * e, 1)}" fill="#22c55e" opacity=".25"/><line x1="10" y1="50" x2="310" y2="50" style="stroke:var(--c)" stroke-width="2"/>${dots}</svg>`; $("sb").textContent = `Tube width ε = ${e}: ${ins} of 10 patients inside (free). Total penalty = ${pen.toFixed(0)}` }
+
+        $("steps").innerHTML = D.stages.map((s, i) => `<span class="st" style="--c:${C[i]}">${i + 1}. ${s}</span>`).join("");
+        $("stage").innerHTML = S.map(s => {
+            let l = `<ul>${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>`, r = s.math.map(m => `<div class="fm">${m}</div>`).join("");
+            if (s.k == "table") r += `<table><tr>${s.table[0].map(h => `<th>${h}</th>`).join("")}</tr>${s.table.slice(1).map(w => `<tr>${w.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
+            if (s.k == "split") r += `<div class="bar"><div style="flex:70;background:#22c55e">Train 70% · 309</div><div style="flex:20;background:#f59e0b">Val 20% · 88</div><div style="flex:10;background:#ef4444">Test 10% · 45</div></div>`;
+            if (s.k == "code") r += `<pre>${s.code.replace(/</g, "&lt;")}</pre>`;
+            let body = s.k == "pipe" ? `${l}<div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div>` : s.k == "title" ? `<ul class="big">${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>` : s.math.length || s.k == "code" || s.k == "split" ? `<div class="gr"><div>${l}</div><div>${r}</div></div>` : l;
+            return `<div class="sl ${s.k == "title" ? "ttl" : ""}" style="--c:${s.c}"><div class="cd"><span class="tg">${s.sp} · Stage ${s.st + 1}: ${D.stages[s.st]}</span><h2>${s.t}</h2>${body}${s.vz ? `<div class="vz">${VZ[s.vz]()}</div>` : ""}${s.ex ? `<div class="eu"><div class="ex"><b>Example</b>${s.ex}</div><div class="us"><b>Used for</b>${s.use}</div></div>` : ""}<div class="sy"><b>Say it simply:</b> ${s.say}</div></div></div>`
+        }).join("");
+        const sl = [...document.querySelectorAll(".sl")], sp = [...document.querySelectorAll(".st")];
+        function go(n) {
+            cur = Math.max(0, Math.min(S.length - 1, n)); sl.forEach((e, i) => { e.className = "sl" + (e.classList.contains("ttl") ? " ttl" : "") + (i == cur ? " on" : i < cur ? " pv" : ""); });
+            sp.forEach((e, i) => e.classList.toggle("on", i == S[cur].st)); $("ct").textContent = (cur + 1) + " / " + S.length; $("th").style.setProperty("--c", S[cur].c); document.querySelectorAll(".fm").forEach(f => { f.style.animation = "none"; f.offsetHeight; f.style.animation = "" }); tgt = cur * .32; col.set(S[cur].c)
+        }
+        $("nx").onclick = () => go(cur + 1); $("pv").onclick = () => go(cur - 1); $("th").onclick = () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme == "light" ? "dark" : "light" };
+        addEventListener("keydown", e => { if (["ArrowRight", " ", "PageDown"].includes(e.key)) go(cur + 1); if (["ArrowLeft", "PageUp"].includes(e.key)) go(cur - 1) });
+        document.querySelectorAll(".cd").forEach(c => c.addEventListener("mousemove", e => { const b = c.getBoundingClientRect(); c.style.transform = `rotateY(${((e.clientX - b.left) / b.width - .5) * 5}deg) rotateX(${-((e.clientY - b.top) / b.height - .5) * 4}deg)` }));
+        document.querySelectorAll(".cd").forEach(c => c.addEventListener("mouseleave", () => c.style.transform = ""));
+        /* 3D background: soft glass shapes */
+        let tgt = 0, col = typeof THREE != 'undefined' ? new THREE.Color(C[0]) : { set() { } };
+        try {
+            const R = new THREE.WebGLRenderer({ canvas: $("bg"), alpha: true, antialias: true }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(55, 1, .1, 200); cam.position.z = 16;
+            sc.add(new THREE.AmbientLight(0xffffff, .85)); const dl = new THREE.DirectionalLight(0xffffff, .8); dl.position.set(5, 8, 10); sc.add(dl);
+            const sh = []; const P = [[-9, 4, -4, 1.8], [9, -3, -5, 2.4], [-6, -6, -2, 1.1], [7, 6, -8, 1.6], [0, -8, -6, 1.4], [-12, -1, -9, 2.2], [12, 1, -3, .9]];
+            P.forEach((p, i) => { const m = new THREE.Mesh(i % 3 == 2 ? new THREE.TorusGeometry(p[3], .35, 24, 64) : new THREE.IcosahedronGeometry(p[3], 3), new THREE.MeshPhongMaterial({ color: col.clone(), transparent: true, opacity: .42, shininess: 100 })); m.position.set(p[0], p[1], p[2]); m.userData = { y: p[1], o: i }; sc.add(m); sh.push(m) });
+            function rs() { R.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix() } rs(); addEventListener("resize", rs);
+            let ry = 0, t = 0; (function a() {
+                requestAnimationFrame(a); t += .01; ry += (tgt - ry) * .04; cam.position.x = Math.sin(ry) * 3; cam.lookAt(0, 0, 0);
+                sh.forEach(m => { m.position.y = m.userData.y + Math.sin(t + m.userData.o) * .8; m.rotation.x += .004; m.rotation.y += .006; const h = new THREE.Color(col); h.offsetHSL((m.userData.o % 4) * .07, 0, 0); m.material.color.lerp(h, .05) }); R.render(sc, cam)
+            })()
+        } catch (e) { }
+        rg(0); sv(5); go(0);
+    </script>
+</body>
+
+</html>
