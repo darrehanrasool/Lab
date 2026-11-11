@@ -3,89 +3,754 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Progression Predictor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Clinical Diabetes Progression Prognostic Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for crisp mathematical formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg-dark: #070d18;
+            --card-bg: rgba(15, 23, 42, 0.90);
+            --card-border: rgba(56, 189, 248, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            margin: 0;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(2, 132, 199, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-size: 2.35rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 760px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 980px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            margin-bottom: 1.75rem;
+        }
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-top: 0;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+        @media (max-width: 580px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        .unit-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        input, select {
+            background: rgba(2, 6, 23, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 0.6rem;
+            padding: 0.65rem 0.85rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            border: none;
+            border-radius: 0.6rem;
+            padding: 0.95rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1, #075985);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+        }
+        
+        /* Beacon Lights and Visual Alert Styles */
+        .beacon-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-radius: 0.85rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid;
+            transition: all 0.3s ease;
+        }
+        .beacon-green {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+        }
+        .beacon-red {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.3);
+            animation: pulse-red-border 2s infinite;
+        }
+        .beacon-amber {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+        }
+
+        .light-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+        .bulb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            position: relative;
+        }
+        .bulb-green {
+            background: #10b981;
+            box-shadow: 0 0 15px #10b981, 0 0 30px #10b981;
+            animation: pulse-green 1.5s infinite ease-in-out;
+        }
+        .bulb-red {
+            background: #ef4444;
+            box-shadow: 0 0 18px #ef4444, 0 0 35px #ef4444;
+            animation: pulse-red 0.8s infinite ease-in-out;
+        }
+        .bulb-amber {
+            background: #f59e0b;
+            box-shadow: 0 0 15px #f59e0b;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 8px #10b981; }
+            50% { transform: scale(1.15); box-shadow: 0 0 22px #10b981, 0 0 40px rgba(16, 185, 129, 0.6); }
+            100% { transform: scale(0.95); box-shadow: 0 0 8px #10b981; }
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(0.92); box-shadow: 0 0 10px #ef4444; }
+            50% { transform: scale(1.22); box-shadow: 0 0 28px #ef4444, 0 0 50px rgba(239, 68, 68, 0.8); }
+            100% { transform: scale(0.92); box-shadow: 0 0 10px #ef4444; }
+        }
+        @keyframes pulse-red-border {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+            50% { border-color: rgba(239, 68, 68, 0.9); }
+        }
+
+        .beacon-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .beacon-green .beacon-title { color: #34d399; }
+        .beacon-red .beacon-title { color: #f87171; }
+        .beacon-amber .beacon-title { color: #fbbf24; }
+        .beacon-desc {
+            font-size: 0.76rem;
+            color: #cbd5e1;
+            margin-top: 0.2rem;
+        }
+
+        .sound-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+        }
+        .sound-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: scale(1.03);
+        }
+
+        /* Result Display Box */
+        .result-box {
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+        .result-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .score-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0.4rem 0;
+        }
+        .result-value {
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: #38bdf8;
+            line-height: 1;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .max-score {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .cohort-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            margin-top: 0.25rem;
+        }
+
+        /* Clinical Gauge Bar */
+        .gauge-container {
+            margin: 1.25rem 0 0.5rem 0;
+            padding: 0 0.5rem;
+        }
+        .gauge-bar {
+            height: 12px;
+            background: linear-gradient(to right, #10b981 0%, #10b981 35%, #f59e0b 45%, #ef4444 65%, #ef4444 100%);
+            border-radius: 9999px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .cutoff-line {
+            position: absolute;
+            top: -6px;
+            bottom: -6px;
+            left: 38.9%; /* (150-25)/(346-25) = 38.9% */
+            width: 3px;
+            background: #ffffff;
+            box-shadow: 0 0 6px #fff;
+            border-radius: 2px;
+            z-index: 2;
+        }
+        .cutoff-label {
+            position: absolute;
+            top: -24px;
+            left: 38.9%;
+            transform: translateX(-50%);
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+        }
+        .pointer-marker {
+            position: absolute;
+            top: -4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #0284c7;
+            box-shadow: 0 0 10px #38bdf8;
+            transform: translateX(-50%);
+            z-index: 3;
+            transition: left 0.8s ease-out;
+        }
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Biomarker Diagnostic Cards */
+        .biomarkers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .bio-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.82rem;
+        }
+        .bio-good { border-color: var(--accent-emerald); }
+        .bio-warning { border-color: var(--accent-amber); }
+        .bio-danger { border-color: var(--accent-rose); }
+        .bio-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        .bio-good .bio-header { color: #34d399; }
+        .bio-warning .bio-header { color: #fbbf24; }
+        .bio-danger .bio-header { color: #f87171; }
+        .bio-detail {
+            color: #94a3b8;
+            font-size: 0.76rem;
+            line-height: 1.4;
+        }
+
+        /* Care Plan Section */
+        .plan-card {
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 0.85rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .plan-item {
+            margin-bottom: 0.75rem;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+        .plan-item:last-child { margin-bottom: 0; }
+        .plan-item strong {
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Formula Card with KaTeX */
+        .math-card {
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.85rem;
+            padding: 1.1rem;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .math-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .math-block {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        .feature-eval-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .eval-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.73rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .eval-chip span { color: #38bdf8; font-weight: 700; }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="badge">Healthcare Analytics</div>
-            <h1>Diabetes Progression Predictor</h1>
-            <p class="subtitle">Machine Learning model predicting disease progression one year after baseline using physiological & blood serum metrics.</p>
+            <div class="badge">M.Tech AI • Centre for AI, IUST • CAI504C</div>
+            <h1>Diabetes Progression Prognostic Engine</h1>
+            <p class="subtitle">Clinical decision support system implementing an end-to-end Machine Learning pipeline: authentic physiological ingestion, domain enrichment, and Random Forest ensemble prognosis with real-time risk triage.</p>
         </header>
 
         <div class="main-grid">
-            <div class="card form-card">
-                <h2>Clinical & Diagnostic Inputs</h2>
-                <form method="POST" action="/">
+            <!-- Left: Patient Ingestion Form -->
+            <div class="card">
+                <h2>
+                    <span>📋 Patient Clinical & Diagnostic Profile</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Authentic Clinical Units</span>
+                </h2>
+                <form method="POST" action="/" id="prognosisForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="age">Age (Standardized)</label>
-                            <input type="number" step="0.001" id="age" name="age" value="{{ input_data.get('age', 0.038) }}" required>
+                            <label for="age">Patient Age</label>
+                            <span class="unit-hint">Years (Study range: 19 - 79 yrs)</span>
+                            <input type="number" step="0.5" id="age" name="age" value="{{ input_data.get('age', 59.0) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="sex">Sex (-0.044 Female, +0.050 Male)</label>
-                            <input type="number" step="0.001" id="sex" name="sex" value="{{ input_data.get('sex', 0.050) }}" required>
+                            <label for="sex">Biological Sex</label>
+                            <span class="unit-hint">Standardized cohort coding</span>
+                            <select id="sex" name="sex">
+                                <option value="2.0" {% if input_data.get('sex') == 2.0 %}selected{% endif %}>Male (2.0)</option>
+                                <option value="1.0" {% if input_data.get('sex') == 1.0 %}selected{% endif %}>Female (1.0)</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="bmi">Body Mass Index (BMI)</label>
-                            <input type="number" step="0.001" id="bmi" name="bmi" value="{{ input_data.get('bmi', 0.061) }}" required>
+                            <span class="unit-hint">kg/m² (Normal: 18.5 - 24.9)</span>
+                            <input type="number" step="0.1" id="bmi" name="bmi" value="{{ input_data.get('bmi', 32.1) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="bp">Avg Blood Pressure (BP)</label>
-                            <input type="number" step="0.001" id="bp" name="bp" value="{{ input_data.get('bp', 0.021) }}" required>
+                            <label for="bp">Mean Arterial Blood Pressure (BP)</label>
+                            <span class="unit-hint">mmHg (Target: 70 - 105 mmHg)</span>
+                            <input type="number" step="0.5" id="bp" name="bp" value="{{ input_data.get('bp', 101.0) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s1">Total Serum Cholesterol (s1)</label>
-                            <input type="number" step="0.001" id="s1" name="s1" value="{{ input_data.get('s1', -0.044) }}" required>
+                            <label for="s1">Total Serum Cholesterol (S1)</label>
+                            <span class="unit-hint">mg/dL (Desirable: &lt; 200 mg/dL)</span>
+                            <input type="number" step="0.5" id="s1" name="s1" value="{{ input_data.get('s1', 157.0) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s2">Low-Density Lipoproteins (s2)</label>
-                            <input type="number" step="0.001" id="s2" name="s2" value="{{ input_data.get('s2', -0.034) }}" required>
+                            <label for="s2">Low-Density Lipoprotein (S2: LDL)</label>
+                            <span class="unit-hint">mg/dL (Optimal: &lt; 100 mg/dL)</span>
+                            <input type="number" step="0.5" id="s2" name="s2" value="{{ input_data.get('s2', 93.2) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s3">High-Density Lipoproteins (s3)</label>
-                            <input type="number" step="0.001" id="s3" name="s3" value="{{ input_data.get('s3', -0.043) }}" required>
+                            <label for="s3">High-Density Lipoprotein (S3: HDL)</label>
+                            <span class="unit-hint">mg/dL (Cardioprotective: &gt; 40 mg/dL)</span>
+                            <input type="number" step="0.5" id="s3" name="s3" value="{{ input_data.get('s3', 38.0) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s4">Total Cholesterol / HDL (s4)</label>
-                            <input type="number" step="0.001" id="s4" name="s4" value="{{ input_data.get('s4', -0.002) }}" required>
+                            <label for="s4">Total / HDL Cholesterol Ratio (S4)</label>
+                            <span class="unit-hint">Ratio (Clinical target: &lt; 4.5)</span>
+                            <input type="number" step="0.1" id="s4" name="s4" value="{{ input_data.get('s4', 4.0) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s5">Log Serum Triglycerides (s5)</label>
-                            <input type="number" step="0.001" id="s5" name="s5" value="{{ input_data.get('s5', 0.019) }}" required>
+                            <label for="s5">Log Serum Triglycerides (S5)</label>
+                            <span class="unit-hint">log(mg/dL) (Typical clinical: 3.5 - 5.5)</span>
+                            <input type="number" step="0.01" id="s5" name="s5" value="{{ input_data.get('s5', 4.86) }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="s6">Blood Glucose Level (s6)</label>
-                            <input type="number" step="0.001" id="s6" name="s6" value="{{ input_data.get('s6', -0.017) }}" required>
+                            <label for="s6">Fasting Blood Glucose (S6)</label>
+                            <span class="unit-hint">mg/dL (Normal fasting: 70 - 99 mg/dL)</span>
+                            <input type="number" step="0.5" id="s6" name="s6" value="{{ input_data.get('s6', 87.0) }}" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">Predict Progression</button>
+                    <button type="submit" class="btn-primary" id="computeBtn">
+                        <span>⚡ Compute 1-Year Prognosis & Triage</span>
+                    </button>
                 </form>
             </div>
 
-            <div class="card result-card">
-                <h2>Diagnostic Output</h2>
-                {% if prediction %}
-                    <div class="result-box">
-                        <div class="result-label">Predicted Progression Index</div>
-                        <div class="result-value">{{ prediction }}</div>
-                        <div class="risk-badge {{ 'risk-low' if 'Low' in risk_level else ('risk-med' if 'Moderate' in risk_level else 'risk-high') }}">
-                            {{ risk_level }}
+            <!-- Right: Dynamic Prognostic Assessment & Triage -->
+            <div>
+                {% if prediction and analysis %}
+                    <!-- Beacon Box (Green vs Red Light with Sound) -->
+                    <div class="beacon-box beacon-{{ analysis.theme }}" id="beaconAlertBox">
+                        <div class="light-indicator">
+                            <div class="bulb bulb-{{ analysis.theme }}"></div>
+                            <div>
+                                <div class="beacon-title">{{ analysis.status_title }}</div>
+                                <div class="beacon-desc">{{ analysis.status_sub }}</div>
+                            </div>
+                        </div>
+                        <button class="sound-btn" onclick="playAudioAlert('{{ analysis.sound_type }}')">
+                            <span>🔊 Replay Alert Sound</span>
+                        </button>
+                    </div>
+
+                    <!-- Continuous Progression Score Box -->
+                    <div class="card" style="padding: 1.75rem;">
+                        <h2>
+                            <span>🔬 1-Year Disease Progression Score</span>
+                            <span class="cohort-badge">{{ analysis.percentile }}th Cohort Percentile</span>
+                        </h2>
+
+                        <div class="result-box">
+                            <div class="result-label">Predicted Progression Index (y)</div>
+                            <div class="score-row">
+                                <span class="result-value">{{ prediction }}</span>
+                                <span class="max-score">/ 346.0</span>
+                            </div>
+
+                            <!-- Interactive Visual Gauge -->
+                            <div class="gauge-container">
+                                <div class="gauge-bar">
+                                    <div class="cutoff-line"></div>
+                                    <div class="cutoff-label">Threshold = 150</div>
+                                    <div class="pointer-marker" style="left: {{ analysis.gauge_pct }}%;"></div>
+                                </div>
+                                <div class="gauge-labels">
+                                    <span>25 (Minimal)</span>
+                                    <span style="color: #ffffff; font-weight: 700;">150 (Triage Cutoff)</span>
+                                    <span>346 (Severe)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Biomarker Breakdown Cards -->
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                            🩺 Patient Diagnostic Biomarker Audit
+                        </div>
+                        <div class="biomarkers-grid">
+                            {% for bio in analysis.biomarkers %}
+                                <div class="bio-card bio-{{ bio.type }}">
+                                    <div class="bio-header">
+                                        <span>{{ bio.name }}: {{ bio.val }}</span>
+                                        <span>{{ bio.status }}</span>
+                                    </div>
+                                    <div class="bio-detail">{{ bio.detail }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Tailored Clinical Care Suggestions -->
+                        <div class="plan-card">
+                            <div style="font-size: 0.85rem; font-weight: 800; color: #38bdf8; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                💡 Tailored Clinical Action & Lifestyle Protocol
+                            </div>
+                            <div class="plan-item">
+                                <strong>🥗 Nutritional Management:</strong>
+                                {{ analysis.care_plan.nutrition }}
+                            </div>
+                            <div class="plan-item">
+                                <strong>🏃 Physical Conditioning:</strong>
+                                {{ analysis.care_plan.exercise }}
+                            </div>
+                            <div class="plan-item">
+                                <strong>🩺 Clinical & Pharmacological Strategy:</strong>
+                                {{ analysis.care_plan.clinical }}
+                            </div>
+                        </div>
+
+                        <!-- Mathematical Formulation Card (KaTeX) -->
+                        <div class="math-card">
+                            <div class="math-title">📐 Mathematical Modeling & Feature Enrichment</div>
+                            The disease progression is inferred via Random Forest aggregation of $B=100$ decorrelated regression trees:
+                            <div class="math-block">
+                                $$\hat{y}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x}) \quad \text{where } B = 100, \, \text{depth} = 5$$
+                            </div>
+                            Three non-linear interaction features were enriched into the 13-dimensional vector:
+                            <div class="math-block">
+                                $$\text{Insulin Proxy} = \text{BMI} \times S_6, \quad \text{Atherogenic Ratio} = \frac{S_2}{S_3}, \quad \text{Metabolic Triad} = \frac{\text{BMI} \times \text{BP}}{S_3}$$
+                            </div>
+                            <div class="feature-eval-chips">
+                                <div class="eval-chip">Insulin Proxy: <span>{{ analysis.enriched.insulin_proxy }}</span></div>
+                                <div class="eval-chip">Atherogenic Ratio: <span>{{ analysis.enriched.athero_ratio }}</span></div>
+                                <div class="eval-chip">Metabolic Triad: <span>{{ analysis.enriched.metabolic_triad }}</span></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="clinical-note">
-                        <p><strong>Clinical Note:</strong> The target is a quantitative measure of diabetes disease progression one year after baseline (scale: 25 to 346). Higher values indicate accelerated progression requiring intensive clinical intervention.</p>
-                    </div>
                 {% else %}
-                    <div class="placeholder-box">
-                        <div class="icon">🩺</div>
-                        <p>Enter patient physiological and blood serum measurements and click <strong>Predict Progression</strong> to see the prognostic score.</p>
+                    <!-- Default Initial State -->
+                    <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🩺</div>
+                        <h3 style="margin-top: 0; color: #38bdf8;">Awaiting Clinical Diagnostics</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; max-width: 450px; margin: 0 auto;">
+                            Enter patient clinical laboratory values on the left. The engine will enrich the vector, evaluate against the trained Random Forest model, trigger the acoustic/visual triage beacon, and render personalized clinical care recommendations.
+                        </p>
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    <!-- Web Audio API Script for Native Procedural Sound Synthesis -->
+    <script>
+        // High-fidelity procedural audio generator (no external mp3 files required)
+        function playAudioAlert(soundType) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                
+                if (soundType === 'alert') {
+                    // Critical Alert: Rapid Double-Beep (880 Hz High-Tone Diagnostic Alarm)
+                    const now = ctx.currentTime;
+                    
+                    // Beep 1
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'square';
+                    osc1.frequency.setValueAtTime(880, now);
+                    gain1.gain.setValueAtTime(0.18, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.15);
+
+                    // Beep 2
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'square';
+                    osc2.frequency.setValueAtTime(880, now + 0.22);
+                    gain2.gain.setValueAtTime(0.22, now + 0.22);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.40);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.22);
+                    osc2.stop(now + 0.40);
+
+                } else {
+                    // Stable State: Calming Two-Tone Melodic Chime (C5 -> E5 Sine Wave)
+                    const now = ctx.currentTime;
+                    
+                    // Tone 1: C5 (523.25 Hz)
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(523.25, now);
+                    gain1.gain.setValueAtTime(0.2, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.35);
+
+                    // Tone 2: E5 (659.25 Hz)
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(659.25, now + 0.18);
+                    gain2.gain.setValueAtTime(0.2, now + 0.18);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.18);
+                    osc2.stop(now + 0.65);
+                }
+            } catch (e) {
+                console.warn("Audio playback not supported or blocked by policy:", e);
+            }
+        }
+
+        // Auto-play sound upon receiving server response with prediction
+        window.addEventListener('DOMContentLoaded', () => {
+            {% if analysis %}
+                // Small timeout to allow user interaction context
+                setTimeout(() => {
+                    playAudioAlert('{{ analysis.sound_type }}');
+                }, 400);
+            {% endif %}
+
+            // Render KaTeX formulas automatically
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
+    </script>
 </body>
 </html>
