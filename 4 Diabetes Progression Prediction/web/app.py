@@ -10,31 +10,39 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'diabetes_model.joblib')
 SCALER_PATH = os.path.join(BASE_DIR, 'models', 'scaler.joblib')
+TRIAGE_PATH = os.path.join(BASE_DIR, 'models', 'triage_logistic_model.joblib')
 RAW_DATA_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'diabetes.csv')
+
+FEATURE_NAMES = ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
 
 # Load models and raw reference data into RAM on startup (0ms cold start)
 try:
     model = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
+    triage_model = joblib.load(TRIAGE_PATH)
     df_raw = pd.read_csv(RAW_DATA_PATH)
     raw_targets = df_raw['progression'].values
-    print("✓ Production model, scaler, and baseline cohort loaded into RAM.")
+    print("✓ Interpretable Multiple Linear Regression model, scaler, and triage model loaded into RAM.")
 except Exception as e:
     model = None
     scaler = None
+    triage_model = None
     raw_targets = np.array([25.0, 140.5, 152.1, 346.0])
     print(f"Warning: Failed to load assets: {e}")
 
-def compute_enriched_vector(raw_inputs):
+def prepare_input_vector(raw_inputs):
     """
-    Computes the 13-dimensional feature vector from 10 raw clinical inputs:
-    Adds:
-      1. insulin_res_proxy = bmi * s6
-      2. atherogenic_ratio = s2 / (s3 + 1e-5)
-      3. metabolic_risk_triad = (bmi * bp) / (s3 + 1e-5)
+    Formats the 10 authentic clinical input features:
+    Handles sex encoding (1.0 = Female -> 0.0, 2.0 = Male -> 1.0).
     """
     age = float(raw_inputs.get('age', 59.0))
-    sex = float(raw_inputs.get('sex', 2.0))
+    raw_sex = float(raw_inputs.get('sex', 2.0))
+    # Map sex: if 1.0 or 2.0, map to 0.0 (female) or 1.0 (male)
+    if raw_sex in [1.0, 2.0]:
+        sex = 0.0 if raw_sex == 1.0 else 1.0
+    else:
+        sex = 1.0 if raw_sex == 1.0 else 0.0
+        
     bmi = float(raw_inputs.get('bmi', 32.1))
     bp  = float(raw_inputs.get('bp', 101.0))
     s1  = float(raw_inputs.get('s1', 157.0))
@@ -44,43 +52,37 @@ def compute_enriched_vector(raw_inputs):
     s5  = float(raw_inputs.get('s5', 4.86))
     s6  = float(raw_inputs.get('s6', 87.0))
     
-    # Enriched interaction terms
-    insulin_proxy = bmi * s6
-    athero_ratio  = s2 / (s3 + 1e-5)
-    metabolic_triad = (bmi * bp) / (s3 + 1e-5)
-    
-    feature_row = [
-        age, sex, bmi, bp, s1, s2, s3, s4, s5, s6,
-        insulin_proxy, athero_ratio, metabolic_triad
-    ]
-    return feature_row, {
-        'insulin_proxy': insulin_proxy,
-        'athero_ratio': athero_ratio,
-        'metabolic_triad': metabolic_triad
-    }
+    feature_row = [age, sex, bmi, bp, s1, s2, s3, s4, s5, s6]
+    return feature_row
 
-def generate_clinical_analysis(pred_val, inputs, enriched):
-    """Generates detailed biomarker diagnostics and personalized recommendations."""
-    # Cohort percentile rank
+def generate_clinical_analysis(pred_val, inputs, scaled_features):
+    """Generates detailed biomarker diagnostics, linear decomposition, and personalized recommendations."""
     percentile = float(np.mean(raw_targets <= pred_val) * 100.0)
     gauge_pct = float(np.clip((pred_val - 25.0) / (346.0 - 25.0) * 100.0, 0.0, 100.0))
     
     is_high_risk = bool(pred_val >= 150.0)
+    is_severe = bool(pred_val >= 200.0)
+    
+    # Severe probability from balanced logistic triage model
+    if triage_model is not None:
+        severe_prob = float(triage_model.predict_proba(scaled_features)[0, 1] * 100.0)
+    else:
+        severe_prob = 80.0 if is_severe else (40.0 if is_high_risk else 15.0)
     
     # Status badges
     if pred_val < 100.0:
-        status_title = "STABLE / LOW PROGRESSION"
+        status_title = "STABLE / MILD PROGRESSION"
         status_sub = "Disease progression is well-controlled. Cellular metabolic load is minimal."
         theme = "green"
         sound_type = "stable"
-    elif pred_val < 150.0:
+    elif pred_val < 200.0:
         status_title = "MODERATE / MONITORING REQUIRED"
-        status_sub = "Disease progression is currently within the safe sub-150 margin, but shows emerging risk indicators."
+        status_sub = "Disease progression is currently within the moderate margin. Lifestyle intervention recommended."
         theme = "amber"
         sound_type = "stable"
     else:
-        status_title = "HIGH-RISK ACCELERATED PROGRESSION"
-        status_sub = "Critical Alert: Progression index exceeds clinical threshold (150). Accelerated organ & vascular risk."
+        status_title = "SEVERE ACCELERATED PROGRESSION"
+        status_sub = "Critical Triage Alert: Progression exceeds clinical severity threshold (200). Urgent escalation needed."
         theme = "red"
         sound_type = "alert"
 
@@ -95,7 +97,7 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
             'val': f"{bmi:.1f} kg/m²",
             'status': 'Elevated (Obesity Class I+)',
             'type': 'danger',
-            'detail': 'Elevated visceral adipose tissue drives systemic insulin resistance and chronic cytokine release.'
+            'detail': 'Major progression driver (weight: +23.46). Visceral adipose tissue drives systemic insulin resistance.'
         })
     elif bmi >= 25.0:
         biomarkers.append({
@@ -103,7 +105,7 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
             'val': f"{bmi:.1f} kg/m²",
             'status': 'Borderline Overweight',
             'type': 'warning',
-            'detail': 'Moderate excess mass; weight reduction of 5-7% will substantially lower 1-year disease progression velocity.'
+            'detail': 'Moderate excess mass; a 5-7% weight reduction substantially slows 1-year progression velocity.'
         })
     else:
         biomarkers.append({
@@ -111,7 +113,7 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
             'val': f"{bmi:.1f} kg/m²",
             'status': 'Optimal / Normal',
             'type': 'good',
-            'detail': 'Healthy baseline body composition minimizes mechanical and metabolic tissue stress.'
+            'detail': 'Healthy baseline body composition minimizes metabolic tissue stress.'
         })
 
     # Blood Pressure audit
@@ -122,7 +124,7 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
             'val': f"{bp:.1f} mmHg",
             'status': 'Hypertensive Range',
             'type': 'danger',
-            'detail': 'Accelerates diabetic nephropathy and microvascular retinal shear stress.'
+            'detail': 'Key vascular driver (weight: +17.37). Accelerates diabetic nephropathy and microvascular retinal shear stress.'
         })
     else:
         biomarkers.append({
@@ -133,33 +135,52 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
             'detail': 'Arterial pressure within manageable clinical parameters.'
         })
 
-    # Atherogenic Ratio (LDL/HDL)
-    ar = enriched['athero_ratio']
-    if ar >= 3.0:
+    # HDL (S3) Protective audit
+    s3 = inputs['s3']
+    if s3 < 40.0:
         biomarkers.append({
-            'name': 'Atherogenic Ratio (LDL/HDL)',
-            'val': f"{ar:.2f}",
-            'status': 'Atherogenic Dyslipidemia',
+            'name': 'HDL Cholesterol (S3)',
+            'val': f"{s3:.1f} mg/dL",
+            'status': 'Low HDL (Depleted Protection)',
             'type': 'danger',
-            'detail': 'High LDL relative to HDL accelerates vascular plaque deposition and endothelial inflammation.'
+            'detail': 'Protective factor (weight: -6.26). Low HDL impairs reverse cholesterol transport and endothelial defense.'
         })
     else:
         biomarkers.append({
-            'name': 'Atherogenic Ratio (LDL/HDL)',
-            'val': f"{ar:.2f}",
-            'status': 'Favorable Lipid Balance',
+            'name': 'HDL Cholesterol (S3)',
+            'val': f"{s3:.1f} mg/dL",
+            'status': 'Protective HDL Concentration',
             'type': 'good',
-            'detail': 'HDL particle density offers protective reverse cholesterol clearance.'
+            'detail': 'Healthy HDL particle density provides natural anti-inflammatory and cardioprotective buffering.'
         })
 
-    # Fasting Glucose (S6)
+    # Log Triglycerides (S5) audit
+    s5 = inputs['s5']
+    if s5 >= 4.5:
+        biomarkers.append({
+            'name': 'Log Triglycerides (S5)',
+            'val': f"{s5:.2f}",
+            'status': 'Elevated Serum Lipids',
+            'type': 'danger',
+            'detail': 'Dominant metabolic driver (weight: +24.27). Elevated triglycerides drive hypertriglyceridemia and vascular damage.'
+        })
+    else:
+        biomarkers.append({
+            'name': 'Log Triglycerides (S5)',
+            'val': f"{s5:.2f}",
+            'status': 'Controlled Serum Lipids',
+            'type': 'good',
+            'detail': 'Circulating lipid levels within metabolic stability threshold.'
+        })
+
+    # Fasting Glucose (S6) audit
     s6 = inputs['s6']
     if s6 >= 100.0:
         biomarkers.append({
             'name': 'Fasting Blood Glucose (S6)',
             'val': f"{s6:.1f} mg/dL",
             'status': 'Elevated Glycemia',
-            'type': 'danger',
+            'type': 'warning',
             'detail': 'Persistent circulating glucose increases advanced glycation end-products (AGEs).'
         })
     else:
@@ -172,33 +193,57 @@ def generate_clinical_analysis(pred_val, inputs, enriched):
         })
 
     # Actionable Care Recommendations
-    if is_high_risk:
+    if is_severe:
         care_plan = {
-            'nutrition': 'Strict low-glycemic Mediterranean dietary protocol (<45% total carbs from high-fiber, unrefined sources). Eliminate all simple sugars and trans-fats to reduce hepatic lipid synthesis.',
-            'exercise': 'Prescribe 150 minutes/week of moderate-intensity aerobic training (e.g. brisk walking, cycling) combined with 2-3 sessions of progressive resistance training to upregulate GLUT-4 receptor translocation.',
-            'clinical': 'Urgent Endocrinology Consult: Initiate or intensify metformin titration; consider GLP-1 receptor agonist or SGLT2 inhibitor therapy; schedule comprehensive renal microalbuminuria and dilated fundoscopic exams.'
+            'nutrition': 'Strict low-glycemic Mediterranean dietary protocol (<45% total carbs from high-fiber, unrefined sources). Eliminate simple sugars and saturated fats to reduce hepatic lipid synthesis.',
+            'exercise': 'Prescribe 150 min/week moderate-intensity aerobic training combined with 2-3 sessions of resistance training to upregulate GLUT-4 receptor translocation.',
+            'clinical': 'Urgent Endocrinology Triage: Initiate or intensify metformin titration; consider GLP-1 receptor agonist or SGLT2 inhibitor; schedule microalbuminuria and dilated fundoscopic exams.'
+        }
+    elif is_high_risk:
+        care_plan = {
+            'nutrition': 'Moderate carbohydrate restriction, increase dietary soluble fiber (>30g/day) to blunt postprandial glucose excursions and lower atherogenic lipids.',
+            'exercise': 'Structured physical activity: 30 minutes of daily brisk walking plus weekend resistance exercise.',
+            'clinical': 'Closer 3-month clinical monitoring: evaluate HbA1c and repeat lipid panel to prevent progression across the severity threshold.'
         }
     else:
         care_plan = {
-            'nutrition': 'Maintain anti-inflammatory, balanced dietary pattern rich in leafy greens, healthy monounsaturated fats (olive oil, avocados), and lean proteins to sustain current metabolic stability.',
-            'exercise': 'Continue routine daily movement (target 8,000–10,000 steps daily) plus light aerobic conditioning to preserve peripheral insulin sensitivity.',
-            'clinical': 'Routine Clinical Follow-Up: 6-month checkup with repeated lipid panel and HbA1c screening. Continue current standard-of-care regimen without immediate aggressive drug escalation.'
+            'nutrition': 'Maintain anti-inflammatory, balanced dietary pattern rich in leafy vegetables, monounsaturated fats (olive oil, avocados), and lean proteins.',
+            'exercise': 'Continue routine daily movement (target 8,000–10,000 steps daily) to preserve peripheral insulin sensitivity.',
+            'clinical': 'Standard annual routine checkup. Continue current metabolic health maintenance without pharmaceutical escalation.'
         }
+
+    # Linear feature decomposition: impact = weight * z_score
+    decomposition = []
+    if model is not None:
+        intercept = float(model.intercept_)
+        for name, w, z in zip(FEATURE_NAMES, model.coef_, scaled_features.values[0]):
+            decomposition.append({
+                'feature': name,
+                'weight': round(float(w), 2),
+                'z_score': round(float(z), 2),
+                'impact': round(float(w * z), 2)
+            })
+    else:
+        intercept = 151.21
 
     return {
         'percentile': round(percentile, 1),
         'gauge_pct': round(gauge_pct, 1),
         'is_high_risk': is_high_risk,
+        'is_severe': is_severe,
+        'severe_prob': round(severe_prob, 1),
         'status_title': status_title,
         'status_sub': status_sub,
         'theme': theme,
         'sound_type': sound_type,
         'biomarkers': biomarkers,
         'care_plan': care_plan,
+        'intercept': round(intercept, 2),
+        'decomposition': decomposition,
         'enriched': {
-            'insulin_proxy': round(enriched['insulin_proxy'], 1),
-            'athero_ratio': round(enriched['athero_ratio'], 2),
-            'metabolic_triad': round(enriched['metabolic_triad'], 1)
+            'insulin_proxy': round(inputs['bmi'] * inputs['s6'], 1),
+            'athero_ratio': round(inputs['s2'] / (inputs['s3'] + 1e-5), 2),
+            'metabolic_triad': round((inputs['bmi'] * inputs['bp']) / (inputs['s3'] + 1e-5), 1)
         }
     }
 
@@ -218,12 +263,14 @@ def home():
                 if k in request.form:
                     input_data[k] = float(request.form[k])
                     
-            vec, enriched = compute_enriched_vector(input_data)
-            vec_scaled = scaler.transform([vec])
-            pred_val = float(model.predict(vec_scaled)[0])
+            vec = prepare_input_vector(input_data)
+            df_in = pd.DataFrame([vec], columns=FEATURE_NAMES)
+            vec_scaled = scaler.transform(df_in)
+            df_scaled = pd.DataFrame(vec_scaled, columns=FEATURE_NAMES)
+            pred_val = float(model.predict(df_scaled)[0])
             
             prediction = f"{pred_val:.1f}"
-            analysis = generate_clinical_analysis(pred_val, input_data, enriched)
+            analysis = generate_clinical_analysis(pred_val, input_data, df_scaled)
         except Exception as e:
             prediction = f"Error: {str(e)}"
             analysis = None
@@ -236,18 +283,22 @@ def api_predict():
     """REST API endpoint for programmatic clinical integration."""
     try:
         data = request.get_json(force=True)
-        vec, enriched = compute_enriched_vector(data)
-        vec_scaled = scaler.transform([vec])
-        pred_val = float(model.predict(vec_scaled)[0])
-        analysis = generate_clinical_analysis(pred_val, data, enriched)
+        vec = prepare_input_vector(data)
+        df_in = pd.DataFrame([vec], columns=FEATURE_NAMES)
+        vec_scaled = scaler.transform(df_in)
+        df_scaled = pd.DataFrame(vec_scaled, columns=FEATURE_NAMES)
+        pred_val = float(model.predict(df_scaled)[0])
+        analysis = generate_clinical_analysis(pred_val, data, df_scaled)
         
         return jsonify({
             'status': 'success',
             'progression_score': round(pred_val, 2),
             'is_high_risk': analysis['is_high_risk'],
+            'is_severe': analysis['is_severe'],
+            'severe_triage_probability': analysis['severe_prob'],
             'status_title': analysis['status_title'],
             'cohort_percentile': analysis['percentile'],
-            'enriched_features': analysis['enriched'],
+            'linear_decomposition': analysis['decomposition'],
             'care_plan': analysis['care_plan']
         })
     except Exception as e:

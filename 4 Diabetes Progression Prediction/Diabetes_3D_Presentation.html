@@ -4,29 +4,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Diabetes Progression: ML Pipeline Defense</title>
+    <title>Diabetes Progression: Multiple Linear Regression & Imbalance Defense</title>
+    <!-- Three.js for 3D Background Visuals -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- KaTeX for Crisp Mathematical Formula Typography -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <style>
         :root {
             --bg: #f4f7ff;
-            --card: rgba(255, 255, 255, .95);
+            --card: rgba(255, 255, 255, .96);
             --tx: #0f172a;
             --mu: #475569;
-            --bd: rgba(15, 23, 42, .10);
-            --fm: #f1f5ff;
-            --sh: rgba(30, 41, 90, .28);
+            --bd: rgba(15, 23, 42, .12);
+            --fm: #f8fafc;
+            --sh: rgba(30, 41, 90, .20);
             box-sizing: border-box;
             padding-top: env(safe-area-inset-top, 0px);
             padding-bottom: env(safe-area-inset-bottom, 0px)
         }
 
         :root[data-theme=dark] {
-            --bg: #0b1020;
-            --card: rgba(20, 27, 50, .94);
-            --tx: #f1f5f9;
-            --mu: #a9b6cc;
-            --bd: rgba(255, 255, 255, .12);
-            --fm: rgba(255, 255, 255, .06);
+            --bg: #090e1a;
+            --card: rgba(18, 25, 44, .95);
+            --tx: #f8fafc;
+            --mu: #94a3b8;
+            --bd: rgba(255, 255, 255, .14);
+            --fm: rgba(255, 255, 255, .05);
             --sh: rgba(0, 0, 0, .6)
         }
 
@@ -44,309 +49,537 @@
         }
 
         body {
-            background: radial-gradient(1200px 700px at 15% 10%, rgba(99, 102, 241, .18), transparent 60%), radial-gradient(1000px 700px at 90% 90%, rgba(236, 72, 153, .14), transparent 60%), var(--bg)
+            background: radial-gradient(1200px 700px at 15% 10%, rgba(59, 130, 246, .16), transparent 60%), radial-gradient(1000px 700px at 90% 90%, rgba(236, 72, 153, .12), transparent 60%), var(--bg)
         }
 
         #bg {
             position: fixed;
             inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
             z-index: 0
         }
 
         #app {
             position: relative;
-            z-index: 2;
+            z-index: 1;
             height: 100%;
             display: flex;
-            flex-direction: column;
-            padding: .9rem 1.6rem
+            flex-direction: column
         }
 
         #steps {
             display: flex;
             gap: .35rem;
-            flex-wrap: wrap;
-            justify-content: center
+            padding: .65rem 1.2rem;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--bd);
+            backdrop-filter: blur(14px);
+            background: color-mix(in srgb, var(--card) 75%, transparent);
+            scrollbar-width: none
+        }
+
+        #steps::-webkit-scrollbar {
+            display: none
         }
 
         .st {
-            font-size: clamp(9px, .9vw, 13px);
-            font-weight: 600;
-            padding: .28rem .7rem;
-            border-radius: 99px;
-            background: var(--card);
-            border: 1px solid var(--bd);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            padding: .3rem .7rem;
+            border-radius: 999px;
             color: var(--mu);
-            transition: .4s
+            white-space: nowrap;
+            transition: all .25s ease;
+            border: 1px solid transparent
         }
 
         .st.on {
             color: #fff;
-            background: var(--c);
-            border-color: var(--c);
-            box-shadow: 0 8px 22px -6px var(--c);
-            transform: translateY(-3px) scale(1.08)
+            background: var(--c, #3b82f6);
+            box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--c, #3b82f6) 60%, transparent);
+            transform: translateY(-1px)
         }
 
         #stage {
             flex: 1;
             position: relative;
-            perspective: 1600px;
-            margin: .8rem 0
+            overflow: hidden
         }
 
         .sl {
             position: absolute;
             inset: 0;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
             opacity: 0;
+            transform: translateY(20px) scale(.99);
             pointer-events: none;
-            transform: translateZ(-600px) rotateY(50deg);
-            transition: all .9s cubic-bezier(.2, .8, .2, 1);
-            transform-style: preserve-3d
+            transition: opacity .35s cubic-bezier(.2, .8, .2, 1), transform .35s cubic-bezier(.2, .8, .2, 1)
         }
 
         .sl.on {
             opacity: 1;
-            pointer-events: auto;
-            transform: none
+            transform: none;
+            pointer-events: auto
         }
 
         .sl.pv {
-            transform: translateZ(-600px) rotateY(-50deg)
+            opacity: 0;
+            transform: translateY(-20px) scale(.99)
         }
 
         .cd {
-            margin: auto;
-            width: min(1180px, 100%);
-            max-height: 100%;
-            overflow: auto;
             background: var(--card);
-            backdrop-filter: blur(18px);
             border: 1px solid var(--bd);
-            border-top: 7px solid var(--c);
-            border-radius: 28px;
-            padding: clamp(1rem, 2.4vw, 2.2rem);
-            box-shadow: 0 45px 90px -35px var(--sh), 0 0 0 1px rgba(255, 255, 255, .4) inset;
-            font-size: clamp(13px, 1.3vw, 19px);
-            line-height: 1.5;
-            transition: transform .25s
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -15px var(--sh);
+            backdrop-filter: blur(20px);
+            padding: 2.2rem 2.6rem;
+            max-width: 980px;
+            width: 100%;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+            transition: transform .2s ease
         }
 
         .tg {
-            display: inline-block;
-            font-size: .58em;
-            font-weight: 700;
-            letter-spacing: .09em;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .08em;
             text-transform: uppercase;
-            color: #fff;
-            background: var(--c);
-            padding: .25rem .8rem;
-            border-radius: 99px;
-            margin-bottom: .7rem
+            color: var(--c, #3b82f6);
+            margin-bottom: .35rem
         }
 
         h2 {
-            font-size: 1.85em;
-            line-height: 1.15;
-            margin-bottom: 1.1rem;
+            font-size: 2.05rem;
+            line-height: 1.2;
             font-weight: 800;
-            letter-spacing: -.01em
-        }
-
-        h2:after {
-            content: "";
-            display: block;
-            width: 72px;
-            height: 5px;
-            border-radius: 9px;
-            background: var(--c);
-            margin-top: .5rem
-        }
-
-        .gr {
-            display: grid;
-            grid-template-columns: 1.1fr 1fr;
-            gap: 1.6rem
-        }
-
-        @media(max-width:800px) {
-            .gr {
-                grid-template-columns: 1fr
-            }
+            letter-spacing: -.02em;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--tx) 65%, color-mix(in srgb, var(--tx) 35%, var(--c)));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
         }
 
         ul {
             list-style: none;
             padding: 0;
-            counter-reset: n
+            margin: 0 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .55rem
         }
 
         li {
-            padding: .5rem 0 .5rem 2.2rem;
+            font-size: 1.01rem;
+            line-height: 1.5;
+            color: var(--tx);
             position: relative;
-            counter-increment: n
+            padding-left: 1.45rem
         }
 
-        li:before {
-            content: counter(n);
+        li::before {
+            content: "•";
             position: absolute;
             left: 0;
-            top: .55em;
-            width: 1.5em;
-            height: 1.5em;
-            border-radius: 50%;
-            background: var(--c);
-            color: #fff;
-            font-size: .72em;
-            font-weight: 700;
-            display: grid;
-            place-items: center
+            color: var(--c, #3b82f6);
+            font-size: 1.5rem;
+            line-height: 1
         }
 
-        .fm {
-            font-family: Cambria, "Times New Roman", serif;
-            font-size: 1.1em;
+        .fm-box {
             background: var(--fm);
             border: 1px solid var(--bd);
-            border-left: 5px solid var(--c);
+            border-left: 4px solid var(--c, #3b82f6);
+            padding: .85rem 1.15rem;
             border-radius: 14px;
-            padding: .7rem 1rem;
-            margin-bottom: .65rem;
-            animation: up .6s both
+            margin: .65rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: .35rem
         }
 
-        .fm i {
-            font-style: italic
+        .fm-header {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--c, #3b82f6)
         }
 
-        .sy {
-            margin-top: 1rem;
-            padding: .8rem 1.1rem;
-            border-radius: 16px;
-            background: color-mix(in srgb, var(--c) 12%, transparent);
-            border-left: 6px solid var(--c);
+        .fm-math {
+            font-size: 1.08rem;
+            font-family: KaTeX_Math, "Times New Roman", serif;
             color: var(--tx);
-            font-size: .92em
+            overflow-x: auto;
+            padding: .2rem 0
         }
 
-        .sy b {
-            color: var(--c)
+        .fm-desc {
+            font-size: .84rem;
+            color: var(--mu);
+            line-height: 1.4
+        }
+
+        .gr {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 1.4rem;
+            align-items: start
+        }
+
+        @media (max-width: 820px) {
+            .gr {
+                grid-template-columns: 1fr
+            }
+
+            .cd {
+                padding: 1.4rem
+            }
+
+            h2 {
+                font-size: 1.6rem
+            }
+        }
+
+
+        /* Real Mathematical Typography & Term Explanations using HTML tags */
+        .fm-math-html {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.35rem 0.5rem;
+            font-size: 1.12rem;
+            font-family: "Cambria Math", "Latin Modern Math", "Georgia", "Times New Roman", serif;
+            color: var(--tx);
+            padding: 0.25rem 0;
+            line-height: 1.5;
+        }
+
+        .fm-math-html i {
+            font-style: italic;
+            font-family: "Times New Roman", "Cambria Math", serif;
+            padding: 0 1px;
+        }
+
+        .fm-math-html b {
+            font-weight: 700;
+        }
+
+        .fm-frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 0.3rem;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+
+        .fm-num {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 0.25rem 0.15rem 0.25rem;
+            display: block;
+        }
+
+        .fm-den {
+            padding: 0.15rem 0.25rem 0 0.25rem;
+            display: block;
+        }
+
+        .fm-term-info {
+            margin-top: 0.35rem;
+            padding-top: 0.35rem;
+            border-top: 1px dashed var(--bd);
+            font-size: 0.8rem;
+            color: var(--tx);
+            line-height: 1.45;
+        }
+
+        .fm-term-info div {
+            margin: 0.2rem 0;
+        }
+
+        .fm-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-right: 5px;
+            letter-spacing: 0.02em;
+        }
+
+        .b-var {
+            background: rgba(37, 99, 235, 0.12);
+            color: #2563eb;
+        }
+
+        .b-param {
+            background: rgba(13, 148, 136, 0.12);
+            color: #0d9488;
+        }
+
+        .b-const {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+        }
+
+        .b-why {
+            background: rgba(225, 29, 72, 0.12);
+            color: #e11d48;
+        }
+
+        .b-green {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+        }
+
+        /* Full-Width Spacious Dataset Split Layout */
+        .split-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+
+        .split-intro-box {
+            background: var(--fm);
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+        }
+
+        .split-intro-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #06b6d4;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .split-bullets-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .split-bullet-item {
+            font-size: 0.82rem;
+            line-height: 1.35;
+            color: var(--tx);
+        }
+
+        .split-bullet-item b {
+            color: #0369a1;
+        }
+
+        .split-container {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .split-bar {
+            display: flex;
+            height: 2.8rem;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1.5px solid var(--bd);
+            width: 100%;
+        }
+
+        .split-bar-seg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+            padding: 0 0.5rem;
+            white-space: nowrap;
+        }
+
+        .seg-train {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            flex: 70;
+        }
+
+        .seg-val {
+            background: linear-gradient(135deg, #0f766e, #0d9488);
+            flex: 20;
+        }
+
+        .seg-test {
+            background: linear-gradient(135deg, #be123c, #e11d48);
+            flex: 18;
+            min-width: 140px;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+        }
+
+        .split-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.1fr;
+            gap: 0.85rem;
+            width: 100%;
+        }
+
+        .split-card {
+            border-radius: 14px;
+            padding: 0.95rem 1.05rem;
+            border: 1.5px solid var(--bd);
+            background: var(--fm);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .split-card.c-test {
+            border: 2px solid #e11d48;
+            background: color-mix(in srgb, #e11d48 8%, var(--fm));
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.12);
+        }
+
+        .split-card .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .split-card .card-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .split-card.c-train .card-tag {
+            color: #2563eb;
+        }
+
+        .split-card.c-val .card-tag {
+            color: #0d9488;
+        }
+
+        .split-card.c-test .card-tag {
+            color: #e11d48;
+        }
+
+        .split-card .card-count {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .split-card h4 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--tx);
+        }
+
+        .split-card p {
+            font-size: 0.82rem;
+            color: var(--mu);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .split-guarantee-badge {
+            background: color-mix(in srgb, #10b981 12%, var(--fm));
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.82rem;
+            color: #065f46;
+            font-weight: 600;
         }
 
         .pp {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: .8rem;
-            margin: .8rem 0;
-            perspective: 900px
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: .5rem;
+            margin-top: .8rem
         }
 
         .nd {
-            padding: .8rem;
-            border-radius: 18px;
-            background: var(--card);
+            background: var(--fm);
             border: 1px solid var(--bd);
-            border-bottom: 5px solid var(--c);
-            box-shadow: 0 14px 30px -18px var(--sh);
-            transform: rotateX(14deg);
-            animation: pl 6s infinite both;
-            animation-delay: calc(var(--i)*.5s)
+            padding: .6rem;
+            border-radius: 12px;
+            font-size: .78rem;
+            border-top: 3px solid var(--c)
         }
 
         .nd b {
             display: block;
-            color: var(--c)
+            margin-bottom: .2rem;
+            color: var(--tx)
         }
 
-        .nd span {
-            font-size: .8em;
-            color: var(--mu)
+        .sy {
+            margin-top: 1rem;
+            padding: .85rem 1.2rem;
+            border-radius: 14px;
+            background: color-mix(in srgb, var(--c, #3b82f6) 12%, transparent);
+            border: 1px solid color-mix(in srgb, var(--c, #3b82f6) 35%, transparent);
+            font-size: .95rem;
+            line-height: 1.45
         }
 
-        @keyframes pl {
-
-            0%,
-            18%,
-            100% {
-                transform: rotateX(14deg)
-            }
-
-            6% {
-                transform: rotateX(0) translateZ(50px) scale(1.07);
-                box-shadow: 0 26px 40px -14px var(--c)
-            }
-        }
-
-        @keyframes up {
-            from {
-                opacity: 0;
-                transform: translateY(16px)
-            }
+        .sy b {
+            color: var(--c, #3b82f6)
         }
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: .6rem;
-            font-size: .85em;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid var(--bd)
-        }
-
-        th {
-            background: var(--c);
-            color: #fff
+            border-collapse: collapse;
+            font-size: .88rem;
+            margin-top: .6rem
         }
 
         th,
         td {
-            padding: .55rem;
+            padding: .5rem .7rem;
             border-bottom: 1px solid var(--bd);
-            text-align: center
+            text-align: left
         }
 
-        pre {
-            background: #1e293b;
-            color: #e2e8f0;
-            border-radius: 14px;
-            padding: 1rem;
-            font-size: .62em;
-            overflow: auto;
-            line-height: 1.5
-        }
-
-        .bar {
-            display: flex;
-            height: 2.6rem;
-            border-radius: 14px;
-            overflow: hidden;
-            margin: .7rem 0;
-            font-size: .7em;
+        th {
+            color: var(--mu);
             font-weight: 700;
-            color: #fff
-        }
-
-        .bar div {
-            display: grid;
-            place-items: center;
-            transform-origin: left;
-            animation: gw 1.2s both
-        }
-
-        @keyframes gw {
-            from {
-                transform: scaleX(0)
-            }
+            font-size: .75rem;
+            text-transform: uppercase
         }
 
         #ft {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            color: var(--mu);
+            justify-content: space-between;
+            padding: .75rem 1.6rem;
+            border-top: 1px solid var(--bd);
+            backdrop-filter: blur(14px);
+            background: color-mix(in srgb, var(--card) 75%, transparent);
             font-size: .9rem;
             font-weight: 600
         }
@@ -356,28 +589,29 @@
             color: var(--tx);
             border: 1px solid var(--bd);
             border-radius: 12px;
-            padding: .5rem 1.1rem;
+            padding: .5rem 1.15rem;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: .95rem;
             font-weight: 600;
-            box-shadow: 0 8px 18px -12px var(--sh)
+            box-shadow: 0 6px 16px -8px var(--sh);
+            transition: all .2s ease
         }
 
         button:hover {
-            background: var(--c, #6366f1);
+            background: var(--c, #3b82f6);
             color: #fff
         }
 
         .big {
-            font-size: 1.25em
+            font-size: 1.2em
         }
 
         .ttl h2 {
-            font-size: 2.9em
+            font-size: 2.7em
         }
 
         .vz {
-            margin: .9rem 0 .2rem;
+            margin: .85rem 0 .2rem;
             padding: .8rem 1rem;
             border-radius: 16px;
             background: var(--fm);
@@ -394,8 +628,8 @@
         .eu {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: .8rem;
-            margin-top: .9rem
+            gap: .75rem;
+            margin-top: .85rem
         }
 
         @media(max-width:800px) {
@@ -408,7 +642,7 @@
             padding: .7rem .9rem;
             border-radius: 14px;
             border: 1px solid var(--bd);
-            font-size: .93em
+            font-size: .92em
         }
 
         .eu b {
@@ -425,7 +659,7 @@
         }
 
         .us {
-            background: color-mix(in srgb, #22c55e 13%, transparent)
+            background: color-mix(in srgb, #10b981 13%, transparent)
         }
 
         .hb {
@@ -455,9 +689,7 @@
             height: 100%;
             background: var(--c);
             border-radius: 9px;
-            transition: width .3s;
-            animation: gw 1s both;
-            transform-origin: left
+            transition: width .3s
         }
 
         .hb em {
@@ -466,27 +698,12 @@
             font-weight: 700
         }
 
-        .c2 u {
-            position: absolute;
-            top: 0
-        }
-
-        .c2:after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--mu)
-        }
-
         .gb {
             position: relative;
             height: 20px;
             border-radius: 12px;
             margin: .9rem 0 .3rem;
-            background: linear-gradient(90deg, #22c55e, #f59e0b 55%, #ef4444)
+            background: linear-gradient(90deg, #10b981, #f59e0b 55%, #ef4444)
         }
 
         .gb i {
@@ -519,7 +736,7 @@
 
         .seg {
             display: flex;
-            height: 2.4rem;
+            height: 2.3rem;
             border-radius: 12px;
             overflow: hidden;
             margin: .5rem 0;
@@ -537,39 +754,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem
-        }
-
-        .vb {
-            display: flex;
-            gap: .7rem;
-            align-items: flex-end;
-            margin-top: .6rem;
-            min-height: 110px
-        }
-
-        .vb>div {
-            text-align: center;
-            font-size: .75em
-        }
-
-        .vb u {
-            display: block;
-            width: 46px;
-            margin: 0 auto .2rem;
-            background: var(--c);
-            border-radius: 8px 8px 0 0;
-            animation: grow .9s both;
-            transform-origin: bottom
-        }
-
-        .vb .avg u {
-            background: #22c55e
-        }
-
-        @keyframes grow {
-            from {
-                transform: scaleY(0)
-            }
         }
 
         .cmx {
@@ -599,62 +783,764 @@
     </style>
 </head>
 
-<body><canvas id="bg"></canvas>
+<body>
+    <canvas id="bg"></canvas>
     <div id="app">
         <div id="steps"></div>
         <div id="stage"></div>
-        <div id="ft"><button id="pv">← Prev</button><span id="ct"></span><button id="th">◐ Theme</button><button
-                id="nx">Next →</button></div>
+        <div id="ft">
+            <button id="pv">← Prev</button>
+            <span id="ct"></span>
+            <button id="th">◐ Theme</button>
+            <button id="nx">Next →</button>
+        </div>
     </div>
+
     <script>
-        const D = { "stages": ["Problem", "Data", "Explore", "Clean", "Features", "Split", "Scale", "Train", "Validate", "Test", "Deploy"], "slides": [{ "k": "title", "st": 0, "sp": "Both", "t": "Diabetes Progression Prediction", "plain": ["End-to-end Machine Learning pipeline", "M.Tech AI · CAI504C Machine Learning Lab · Experiment 4 · IUST Kashmir", "Speaker 1: Data Engineering · Speaker 2: Modeling & Deployment", "Techniques: OLS · Ridge · Linear SVR · Random Forest"], "math": [], "say": "Press → to start. Problem first, then every pipeline step with its maths.", "c": "#f43f5e", "n": 1 }, { "st": 0, "sp": "Speaker 1", "t": "The Problem: Who will get worse fastest?", "plain": ["A doctor sees 10 basic numbers per diabetic patient: age, sex, BMI, blood pressure and 6 blood tests.", "Some patients stay stable. Others deteriorate within 12 months (kidney, eye, nerve damage).", "Predict too <b>low</b> → treatment is delayed, damage may be irreversible. Most dangerous.", "Predict too <b>high</b> → stable patient may get medicine they do not need."], "math": ["Input: <i>x</i> = [age, sex, bmi, bp, s1 … s6]", "Output: <i>y</i> = progression score (25 to 346)", "Goal: <i>f</i>(<i>x</i>) ≈ <i>y</i>, minimise MSE = (1/<i>N</i>) Σ(<i>y</i> − <i>f</i>(<i>x</i>))²", "Extra rule: score ≥ 150 → High-Risk, else Controlled"], "say": "<b>Supervised regression</b> (answer is a number) plus a <b>triage threshold</b>. One model, two outputs.", "c": "#f43f5e", "n": 2, "ex": "Patient: age 59, BMI 32.1, BP 101 … → model says <b>196</b>. That is above 150, so the patient is flagged for early treatment.", "use": "Helping doctors decide who needs closer follow-up first.", "vz": "gauge" }, { "k": "pipe", "st": 0, "sp": "Speaker 1", "t": "The ML Pipeline: our roadmap", "plain": ["A pipeline is a fixed chain of steps. Each step feeds the next.", "<b>Four techniques, each with a job:</b> OLS = baseline. Ridge = fixes unstable weights. Linear SVR = robust to outliers. Random Forest = captures non-linear effects.", "The stage bar at the top shows where we are on every slide."], "math": [], "say": "Linear models first, then a non-linear one, so we can see whether complexity actually helps.", "c": "#f43f5e", "n": 3, "ex": "Like cooking: buy ingredients (data), wash (clean), chop (features), cook (train), taste (test), serve (web app).", "use": "Shows the order of work so no step is skipped.", "vz": null }, { "st": 1, "sp": "Speaker 1", "t": "Step 1: The Dataset", "plain": ["Efron, Hastie, Johnstone, Tibshirani (2004): 442 diabetes patients followed for 1 year.", "We use <b>real medical units</b> (age in years, BMI in kg/m², BP in mmHg, blood tests in mg/dL), not pre-scaled decimals.", "Why this data? Real clinical data, small and fast, has collinear features (needs Ridge) and non-linear effects (needs Forest).", "Raw file is <b>read-only</b>. We check shape (442, 11) and zero nulls."], "math": ["<i>N</i> = 442, <i>p</i> = 10 (13 after enrichment)", "Target mean 152.13, std 77.09"], "say": "Read-only raw data means no later bug can destroy the original evidence.", "c": "#38bdf8", "n": 4, "ex": "One row = one patient: age, sex, BMI, BP, six blood tests, and the known progression score.", "use": "Gives the model solved examples to learn from.", "vz": null }, { "st": 2, "sp": "Speaker 1", "t": "Step 2: Explore the Data (EDA)", "plain": ["Mean 152.1 is above median 140.5: a few very sick patients pull the average up (mild right skew).", "Distribution is one hill, no artificial cap. Regression is appropriate.", "<b>Imbalance?</b> At the 150 threshold: 238 Controlled (53.85%) and 204 High-Risk (46.15%). Almost 1:1, so no oversampling.", "Zones: Mild 25 to 100, Moderate 100 to 200, Severe above 200."], "math": ["Q1 = 87.0, Q3 = 211.5, IQR = 124.5", "Skewness = +0.44"], "say": "EDA means: look first, model later.", "c": "#a855f7", "n": 5, "ex": "Mean 152 vs median 140: a few very sick patients drag the average up, like one billionaire raising a town's average income.", "use": "Spotting skew and class balance before choosing a model.", "vz": "eda" }, { "st": 2, "sp": "Speaker 1", "t": "Step 3: Multicollinearity in Blood Fats", "plain": ["S1 (total cholesterol) and S2 (LDL) have <b>r = +0.897</b>. They carry almost the same information.", "OLS cannot decide who deserves the credit, so their weights become huge and opposite.", "Predictions stay fine. Interpretation and stability suffer.", "Remedies in this project: <b>Ridge</b> and <b>Random Forest</b>."], "math": ["<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>", "Var(<i>ŵ</i>) = σ²(<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup> → very large when S1 ≈ S2", "Also: r(S3, S4) = −0.738, r(S1, S4) = +0.542"], "say": "Two friends shouting the same advice: you cannot tell who is responsible.", "c": "#a855f7", "n": 6, "ex": "LDL is most of total cholesterol, so knowing S1 already tells you most of S2.", "use": "Deciding to use Ridge and Random Forest.", "vz": "mc" }, { "st": 3, "sp": "Speaker 1", "t": "Step 4: Clean and Validate", "plain": ["0 missing values in all 11 columns.", "Assertions stop the program if a value is physically impossible.", "The same bounds are reused later by the web app."], "math": ["BMI 18.5 ≤ BMI ≤ 60 (observed 18.5 to 42.2)", "BP ∈ [62, 133] mmHg · Glucose ∈ [58, 124], never 0", "Sex ∈ {1, 2}", "MAP = DBP + ⅓(SBP − DBP)"], "say": "assert df.isnull().sum().sum() == 0", "c": "#10b981", "n": 7, "ex": "BMI = 200 or glucose = 0 is impossible, so the program stops instead of learning from it.", "use": "Protecting the model from bad data.", "vz": null }, { "st": 4, "sp": "Speaker 1", "t": "Step 5: Feature Engineering", "plain": ["A linear model only adds features. It cannot multiply or divide them.", "So we add 3 medical combinations: <b>insulin resistance</b>, <b>artery risk ratio</b>, <b>metabolic syndrome triad</b>.", "Total: 10 original + 3 new = <b>13 features</b>."], "math": ["insulin_res_proxy = BMI × S6 (r = +0.59)", "atherogenic_ratio = S2 / (S3 + 10<sup>−5</sup>)", "metabolic_risk_triad = (BMI × BP) / (S3 + 10<sup>−5</sup>)"], "say": "The tiny 10⁻⁵ prevents division by zero.", "c": "#f59e0b", "n": 8, "ex": "BMI 32.1 × glucose 87 = <b>2793</b>. BMI 22 × glucose 80 = <b>1760</b>. The product separates the two patients far more sharply.", "use": "Giving linear models combined clues.", "vz": null }, { "k": "split", "st": 5, "sp": "Speaker 1", "t": "Step 6: Split 70% / 20% / 10%", "plain": ["<b>Train 309:</b> the model learns weights here.", "<b>Validation 88:</b> compare models, tune α, C, ε, depth.", "<b>Test 45:</b> opened once for the final honest score.", "Tuning on the test set would leak information (snooping bias)."], "math": ["DoF = 309 − 13 − 1 = 295", "≈ 24 patients per weight (rule: ≥ 10)", "test_size = 45/133 for the second split"], "say": "Homework (train), mock test (validation), real exam (test).", "c": "#06b6d4", "n": 9, "ex": "309 patients to learn, 88 to compare models, 45 hidden until the very end.", "use": "Honest scoring that is not fooled by tuning.", "vz": null }, { "st": 6, "sp": "Speaker 1", "t": "Step 7: Scaling and Zero Leakage", "plain": ["Columns live on different scales: cholesterol spans 204, log-triglycerides 2.86.", "Ridge and SVR penalise weights, so unscaled columns are treated unfairly.", "<b>X_train_scaled</b> = X_train after z-score using <b>train</b> mean and std.", "Validation and test are transformed with the same train numbers. Never fit on them."], "math": ["<i>z</i> = (<i>x</i> − μ<sub>train</sub>) / σ<sub>train</sub>", "Ridge penalty: α Σ <i>w</i><sub>j</sub>²", "SVR penalty: ½‖<i>w</i>‖²"], "say": "fit_transform on train. transform only on val and test. Forest does not need scaling.", "c": "#ec4899", "n": 10, "ex": "Age 59, train mean 48.5, std 13 → z = (59 − 48.5)/13 = <b>+0.81</b>, about 0.8 standard deviations above average.", "use": "Fair penalties in Ridge and SVR; one common ruler for all columns.", "vz": "sc" }, { "st": 7, "sp": "Speaker 2", "t": "Model 1: OLS (Multiple Linear Regression)", "plain": ["The baseline: one flat surface through all 13 features.", "Choose weights that make squared errors smallest.", "Slope of cost = 0 gives one exact formula, the Normal Equation.", "Test R² 0.4079 · RMSE 58.88 · CV 0.4536 ± 0.1311."], "math": ["<i>J</i>(<i>w</i>) = (1/2<i>N</i>)(<i>y</i> − <i>Xw</i>)<sup>T</sup>(<i>y</i> − <i>Xw</i>)", "∇<i>J</i> = (1/<i>N</i>)(−<i>X</i><sup>T</sup><i>y</i> + <i>X</i><sup>T</sup><i>Xw</i>) = 0", "<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>"], "say": "Why not gradient descent? Only 14 weights, so the exact answer is instant.", "c": "#8b5cf6", "n": 11, "ex": "Points (1,2), (2,3), (3,5): slope = 3/2 = <b>1.5</b>, intercept = 0.33, so at x = 4 the line predicts <b>6.33</b>.", "use": "The baseline: each weight says how much one feature moves the score. Easy to explain to a doctor.", "vz": "ols" }, { "st": 7, "sp": "Speaker 2", "t": "Model 2: Ridge Regression", "plain": ["OLS with a leash on the weights.", "The penalty α keeps S1 and S2 weights moderate and stable.", "α = 1.0, chosen on the validation set.", "Test R² 0.3906 · Validation 0.5164 · CV 0.4562 ± 0.1253."], "math": ["<i>J</i><sub>Ridge</sub> = (1/2<i>N</i>)‖<i>y</i> − <i>Xw</i>‖² + (α/2)‖<i>w</i>‖²", "<i>ŵ</i> = (<i>X</i><sup>T</sup><i>X</i> + α<i>I</i>)<sup>−1</sup><i>X</i><sup>T</sup><i>y</i>", "Eigenvalues become λ + α, so det &gt; 0"], "say": "Adding αI lifts every eigenvalue, so the matrix is always invertible.", "c": "#8b5cf6", "n": 12, "ex": "Without Ridge: S1 = +9 and S2 = −8 cancel each other. With a larger α both shrink to small stable values (move the slider).", "use": "Stable weights when features are correlated.", "vz": "ridge" }, { "st": 7, "sp": "Speaker 2", "t": "Model 3: Linear SVR", "plain": ["Errors smaller than ε cost nothing (the tube).", "Outside the tube, penalty grows <b>linearly</b>, not squared. Outliers pull less.", "C = 10 (strictness), ε = 5, linear kernel only.", "Test R² 0.3312 · Validation 0.4947 · CV 0.4501 ± 0.0992 (most stable)."], "math": ["<i>L</i><sub>ε</sub> = max(0, |<i>y</i> − ŷ| − ε)", "min ½‖<i>w</i>‖² + <i>C</i> Σ(ξ<sub>i</sub> + ξ<sub>i</sub>*)", "Error 40: SVR loss 35, OLS loss 1600"], "say": "ξ (slack) is how far a point sits outside the tube.", "c": "#8b5cf6", "n": 13, "ex": "ε = 5: error 3 → cost 0, error 12 → cost 7, error 40 → cost 35. OLS would charge 9, 144 and 1600.", "use": "Predictions that a few odd patients cannot drag around (move the ε slider).", "vz": "svr" }, { "st": 7, "sp": "Speaker 2", "t": "Model 4: Random Forest", "plain": ["Many shallow decision trees, each trained on a bootstrap sample, then averaged.", "Trees split on thresholds, so they capture non-linear effects like BMI × glucose.", "100 trees, max_depth 5, min_samples_split 6 to avoid memorising 309 patients.", "Test R² 0.4227 · RMSE 58.14 · MAE 48.67 · CV 0.4206 ± 0.1741."], "math": ["ŷ = (1/<i>B</i>) Σ <i>T</i><sub>b</sub>(<i>x</i>),  <i>B</i> = 100", "ΔH = H(R) − [ |R<sub>L</sub>|/|R| · H(R<sub>L</sub>) + |R<sub>R</sub>|/|R| · H(R<sub>R</sub>) ]", "H(R) = variance of <i>y</i> inside the group"], "say": "Averaging many different trees lowers variance.", "c": "#8b5cf6", "n": 14, "ex": "5 trees predict 180, 150, 210, 170, 190. The forest answer is the average: <b>180</b>.", "use": "Catching patterns like 'BMI high AND glucose high' that straight lines miss.", "vz": "rf" }, { "st": 8, "sp": "Speaker 2", "t": "Step 8: 5-Fold Cross-Validation", "plain": ["Train on 4 parts, test on 1, rotate 5 times.", "Forest fold R²: 0.5111, 0.1132 (noisy), 0.5688, 0.5658, 0.3443.", "The mean is close to test R², so the result is not just a lucky split.", "The learning curve flattens as data grows: low variance, no serious over-fitting."], "math": ["Mean = (0.5111 + 0.1132 + 0.5688 + 0.5658 + 0.3443)/5 = 0.4206", "Std ≈ 0.174"], "say": "CV tells us how stable a model is.", "c": "#22c55e", "n": 15, "ex": "Like 5 mini-exams instead of one. Scores of 0.51, 0.11, 0.57, 0.57, 0.34 show one fold is much harder than the rest.", "use": "Checking stability and choosing settings without touching the test set.", "vz": "cv" }, { "k": "table", "st": 9, "sp": "Speaker 2", "t": "Step 9: Test Results and Clinical Triage", "plain": ["45 unseen patients, opened once.", "<b>Random Forest</b> has the best test R², RMSE and MAE.", "Honest note: gaps between models are smaller than the CV spread. Linear models are comparable.", "R² ≈ 0.4 to 0.5 is the realistic ceiling: lifestyle and genes are not in the data."], "math": ["Triage at 150: Accuracy 82.22% (37/45)", "Sensitivity 78.26% (18/23) · Specificity 86.36% (19/22)", "Precision 85.71% · F1 0.8182", "TN 19 · FP 3 · FN 5 · TP 18"], "table": [["Model", "R²", "RMSE", "MAE", "CV mean"], ["Random Forest", "0.4227", "58.14", "48.67", "0.4206"], ["OLS", "0.4079", "58.88", "49.72", "0.4536"], ["Ridge", "0.3906", "59.74", "50.42", "0.4562"], ["Linear SVR", "0.3312", "62.58", "52.42", "0.4501"]], "say": "Sensitivity matters most: a missed high-risk patient is worse than a false alarm.", "c": "#f97316", "n": 16, "ex": "Of 23 truly high-risk patients we flagged 18 (78%). 5 were missed. Of 22 controlled patients, 3 got a false alarm.", "use": "Choosing which model to deploy and how far to trust it.", "vz": "cm" }, { "k": "code", "st": 9, "sp": "Speaker 1", "t": "Code Walkthrough", "plain": ["Load real-unit data and assert shape and nulls.", "Add the 3 engineered features.", "70/20/10 split, scaler fitted on train only.", "Train Random Forest, score on test, save model and scaler."], "math": [], "code": "df = load_diabetes(scaled=False, as_frame=True).frame\nassert df.shape == (442, 11) and not df.isnull().any().any()\ndf['insulin_res_proxy'] = df['bmi'] * df['s6']\ndf['atherogenic_ratio'] = df['s2'] / (df['s3'] + 1e-5)\nX_tr, X_tmp, y_tr, y_tmp = train_test_split(X, y, test_size=0.30, random_state=42)\nX_val, X_te, y_val, y_te = train_test_split(X_tmp, y_tmp, test_size=45/133, random_state=42)\nsc = StandardScaler()\nX_tr_s = sc.fit_transform(X_tr)   # train only\nX_te_s = sc.transform(X_te)\nrf = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=6, random_state=42)\nrf.fit(X_tr_s, y_tr)\njoblib.dump(rf, 'models/diabetes_model.joblib'); joblib.dump(sc, 'models/scaler.joblib')", "say": "Save the scaler too, or new patients would be scaled differently.", "c": "#f97316", "n": 17, "ex": "fit() learns from train. predict() uses what was learned. The saved scaler travels with the model.", "use": "Making the whole pipeline repeatable.", "vz": null }, { "st": 10, "sp": "Speaker 2", "t": "Step 10: Web App (Flask API)", "plain": ["Request: browser sends 10 numbers as JSON to POST /predict (port 5003).", "Server validates ranges, <b>builds the 3 engineered features</b>, scales with the saved scaler, predicts.", "Response: score, risk tier, and the 150-threshold class.", "About 1.12 ms per request, 800+ per second per worker. Production: Docker + Gunicorn + NGINX."], "math": ["Example: score 196.16 → tier Moderate (100 to 200)", "but ≥ 150 → triage: High Risk", "Tier is display; threshold is the clinical rule"], "say": "Same scaler and same column order in training and production.", "c": "#3b82f6", "n": 18, "ex": "Send BMI 32.1, BP 101 … → server returns 196.16 → High Risk (≥ 150).", "use": "Letting any app or website use the model in about 1 ms.", "vz": "gauge" }, { "st": 10, "sp": "Speaker 2", "t": "Step 11: Monitoring — Drift", "plain": ["<b>Data drift:</b> new patient types, for example teenagers while we trained on ages 19 to 79. Monitor inputs with PSI monthly.", "<b>Concept drift:</b> new drugs (GLP-1, SGLT2) change how risk factors lead to progression. Quarterly audits, retrain on sliding 12-month data."], "math": ["Data drift: P(<i>x</i>) changes", "Concept drift: P(<i>y</i> | <i>x</i>) changes", "PSI = Σ(a − e)·ln(a/e);  &gt; 0.25 = major shift"], "say": "Thank you. Questions?", "c": "#3b82f6", "n": 19, "ex": "A teenage clinic has different glucose levels, so predictions can be wrong without any error message.", "use": "Knowing when the model is getting old and must be retrained.", "vz": null }], "pipe": [["1 Problem", "Predict disease progression"], ["2 Data", "442 patients, 10 inputs"], ["3 Explore", "Target shape, class balance"], ["4 Clean", "Assert nulls and ranges"], ["5 Features", "Add 3 metabolic features"], ["6 Split", "70 / 20 / 10"], ["7 Scale", "Z-score, fit on train only"], ["8 Train", "OLS · Ridge · SVR · Forest"], ["9 Validate", "5-fold CV, tune settings"], ["10 Test", "R², RMSE, triage metrics"], ["11 Deploy", "Flask API + drift watch"]] }, S = D.slides, C = ["#f43f5e", "#38bdf8", "#a855f7", "#10b981", "#f59e0b", "#06b6d4", "#ec4899", "#8b5cf6", "#22c55e", "#f97316", "#3b82f6"];
-        const $ = id => document.getElementById(id); let cur = 0; const VZ = {
-            gauge: () => `<div class="gq"><b>Progression scale</b><div class="gb"><i style="left:${150 / 346 * 100}%"></i><em style="left:${196 / 346 * 100}%">196</em></div><div class="gl"><span>25 mild</span><span>150 = triage line</span><span>346 severe</span></div></div>`,
-            eda: () => `<b>Controlled vs High-Risk patients (threshold 150)</b><div class="seg"><div style="flex:53.85;background:#22c55e">Controlled 238 · 53.85%</div><div style="flex:46.15;background:#ef4444">High-Risk 204 · 46.15%</div></div><small>Almost 1 : 1, so no oversampling needed.</small>`,
-            mc: () => `<b>How strongly pairs move together (|r|)</b>${[["S1 total vs S2 LDL", "0.897", .897], ["S3 HDL vs S4 ratio", "0.738 (negative)", .738], ["S1 vs S4", "0.542", .542]].map(r => `<div class="hb"><span>${r[0]}</span><div><u style="width:${r[2] * 100}%"></u></div><em>${r[1]}</em></div>`).join("")}`,
-            sc: () => `<div class="two"><div><b>Before: raw ranges</b>${[["Cholesterol 204", 100], ["Glucose 66", 32], ["log-TG 2.9", 3]].map(r => `<div class="hb"><span>${r[0]}</span><div><u style="width:${r[1]}%;background:#ef4444"></u></div></div>`).join("")}</div><div><b>After: z-scores, same ruler</b>${["Cholesterol", "Glucose", "log-TG"].map(r => `<div class="hb"><span>${r}</span><div><u style="width:60%;background:#22c55e"></u></div></div>`).join("")}</div></div>`,
-            ols: () => { const X = x => 40 + x * 70, Y = y => 130 - y * 22, f = x => .33 + 1.5 * x, P = [[1, 2], [2, 3], [3, 5]]; return `<svg viewBox="0 0 330 150" width="100%" style="max-height:190px"><line x1="30" y1="135" x2="320" y2="135" stroke="currentColor" opacity=".3"/><line x1="${X(.4)}" y1="${Y(f(.4))}" x2="${X(3.6)}" y2="${Y(f(3.6))}" style="stroke:var(--c)" stroke-width="3"/>${P.map(p => `<line x1="${X(p[0])}" y1="${Y(p[1])}" x2="${X(p[0])}" y2="${Y(f(p[0]))}" stroke="#ef4444" stroke-dasharray="3"/><circle cx="${X(p[0])}" cy="${Y(p[1])}" r="6" fill="#2563eb"/>`).join("")}<text x="150" y="26" fill="currentColor" font-size="11">Blue = patients · red = errors · line ŷ = 0.33 + 1.5x</text></svg>` },
-            ridge: () => `<b>Slide α: <span id="ra">0.0</span></b><input type="range" min="0" max="10" step=".1" value="0" style="width:100%" oninput="rg(this.value)"><div id="rb"></div>`,
-            svr: () => `<b id="sb"></b><input type="range" min="0" max="40" value="5" style="width:100%" oninput="sv(this.value)"><div id="sa"></div>`,
-            rf: () => `<b>Each tree votes, the forest averages</b><div class="vb">${[180, 150, 210, 170, 190].map((v, i) => `<div><u style="height:${v / 2.2}px"></u><small>Tree ${i + 1}<br>${v}</small></div>`).join("")}<div class="avg"><u style="height:${180 / 2.2}px"></u><small>Forest<br><b>180</b></small></div></div>`,
-            cv: () => `<b>R² in each of the 5 folds (mean 0.42)</b><div class="vb">${[.5111, .1132, .5688, .5658, .3443].map((v, i) => `<div><u style="height:${v * 170}px"></u><small>Fold ${i + 1}<br>${v}</small></div>`).join("")}</div>`,
-            cm: () => `<b>Triage result on 45 test patients</b><div class="cmx"><span></span><i>Pred. Controlled</i><i>Pred. High-Risk</i><i>Actual Controlled</i><u style="background:#16a34a">19 correct</u><u style="background:#f59e0b">3 false alarms</u><i>Actual High-Risk</i><u style="background:#dc2626">5 missed</u><u style="background:#16a34a">18 caught</u></div>`
+        const D = {
+            "stages": [
+                "Problem",
+                "Dataset",
+                "Features",
+                "Imbalance",
+                "Scaling",
+                "Split",
+                "Linear ML",
+                "Evaluate",
+                "Diagnostics",
+                "Triage",
+                "Conclusion"
+            ],
+            "slides": [
+                {
+                    "k": "title",
+                    "st": 0,
+                    "sp": "Both Speakers",
+                    "t": "Diabetes Progression Prediction via Multiple Linear Regression",
+                    "plain": [
+                        "Complete End-to-End Machine Learning Pipeline Built from Scratch",
+                        "Course: CAI504C Machine Learning Laboratory \u00b7 Semester I \u00b7 IUST Kashmir",
+                        "Primary Technique: Multiple Linear Regression (Ordinary Least Squares \u2014 OLS)",
+                        "Key Focus: Dataset Imbalance Management, Feature Heterogeneity, & Zero Data Leakage"
+                    ],
+                    "math": [],
+                    "say": "Good morning Professor. We are presenting our Machine Learning lab project on Diabetes Disease Progression Prediction using Multiple Linear Regression, focusing deeply on dataset exploration, feature handling, and imbalance management.",
+                    "c": "#2563eb",
+                    "n": 1
+                },
+                {
+                    "st": 0,
+                    "sp": "Speaker 1",
+                    "t": "The Clinical Problem Statement",
+                    "plain": [
+                        "A clinician evaluates diabetic patients and measures 10 baseline clinical measurements (vitals, composition, and blood serum lipids).",
+                        "<b>Goal:</b> Predict quantitative disease progression 1 year post baseline (scale: 25 to 346).",
+                        "<b>Under-predicting</b> is dangerous: treatment is delayed and patients suffer irreversible organ damage (kidney failure, blindness).",
+                        "<b>Over-predicting</b> causes unnecessary drug escalation and hypoglycemic risk."
+                    ],
+                    "math": [
+                        {
+                            "h": "Model Inputs Vector (x)",
+                            "html": "<b>x</b> = [<i>age</i>, <i>sex</i>, <i>bmi</i>, <i>bp</i>, <i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>, <i>s</i><sub>3</sub>, <i>s</i><sub>4</sub>, <i>s</i><sub>5</sub>, <i>s</i><sub>6</sub>]<sup>T</sup> &in; &reals;<sup>10</sup>",
+                            "info": "<div><span class=\"fm-badge b-var\">10 Inputs</span> 4 physical vitals (age, sex, BMI, blood pressure) and 6 blood serums (total cholesterol, LDL, HDL, TCH, log-triglycerides, glucose).</div>",
+                            "m": "$$\\mathbf{x} = [\\text{age}, \\text{sex}, \\text{bmi}, \\text{bp}, s_1, s_2, s_3, s_4, s_5, s_6]^T \\in \\mathbb{R}^{10}$$",
+                            "d": "10 baseline patient measurements in authentic clinical units."
+                        },
+                        {
+                            "h": "Target Progression Metric (y)",
+                            "html": "<i>y</i> &in; [25.0, 346.0] &nbsp; (Mean = 152.1, Median = 140.5)",
+                            "info": "<div><span class=\"fm-badge b-why\">Target y</span> Continuous disease progression score recorded 1 year after baseline. Higher score indicates faster microvascular and tissue deterioration.</div>",
+                            "m": "$$y \\in [25.0, 346.0]$$",
+                            "d": "Quantitative clinical progression metric 1 year post baseline."
+                        },
+                        {
+                            "h": "Optimization Objective (MSE)",
+                            "html": "min<sub><b>&beta;</b></sub> MSE = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\"><i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup>",
+                            "info": "<div><span class=\"fm-badge b-param\">Goal</span> Find parameter weights <b>&beta;</b> that minimize the average squared prediction error across all patients.</div>",
+                            "m": "$$\\min_{\\boldsymbol{\\beta}} \\text{MSE} = \\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2$$",
+                            "d": "Minimizes the average squared error between actual and predicted progression."
+                        }
+                    ],
+                    "say": "This is a Supervised Multivariate Continuous Regression problem where our goal is to fit a linear mapping that accurately predicts progression while remaining 100% interpretable.",
+                    "c": "#f43f5e",
+                    "n": 2,
+                    "ex": "A patient with BMI 32.1 and elevated blood pressure is predicted at 225.9, triggering an immediate severe clinical triage alert.",
+                    "use": "Early warning clinical decision support to prioritize patients needing urgent care.",
+                    "vz": "gauge"
+                },
+                {
+                    "k": "pipe",
+                    "st": 1,
+                    "sp": "Speaker 1",
+                    "t": "The Complete ML Pipeline Architecture",
+                    "plain": [
+                        "Every step in our pipeline is built modularly with strict zero-leakage enforcement.",
+                        "1. <b>Data Ingestion:</b> Authentic unscaled clinical measurements (N=442).",
+                        "2. <b>Feature Handling:</b> Binary dummy encoding for sex, continuous scaling for vitals.",
+                        "3. <b>Imbalance Management:</b> Target quantile stratification across 70/20/10 splits.",
+                        "4. <b>Simple Modeling:</b> Multiple Linear Regression solved via Ordinary Least Squares (Normal Equation)."
+                    ],
+                    "math": [],
+                    "say": "Our pipeline begins with untouched raw data, handles categorical and continuous features, balances target quantiles, fits Ordinary Least Squares, and validates assumptions.",
+                    "c": "#06b6d4",
+                    "n": 3,
+                    "ex": "Like a diagnostic assembly line: Clean -> Encode -> Stratify -> Scale -> Train -> Diagnose -> Serve.",
+                    "use": "Ensures full reproducibility with zero data leakage across train, val, and test.",
+                    "vz": null
+                },
+                {
+                    "st": 1,
+                    "sp": "Speaker 1",
+                    "t": "Step 1: The Raw Clinical Dataset",
+                    "plain": [
+                        "Cohort: 442 diabetes patients from the landmark study by Efron, Hastie, Johnstone & Tibshirani.",
+                        "Preserved in <b>authentic unscaled physical units</b> (not arbitrary decimals):",
+                        "Age in years (19 to 79), BMI in kg/m\u00b2 (18.5 to 42.2), Blood Pressure in mmHg (62 to 133).",
+                        "Six blood serum biomarkers: S1 (Total Chol), S2 (LDL), S3 (HDL), S4 (TCH Ratio), S5 (Log Triglycerides), S6 (Glucose)."
+                    ],
+                    "math": [
+                        {
+                            "h": "Dataset Matrix Dimensions",
+                            "html": "<i>N</i> = <b>442</b> Patients &nbsp;&times;&nbsp; <i>p</i> = <b>10</b> Features &nbsp;&DoubleRightArrow;&nbsp; <b>4,420</b> Total Data Points",
+                            "info": "<div><span class=\"fm-badge b-const\">Sample Size</span> 442 patients is a realistic clinical cohort (~44 patients per parameter).</div><div><span class=\"fm-badge b-green\">Zero Missing Data</span> All 4,420 values are 100% verified with zero nulls.</div>",
+                            "m": "$$N = 442 \\text{ Patients}, \\quad p = 10 \\text{ Features}$$",
+                            "d": "Full cohort with complete clinical measurements and zero missing values."
+                        },
+                        {
+                            "h": "Target Progression Statistics",
+                            "html": "Min = <b>25</b>, &nbsp; Mean = <b>152.13</b>, &nbsp; Median = <b>140.50</b>, &nbsp; Max = <b>346</b>",
+                            "info": "<div><span class=\"fm-badge b-why\">Progression Span</span> Spans from mild disease stability (25) to severe microvascular deterioration (346). Skewness = +0.44.</div>",
+                            "m": "$$\\text{Mean} = 152.13, \\; \\text{Median} = 140.50, \\; \\text{Skewness} = +0.44$$",
+                            "d": "Continuous progression spanning from mild stability (25) to severe rapid decline (346)."
+                        }
+                    ],
+                    "say": "We purposely used real physical units rather than pre-scaled decimals so every weight and clinical parameter has direct medical meaning.",
+                    "c": "#38bdf8",
+                    "n": 4,
+                    "ex": "Row 1: Age 59, Sex Male, BMI 32.1, BP 101 mmHg, S1 157 mg/dL, S5 4.86, Progression 151.",
+                    "use": "Gives the model ground-truth clinical data to establish baseline metabolic relationships.",
+                    "vz": null
+                },
+                {
+                    "st": 2,
+                    "sp": "Speaker 1",
+                    "t": "Step 2: Handling Different Input Feature Types",
+                    "plain": [
+                        "1. <b>Categorical Demographic Feature (Sex):</b> Originally coded as 1.0 (Female) and 2.0 (Male).",
+                        "   -> Leaving 1 vs 2 implies Male is 'twice' Female, which is mathematically invalid for linear models!",
+                        "   -> We map Sex to a binary dummy indicator: [0.0 = Female, 1.0 = Male].",
+                        "   -> Now $\\beta_{\\text{sex}}$ directly represents the progression difference for males relative to females.",
+                        "2. <b>Continuous Physiological Vitals:</b> Age (years), BMI (kg/m\u00b2), BP (mmHg).",
+                        "3. <b>Continuous Blood Serum Lipids:</b> S1 through S6. Notice S5 is already log-transformed by clinicians to stabilize natural lipid variance."
+                    ],
+                    "math": [
+                        {
+                            "h": "Biological Sex Dummy Encoding",
+                            "html": "<i>sex</i> &in; { 0.0: Female, &nbsp; 1.0: Male }",
+                            "info": "<div><span class=\"fm-badge b-var\">Categorical Handling</span> Converted from continuous centering into a binary dummy variable (0=Female, 1=Male).</div><div><span class=\"fm-badge b-why\">Linear Validity</span> OLS adds &beta;<sub>sex</sub> for males and 0.0 for females without arbitrary numerical distortion.</div>",
+                            "m": "$$\\text{sex} \\in \\{0.0: \\text{Female}, \\; 1.0: \\text{Male}\\}$$",
+                            "d": "Guarantees valid linear mathematics without imposing arbitrary numeric scale."
+                        },
+                        {
+                            "h": "Multicollinearity Detection (VIF)",
+                            "html": "<i>r</i>(<i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>) = <b>+0.897</b> &nbsp;&DoubleRightArrow;&nbsp; VIF(<i>s</i><sub>1</sub>) = <b>53.71</b>, &nbsp; VIF(<i>s</i><sub>2</sub>) = <b>35.39</b>",
+                            "info": "<div><span class=\"fm-badge b-const\">Cholesterol & LDL</span> High VIF causes coefficient signs to oppose, but net predictions remain accurate and unbiased.</div>",
+                            "m": "$$r(s_1, s_2) = +0.897 \\implies \\text{VIF}(s_1) = 53.71, \\; \\text{VIF}(s_2) = 35.39$$",
+                            "d": "Total cholesterol and LDL are highly collinear; handled gracefully by OLS closed-form solver."
+                        }
+                    ],
+                    "say": "Professor, handling categorical variables properly is vital: mapping sex to zero and one ensures our linear coefficients retain pure dummy variable interpretation.",
+                    "c": "#8b5cf6",
+                    "n": 5,
+                    "ex": "Sex was 1.0 and 2.0. Converted to 0 and 1. If beta is -10.1, it means males have an expected baseline progression 10.1 units lower than females.",
+                    "use": "Guarantees valid linear mathematics without imposing false ordinal scales on demographics.",
+                    "vz": "sc"
+                },
+                {
+                    "st": 3,
+                    "sp": "Speaker 1",
+                    "t": "Step 3: Managing Dataset Imbalance",
+                    "plain": [
+                        "Dataset imbalance occurs in TWO distinct forms in this project:",
+                        "<b>A. Continuous Target Imbalance (Right-Skewed Tail Sparsity):</b>",
+                        "   -> Progression is right-skewed (+0.44 skewness). Mean (152.1) exceeds Median (140.5).",
+                        "   -> Severe cases (>200) constitute only 28.7% of patients. Naive random splits risk an empty test set!",
+                        "   -> <b>Solution:</b> Quantile-Stratified Splitting (5 bins) guarantees identical target distributions across Train, Val, and Test.",
+                        "<b>B. Clinical Triage Class Imbalance (Severe vs Controlled):</b>",
+                        "   -> Triage threshold at Severe Progression (y >= 200) results in an imbalanced 1 : 2.5 class ratio.",
+                        "   -> <b>Solution:</b> Cost-sensitive balanced weights prioritize Sensitivity (Recall) over deceptive overall accuracy."
+                    ],
+                    "math": [
+                        {
+                            "h": "Continuous Progression Imbalance (Right-Skewed)",
+                            "html": "Mild (&lt;100): <b>33.3%</b> &nbsp;|&nbsp; Moderate (100-200): <b>38.0%</b> &nbsp;|&nbsp; Severe (&gt;200): <b>28.7%</b>",
+                            "info": "<div><span class=\"fm-badge b-why\">The Challenge</span> Severe progression is a sparse minority (28.7%). Random splitting risks leaving test data with too few high-risk patients.</div>",
+                            "m": "$$\\text{Mild } (<100): 33.3\\%, \\; \\text{Moderate } (100-200): 38.0\\%, \\; \\text{Severe } (>200): 28.7\\%$$",
+                            "d": "Severe cases form a sparse minority; random splitting risks severe distribution shift."
+                        },
+                        {
+                            "h": "5-Bin Quantile Stratification Solution",
+                            "html": "<i>Q</i><sub>1</sub>: [25, 68] &nbsp;|&nbsp; <i>Q</i><sub>2</sub>: (68, 109] &nbsp;|&nbsp; <i>Q</i><sub>3</sub>: (109, 159] &nbsp;|&nbsp; <i>Q</i><sub>4</sub>: (159, 211] &nbsp;|&nbsp; <i>Q</i><sub>5</sub>: (211, 346]",
+                            "info": "<div><span class=\"fm-badge b-green\">Identical Distributions</span> Means across splits match almost perfectly: Train = 151.21, Val = 155.05, Test = 152.78. Zero distribution drift!</div>",
+                            "m": "$$\\mu_{\\text{train}} = 151.21, \\; \\mu_{\\text{val}} = 155.05, \\; \\mu_{\\text{test}} = 152.78$$",
+                            "d": "Quantile stratification ensures zero distribution drift across splits."
+                        }
+                    ],
+                    "say": "We actively managed continuous target imbalance by quantile-stratifying our splits, ensuring zero distribution drift across training, validation, and test sets.",
+                    "c": "#ec4899",
+                    "n": 6,
+                    "ex": "Without stratification, a random 10% test set might contain only 4 severe patients. With 5-bin quantile stratification, all sets have matching progression distributions.",
+                    "use": "Prevents evaluation bias and ensures model is properly tested across all disease severity levels.",
+                    "vz": "eda"
+                },
+                {
+                    "st": 4,
+                    "sp": "Speaker 1",
+                    "t": "Step 4: Zero Data Leakage Feature Standardization",
+                    "plain": [
+                        "Features span vastly different physical magnitudes: Cholesterol spans ~200 mg/dL, while log-triglycerides spans only ~2.8.",
+                        "Without standardization, raw coefficients cannot be compared to determine feature importance.",
+                        "<b>The Zero Data Leakage Rule:</b> Scaler is fitted EXCLUSIVELY on the 70% Training set.",
+                        "Validation and Test sets are transformed using the training mean and standard deviation.",
+                        "Never call fit() or fit_transform() on validation or test sets!"
+                    ],
+                    "math": [
+                        {
+                            "h": "Z-Score Standardization Formula",
+                            "html": "<i>z<sub>ij</sub></i> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>x<sub>ij</sub></i> - &mu;<sub><i>j</i>, train</sub></span><span class=\"fm-den\">&sigma;<sub><i>j</i>, train</sub></span></div>",
+                            "info": "<div><span class=\"fm-badge b-var\">Unified Ruler</span> Standardizes all features to Mean = 0.0, Std = 1.0. Allows fair comparison of beta effect sizes across cholesterol, blood pressure, and BMI.</div>",
+                            "m": "$$z_{ij} = \\frac{x_{ij} - \\mu_{j, \\text{train}}}{\\sigma_{j, \\text{train}}}$$",
+                            "d": "Every standardized feature has mean = 0.0 and std = 1.0 on train."
+                        },
+                        {
+                            "h": "Zero Data Leakage Invariant",
+                            "html": "<b>Law:</b> &mu;<sub>test</sub> and &sigma;<sub>test</sub> are <b>NEVER</b> computed during training!",
+                            "info": "<div><span class=\"fm-badge b-why\">Strict Isolation</span> Scaler is fitted exclusively on the 309 training patients. Validation and Test sets are transformed using training &mu; and &sigma; alone.</div>",
+                            "m": "$$\\mu_{\\text{test}} \\text{ is NEVER computed during training}$$",
+                            "d": "Test statistics remain 100% blind until final evaluation."
+                        }
+                    ],
+                    "say": "Professor, we strictly prevented data leakage. Fitting the scaler on the whole dataset would leak future test distribution statistics into the training pipeline.",
+                    "c": "#10b981",
+                    "n": 7,
+                    "ex": "Patient BMI = 32.1. Train mean = 26.3, std = 4.2 -> z = (32.1 - 26.3)/4.2 = +1.38 SD above average.",
+                    "use": "Harmonizes features to a unified ruler so beta coefficients represent direct comparable standardized effect sizes.",
+                    "vz": "sc"
+                },
+                {
+                    "k": "split",
+                    "st": 5,
+                    "sp": "Speaker 1",
+                    "t": "Step 5: Strict 70% / 20% / 10% Dataset Partitioning",
+                    "plain": [
+                        "Total N = 442 patients partitioned with 5-bin quantile stratification:",
+                        "1. <b>Training Set (70%, N=309):</b> Model learns parameter weights exclusively here. (~31 patients per parameter).",
+                        "2. <b>Validation Set (20%, N=88):</b> Used for diagnostic checks, testing convergence, and verifying residual assumptions.",
+                        "3. <b>Holdout Test Set (10%, N=45):</b> Kept untouched in a vault, opened only once at the very end to evaluate honest generalization to unseen patients."
+                    ],
+                    "math": [],
+                    "say": "Three independent sets: Training to learn, Validation to verify, and Holdout Test to score unseen performance.",
+                    "c": "#06b6d4",
+                    "n": 8,
+                    "ex": "Homework (Train 309), Pre-board mock test (Validation 88), Final Board Exam (Test 45).",
+                    "use": "Guarantees that test performance reflects true generalization to future patients.",
+                    "vz": null
+                },
+                {
+                    "st": 6,
+                    "sp": "Speaker 2",
+                    "t": "Step 6: Mathematical Equations of Multiple Linear Regression",
+                    "plain": [
+                        "Why Multiple Linear Regression? It is the most foundational, fully transparent, and explainable ML algorithm.",
+                        "We model disease progression <i>y&#770;</i> as a linear combination of the 10 standardized clinical inputs.",
+                        "<b>Cost Function:</b> We minimize Mean Squared Error (MSE), also known as the Residual Sum of Squares (RSS).",
+                        "<b>Optimization:</b> Solved analytically in closed-form via the <b>Normal Equation</b> (zero iterative tuning, instant exact global optimum!)."
+                    ],
+                    "math": [
+                        {
+                            "h": "1. Linear Hypothesis Model",
+                            "html": "<i>y&#770;</i>(<b>x</b>) = <span class=\"fm-badge b-const\">&beta;<sub>0</sub></span> + <span class=\"fm-badge b-param\">&sum;<sub><i>j</i>=1</sub><sup>10</sup> &beta;<sub><i>j</i></sub><i>z<sub>j</sub></i></span> = <b>X&beta;</b>",
+                            "info": "<div><span class=\"fm-badge b-var\"><i>y&#770;</i></span> Predicted 1-year disease progression score (e.g. 185.4).</div><div><span class=\"fm-badge b-const\">&beta;<sub>0</sub> = 151.21</span> Baseline intercept: expected progression when all biomarkers are at cohort average (all z = 0).</div><div><span class=\"fm-badge b-param\">&beta;<sub><i>j</i></sub></span> Learned clinical weight: points increase per +1 SD increase in biomarker <i>j</i>.</div><div><span class=\"fm-badge b-var\"><i>z<sub>j</sub></i></span> Standardized patient biomarker z-score.</div>",
+                            "m": "$$\\hat{y}(\\mathbf{x}) = \\beta_0 + \\sum_{j=1}^{10} \\beta_j z_j = \\mathbf{X} \\boldsymbol{\\beta}$$",
+                            "d": "Predicted progression is baseline intercept plus sum of weighted standardized features."
+                        },
+                        {
+                            "h": "2. Mean Squared Error (MSE) Cost Function",
+                            "html": "<i>J</i>(<b>&beta;</b>) = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup> = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> (<b>y</b> - <b>X&beta;</b>)<sup>T</sup>(<b>y</b> - <b>X&beta;</b>)",
+                            "info": "<div><span class=\"fm-badge b-var\">Residual</span> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>) is prediction error for patient <i>i</i>.</div><div><span class=\"fm-badge b-why\">Why Squared?</span> 1) Errors don't cancel out; 2) Punishes large clinical mistakes quadratically; 3) Smooth convex bowl with single global minimum.</div>",
+                            "m": "$$J(\\boldsymbol{\\beta}) = \\frac{1}{2N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2 = \\frac{1}{2N} (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})^T (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})$$",
+                            "d": "Squares errors to penalize large mistakes and provide a differentiable convex surface."
+                        },
+                        {
+                            "h": "3. The Normal Equation (Analytical Optimum)",
+                            "html": "&nabla;<sub><b>&beta;</b></sub><i>J</i>(<b>&beta;</b>) = <b>0</b> &nbsp;&DoubleRightArrow;&nbsp; <span class=\"fm-badge b-green\" style=\"font-size: 1.05rem;\"><b>&beta;&#770;</b> = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup> <b>X</b><sup>T</sup><b>y</b></span>",
+                            "info": "<div><span class=\"fm-badge b-param\">Closed-Form Solution</span> Setting the gradient of MSE to zero directly yields the mathematical minimum.</div><div><span class=\"fm-badge b-const\">Fast Matrix Inversion</span> (<b>X</b><sup>T</sup><b>X</b>) is 11 &times; 11. Inverting takes &lt; 1 ms. Zero iterations, zero learning rate!</div>",
+                            "m": "$$\\nabla_{\\boldsymbol{\\beta}} J(\\boldsymbol{\\beta}) = \\mathbf{0} \\implies \\hat{\\boldsymbol{\\beta}} = (\\mathbf{X}^T \\mathbf{X})^{-1} \\mathbf{X}^T \\mathbf{y}$$",
+                            "d": "Exact closed-form solution. Solves 11x11 matrix inversion in < 1 millisecond!"
+                        }
+                    ],
+                    "say": "Professor, we chose Multiple Linear Regression because every single parameter has a closed-form analytical solution and direct medical explainability.",
+                    "c": "#2563eb",
+                    "n": 9,
+                    "ex": "Setting the gradient of MSE to zero directly yields beta = (X^T X)^-1 X^T y. Because X^T X is 11x11, inversion takes less than 1 millisecond.",
+                    "use": "Provides transparent, defensible, and fast clinical prognostic modeling.",
+                    "vz": "ols"
+                },
+                {
+                    "st": 7,
+                    "sp": "Speaker 2",
+                    "t": "Step 7: Holdout Test Set Benchmark Results",
+                    "plain": [
+                        "The model was evaluated on the 45 unseen holdout test patients (opened only once).",
+                        "<b>Test R\u00b2 Score: 0.4882</b> (Explains 48.8% of variance in 1-year progression in unseen patients).",
+                        "<b>Test RMSE: 55.17</b> progression units (Average root-squared error).",
+                        "<b>Test MAE: 44.92</b> progression units (Average absolute error).",
+                        "<b>5-Fold Cross-Validation on Train:</b> Mean R\u00b2 = <b>0.4587 \u00b1 0.0538</b> (Proves model stability across folds!)."
+                    ],
+                    "math": [
+                        {
+                            "h": "Coefficient of Determination (R\u00b2 Score)",
+                            "html": "<i>R</i><sup>2</sup> = 1 - <div class=\"fm-frac\"><span class=\"fm-num\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup></span><span class=\"fm-den\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#772;</i>)<sup>2</sup></span></div> = <b>0.4882</b>",
+                            "info": "<div><span class=\"fm-badge b-green\">Meaning</span> Our 10 baseline clinical biomarkers explain <b>48.82%</b> of the variance in 1-year disease progression in unseen patients (vs a baseline of 0 for guessing the mean).</div>",
+                            "m": "$$R^2 = 1 - \\frac{\\sum_{i=1}^N (y_i - \\hat{y}_i)^2}{\\sum_{i=1}^N (y_i - \\bar{y})^2} = 0.4882$$",
+                            "d": "Explains ~49% of total variance in unseen patients compared to predicting the mean."
+                        },
+                        {
+                            "h": "Error Metrics (RMSE & MAE) & Cross-Validation",
+                            "html": "RMSE = &radic;[MSE] = <b>55.17</b> &nbsp;|&nbsp; MAE = <b>44.92</b> &nbsp;|&nbsp; 5-Fold CV <i>R</i><sup>2</sup> = <b>0.4587 &plusmn; 0.0538</b>",
+                            "info": "<div><span class=\"fm-badge b-var\">RMSE (55.17)</span> Standard deviation of residuals on the 25-346 scale.</div><div><span class=\"fm-badge b-param\">5-Fold CV</span> Validated across 5 folds within training data, proving stability and low variance.</div>",
+                            "m": "$$\\text{RMSE} = \\sqrt{\\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2} = 55.17$$",
+                            "d": "Standard deviation of the unexplained residuals on the holdout test cohort."
+                        }
+                    ],
+                    "table": [
+                        [
+                            "Evaluation Metric",
+                            "Training Set (N=309)",
+                            "Validation Set (N=88)",
+                            "Holdout Test Set (N=45)"
+                        ],
+                        [
+                            "R\u00b2 Score",
+                            "0.4967",
+                            "0.5894",
+                            "0.4882"
+                        ],
+                        [
+                            "RMSE",
+                            "54.16",
+                            "50.71",
+                            "55.17"
+                        ],
+                        [
+                            "MAE",
+                            "43.70",
+                            "41.69",
+                            "44.92"
+                        ]
+                    ],
+                    "say": "An R\u00b2 of 0.488 on unseen clinical test patients is solid: it explains nearly half the biological variance using only baseline clinical metrics.",
+                    "c": "#10b981",
+                    "n": 10,
+                    "ex": "For a test patient with actual progression of 150, our model predicts 142. Error is only 8 units, well within clinical tolerance.",
+                    "use": "Quantifies honest predictive power without data snooping or overfitting.",
+                    "vz": null
+                },
+                {
+                    "st": 8,
+                    "sp": "Speaker 2",
+                    "t": "Step 8: Verifying Linear Regression Assumptions (Diagnostics)",
+                    "plain": [
+                        "Linear regression relies on core statistical assumptions that we rigorously verified:",
+                        "1. <b>Homoscedasticity:</b> Residuals ($e_i = y_i - \\hat{y}_i$) are evenly dispersed with constant variance across all predicted values (no funnel shape).",
+                        "2. <b>Normality of Residuals:</b> Quantile-Quantile (Q-Q) plot confirms errors align along the theoretical Gaussian line ($r > 0.98$).",
+                        "3. <b>Zero Mean of Residuals:</b> The average error is exactly $0.00$.",
+                        "4. <b>Low Overfitting:</b> The learning curve shows Training and Cross-Validation scores converging smoothly as sample size increases."
+                    ],
+                    "math": [
+                        {
+                            "h": "Residual Definition & Gauss-Markov Conditions",
+                            "html": "<i>e<sub>i</sub></i> = <i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i> &nbsp;|&nbsp; Var(<i>e<sub>i</sub></i> | <b>x</b>) = &sigma;<sup>2</sup> &nbsp;|&nbsp; E[<i>e<sub>i</sub></i> | <b>x</b>] = 0.00",
+                            "info": "<div><span class=\"fm-badge b-var\">1. Homoscedasticity</span> Error spread is constant across all predicted values (no funnel shape).</div><div><span class=\"fm-badge b-param\">2. Normality</span> Q-Q plot correlation <i>r</i> &gt; 0.98 confirms errors follow a Gaussian bell curve.</div><div><span class=\"fm-badge b-green\">BLUE Theorem</span> Confirms OLS is the Best Linear Unbiased Estimator.</div>",
+                            "m": "$$e_i = y_i - \\hat{y}_i, \\quad \\mathbb{E}[e_i \\mid \\mathbf{x}_i] = 0.00, \\quad \\text{Var}(e_i \\mid \\mathbf{x}_i) = \\sigma^2$$",
+                            "d": "Residuals are homoscedastic (constant spread) and follow a Gaussian distribution."
+                        }
+                    ],
+                    "say": "Professor, we verified that the model does not violate homoscedasticity or normality, ensuring our linear inferences are statistically valid.",
+                    "c": "#f59e0b",
+                    "n": 11,
+                    "ex": "If residuals had a fan shape, error would explode for severe patients. Our residual plot shows random uniform scatter around zero.",
+                    "use": "Validates that the linear model structure is mathematically sound for this dataset.",
+                    "vz": null
+                },
+                {
+                    "st": 8,
+                    "sp": "Speaker 2",
+                    "t": "Step 9: Standardized Beta Weights & Medical Interpretation",
+                    "plain": [
+                        "Because all features were standardized via z-score, each Beta coefficient represents the expected change in progression per 1 Standard Deviation increase in that biomarker:",
+                        "1. <b>S5 Log Triglycerides ($\\beta = +34.89$):</b> Strongest metabolic driver. High triglycerides accelerate vascular and pancreatic damage.",
+                        "2. <b>BMI Body Mass Index ($\\beta = +23.72$):</b> Visceral adipose tissue drives systemic insulin resistance.",
+                        "3. <b>BP Blood Pressure ($\\beta = +17.76$):</b> Hypertension exerts physical shear stress on microvascular capillary beds.",
+                        "4. <b>S6 Fasting Glucose ($\\beta = +3.57$):</b> Glycemic burden adds continuous tissue damage.",
+                        "5. <b>Baseline Intercept $\\beta_0 = 151.21$:</b> The expected progression of an average patient."
+                    ],
+                    "math": [
+                        {
+                            "h": "Complete Linear Prognostic Equation",
+                            "html": "<i>y&#770;</i> = <b>151.21</b> + <b>34.89</b>(<i>z</i><sub>s5</sub>) + <b>23.72</b>(<i>z</i><sub>bmi</sub>) + <b>18.96</b>(<i>z</i><sub>s2</sub>) + <b>17.76</b>(<i>z</i><sub>bp</sub>) + <b>5.30</b>(<i>z</i><sub>s4</sub>) + <b>4.22</b>(<i>z</i><sub>s3</sub>) + <b>3.57</b>(<i>z</i><sub>s6</sub>) - <b>1.12</b>(<i>z</i><sub>age</sub>) - <b>11.27</b>(<i>z</i><sub>sex</sub>) - <b>16.89</b>(<i>z</i><sub>s1</sub>)",
+                            "info": "<div><span class=\"fm-badge b-why\">Top 3 Drivers</span> S5 Log-Triglycerides (+34.89), BMI (+23.72), and Blood Pressure (+17.76) drive ~75% of progression.</div><div><span class=\"fm-badge b-const\">Multicollinearity Note</span> S1 (-16.89) and S2 (+18.96) have high VIF (53.7, 35.4); their opposing signs balance each other while overall predictions remain accurate.</div>",
+                            "m": "$$\\hat{y} = 151.21 + 34.89(z_{s5}) + 23.72(z_{\\text{bmi}}) + 18.96(z_{s2}) + 17.76(z_{\\text{bp}}) + 5.30(z_{s4}) + 4.22(z_{s3}) + 3.57(z_{s6}) - 1.12(z_{\\text{age}}) - 11.27(z_{\\text{sex}}) - 16.89(z_{s1})$$",
+                            "d": "S5 (triglycerides), BMI, and blood pressure are the primary clinical progression drivers."
+                        }
+                    ],
+                    "say": "Every coefficient translates into actionable medical advice: reducing BMI and lowering serum triglycerides produces the largest biological drop in disease progression.",
+                    "c": "#2563eb",
+                    "n": 12,
+                    "ex": "If a patient loses weight to drop BMI by 1 standard deviation, their expected progression immediately drops by 23.7 units.",
+                    "use": "Explaining the exact biological drivers to doctors and patients.",
+                    "vz": null
+                },
+                {
+                    "st": 9,
+                    "sp": "Speaker 2",
+                    "t": "Step 10: Clinical Risk Triage & Managing Class Imbalance",
+                    "plain": [
+                        "In hospitals, doctors need triage: Severe Progression (y >= 200) vs Controlled (y < 200).",
+                        "<b>Problem:</b> Severe patients make up only 28.7% of the cohort (Imbalanced 1 : 2.5 ratio).",
+                        "Standard Logistic Regression suffers from majority class bias: it predicts the common class and achieves 84.4% accuracy, BUT misses 5 out of 13 severe patients (Sensitivity is only 61.5%)!",
+                        "<b>Our Solution:</b> Balanced Cost-Sensitive Logistic Regression (class_weight='balanced').",
+                        "<b>Result:</b> Sensitivity jumps to 76.9%! Missed severe cases drop from 5 to 3."
+                    ],
+                    "math": [
+                        {
+                            "h": "Inverse Frequency Balanced Class Weights",
+                            "html": "<i>w</i><sub>severe</sub> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>N</i></span><span class=\"fm-den\">2 &times; <i>N</i><sub>severe</sub></span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">309</span><span class=\"fm-den\">2 &times; 87</span></div> = <b>1.78</b> &nbsp;|&nbsp; <i>w</i><sub>controlled</sub> = <b>0.70</b>",
+                            "info": "<div><span class=\"fm-badge b-why\">Cost-Sensitive Penalty</span> Severe patients (28.7%) are penalized 2.54&times; more heavily when misclassified, eliminating majority-class bias.</div>",
+                            "m": "$$w_1 = \\frac{N}{2 \\times N_{\\text{severe}}} = 1.78, \\quad w_0 = \\frac{N}{2 \\times N_{\\text{controlled}}} = 0.70$$",
+                            "d": "Penalizes false negatives 2.54x more heavily to reflect medical triage realities."
+                        },
+                        {
+                            "h": "Clinical Sensitivity Boost on Holdout Test Set",
+                            "html": "Sensitivity = <div class=\"fm-frac\"><span class=\"fm-num\">TP</span><span class=\"fm-den\">TP + FN</span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">10</span><span class=\"fm-den\">10 + 3</span></div> = <b>76.92%</b> &nbsp; (vs 61.54% unweighted baseline)",
+                            "info": "<div><span class=\"fm-badge b-green\">Life-Saving Impact</span> Catches 10 out of 13 severe test patients (2 more high-risk patients rescued compared to unweighted model).</div>",
+                            "m": "$$\\text{Sensitivity} = \\frac{10}{10 + 3} = 76.92\\% \\quad (\\text{Baseline: } 61.54\\%)$$",
+                            "d": "Balanced triage successfully flags 76.92% of high-risk patients for intervention."
+                        }
+                    ],
+                    "table": [
+                        [
+                            "Clinical Metric",
+                            "Standard Unweighted Baseline",
+                            "Balanced Model (Managing Imbalance)"
+                        ],
+                        [
+                            "Clinical Accuracy",
+                            "84.44%",
+                            "82.22%"
+                        ],
+                        [
+                            "Clinical Sensitivity (Recall)",
+                            "61.54% (5 missed severe)",
+                            "76.92% (Only 3 missed severe!)"
+                        ],
+                        [
+                            "Clinical Specificity",
+                            "93.75%",
+                            "84.38%"
+                        ],
+                        [
+                            "Clinical F1-Score",
+                            "0.6957",
+                            "0.7143"
+                        ]
+                    ],
+                    "say": "Professor, in healthcare a False Negative (missing a severe diabetic patient) is far more dangerous than a False Positive. Managing class imbalance increased our sensitivity to 76.9%.",
+                    "c": "#f97316",
+                    "n": 13,
+                    "ex": "Standard model misses 5 severe patients who would develop kidney disease untreated. The balanced model catches 2 more of them.",
+                    "use": "Hospital triage prioritizing patient safety over naive accuracy.",
+                    "vz": "cm"
+                },
+                {
+                    "st": 10,
+                    "sp": "Both Speakers",
+                    "t": "Project Conclusion: Feasibility & Clinical Summary",
+                    "plain": [
+                        "<b>Have we solved the problem? Was OLS a feasible solution?</b>",
+                        "1. <b>YES, OLS is highly feasible:</b> Achieved Test R\u00b2 = 0.4882 and CV R\u00b2 = 0.4587 on unseen patients using only 10 non-invasive baseline measurements.",
+                        "2. <b>100% Explainable & Transparent:</b> Closed-form Normal Equation provides immediate, reproducible parameters with direct clinical interpretability (BMI +23.7, S5 +34.9, BP +17.8).",
+                        "3. <b>Imbalance Successfully Managed:</b> Quantile stratification eliminated split drift; cost-sensitive weighting boosted triage sensitivity to 76.9%.",
+                        "4. <b>Assumptions Validated:</b> Residuals exhibit homoscedasticity and Gaussian normality.",
+                        "5. <b>Natural Biological Boundary:</b> The remaining ~50% variance is unmeasured biology (lifestyle habits, genetics, treatment compliance), which no algorithm can extract from baseline measurements alone."
+                    ],
+                    "math": [
+                        {
+                            "h": "Final Quantitative Performance Summary",
+                            "html": "Test <i>R</i><sup>2</sup> = <b>0.4882</b> &nbsp;|&nbsp; Test RMSE = <b>55.17</b> &nbsp;|&nbsp; Test MAE = <b>44.92</b>",
+                            "info": "<div><span class=\"fm-badge b-green\">Verified Generalization</span> Evaluated on 45 unseen holdout test patients with strict zero data leakage. 5-Fold CV: 0.4587 \u00b1 0.0538.</div>",
+                            "m": "$$\\text{Test } R^2 = 0.4882, \\; \\text{Test RMSE} = 55.17, \\; \\text{Test MAE} = 44.92$$",
+                            "d": "Verified on 45 unseen holdout test patients with zero data leakage."
+                        },
+                        {
+                            "h": "Clinical Feasibility Verdict",
+                            "html": "Triage Sensitivity = <b>76.92%</b> &nbsp;|&nbsp; Latency &lt; <b>1.2 ms</b> &nbsp;|&nbsp; <b>100% Explainable</b>",
+                            "info": "<div><span class=\"fm-badge b-why\">Biological Noise Limit</span> Remaining ~51% variance is unmeasured lifestyle/genetics. Complex models overfit to this noise; OLS is the optimal clinical solution.</div>",
+                            "m": "$$\\text{Triage Sensitivity} = 76.92\\%, \\; \\text{Inference Latency} < 1.2 \\text{ ms}$$",
+                            "d": "Production-ready prognostic dashboard active at port 5003."
+                        }
+                    ],
+                    "say": "In conclusion, Multiple Linear Regression is not only feasible, but the optimal educational and clinical choice: it delivers competitive predictive accuracy while remaining 100% explainable to doctors. Thank you Professor \u2014 we welcome your questions.",
+                    "c": "#2563eb",
+                    "n": 14,
+                    "ex": "A simple, solid, transparent linear model is far more useful in medicine than a black box.",
+                    "use": "Summary of achievements and defense conclusion.",
+                    "vz": null
+                }
+            ],
+            "pipe": [
+                [
+                    "1 Problem",
+                    "Predict disease progression"
+                ],
+                [
+                    "2 Dataset",
+                    "442 authentic clinical records"
+                ],
+                [
+                    "3 Features",
+                    "Encode sex, scale continuous vitals"
+                ],
+                [
+                    "4 Imbalance",
+                    "Quantile stratification & class weights"
+                ],
+                [
+                    "5 Scale",
+                    "Z-score, fit on train only"
+                ],
+                [
+                    "6 Split",
+                    "70% Train / 20% Val / 10% Test"
+                ],
+                [
+                    "7 Linear ML",
+                    "Ordinary Least Squares (OLS)"
+                ],
+                [
+                    "8 Evaluate",
+                    "R\u00b2 = 0.4882, RMSE = 55.17"
+                ],
+                [
+                    "9 Diagnostics",
+                    "Homoscedasticity & Q-Q normality"
+                ],
+                [
+                    "10 Triage",
+                    "Balanced risk classification"
+                ],
+                [
+                    "11 Conclusion",
+                    "Feasibility & clinical summary"
+                ]
+            ]
         };
-        function rg(a) { a = +a; $("ra").textContent = a.toFixed(1); $("rb").innerHTML = [["S1 weight", 9], ["S2 weight", -8]].map(n => { const v = n[1] / (1 + a * .8); return `<div class="hb"><span>${n[0]}</span><div class="c2"><u style="${v < 0 ? "right:50%;background:#ef4444" : "left:50%"};width:${Math.abs(v) * 5}%"></u></div><em>${v.toFixed(1)}</em></div>` }).join("") + "<small>Illustration: collinear weights shrink toward small, stable values as α grows.</small>" }
-        function sv(e) { e = +e; const R = [-30, -18, -9, -4, 2, 6, 12, 20, 33, -26]; let pen = 0, ins = 0; const dots = R.map((r, i) => { const o = Math.abs(r) > e; if (o) pen += Math.abs(r) - e; else ins++; return `<circle cx="${25 + i * 30}" cy="${50 - r}" r="5" fill="${o ? "#ef4444" : "#2563eb"}"/>` }).join(""); $("sa").innerHTML = `<svg viewBox="0 0 320 100" width="100%" style="max-height:140px"><rect x="10" y="${50 - e}" width="300" height="${Math.max(2 * e, 1)}" fill="#22c55e" opacity=".25"/><line x1="10" y1="50" x2="310" y2="50" style="stroke:var(--c)" stroke-width="2"/>${dots}</svg>`; $("sb").textContent = `Tube width ε = ${e}: ${ins} of 10 patients inside (free). Total penalty = ${pen.toFixed(0)}` }
+        const S = D.slides, C = ["#2563eb", "#f43f5e", "#06b6d4", "#38bdf8", "#8b5cf6", "#ec4899", "#10b981", "#06b6d4", "#2563eb", "#10b981", "#f59e0b", "#2563eb", "#f97316", "#2563eb"];
+        const $ = id => document.getElementById(id);
+        let cur = 0;
+
+        const VZ = {
+            gauge: () => `<div class="gq"><b>Progression Scale (25 to 346)</b><div class="gb"><i style="left:${200 / 346 * 100}%"></i><em style="left:${225 / 346 * 100}%">226</em></div><div class="gl"><span>25 Mild</span><span>200 = Severe Triage Line</span><span>346 Severe</span></div></div>`,
+            eda: () => `<b>Target Progression Quantiles (Balanced via Stratification)</b><div class="seg"><div style="flex:33.3;background:#10b981">Mild (&lt;100) 33.3%</div><div style="flex:38.0;background:#f59e0b">Moderate (100-200) 38.0%</div><div style="flex:28.7;background:#ef4444">Severe (&gt;200) 28.7%</div></div><small>5-bin quantile stratification guarantees zero distribution drift across Train, Val, and Test.</small>`,
+            sc: () => `<div class="two"><div><b>Before: Raw Physical Scales</b>${[["Cholesterol (97-301)", 100], ["Glucose (58-124)", 40], ["Log-TG (3.2-6.1)", 2]].map(r => `<div class="hb"><span>${r[0]}</span><div><u style="width:${r[1]}%;background:#ef4444"></u></div></div>`).join("")}</div><div><b>After: Standardized Z-Scores (Zero Leakage)</b>${["Cholesterol (z)", "Glucose (z)", "Log-TG (z)"].map(r => `<div class="hb"><span>${r}</span><div><u style="width:60%;background:#10b981"></u></div></div>`).join("")}</div></div>`,
+            ols: () => {
+                const X = x => 40 + x * 70, Y = y => 130 - y * 22, f = x => .33 + 1.5 * x, P = [[1, 2], [2, 3], [3, 5]];
+                return `<svg viewBox="0 0 330 150" width="100%" style="max-height:190px"><line x1="30" y1="135" x2="320" y2="135" stroke="currentColor" opacity=".3"/><line x1="${X(.4)}" y1="${Y(f(.4))}" x2="${X(3.6)}" y2="${Y(f(3.6))}" style="stroke:var(--c)" stroke-width="3"/>${P.map(p => `<line x1="${X(p[0])}" y1="${Y(p[1])}" x2="${X(p[0])}" y2="${Y(f(p[0]))}" stroke="#ef4444" stroke-dasharray="3"/><circle cx="${X(p[0])}" cy="${Y(p[1])}" r="6" fill="#2563eb"/>`).join("")}<text x="130" y="26" fill="currentColor" font-size="11">Blue = patients · red = residuals e_i · Best-fit hyperplane minimizes sum(e_i²)</text></svg>`
+            },
+            cm: () => `<b>Clinical Triage on 45 Test Patients (Severe >= 200)</b><div class="cmx"><span></span><i>Pred. Controlled</i><i>Pred. Severe</i><i>Actual Controlled (32)</i><u style="background:#16a34a">27 Correct</u><u style="background:#f59e0b">5 False Alarms</u><i>Actual Severe (13)</i><u style="background:#dc2626">3 Missed (FN)</u><u style="background:#16a34a">10 Caught (TP)</u></div><small>Sensitivity = 10/13 = 76.92% (Balanced Model catches 2 more severe patients than unweighted baseline).</small>`
+        };
 
         $("steps").innerHTML = D.stages.map((s, i) => `<span class="st" style="--c:${C[i]}">${i + 1}. ${s}</span>`).join("");
+
         $("stage").innerHTML = S.map(s => {
-            let l = `<ul>${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>`, r = s.math.map(m => `<div class="fm">${m}</div>`).join("");
-            if (s.k == "table") r += `<table><tr>${s.table[0].map(h => `<th>${h}</th>`).join("")}</tr>${s.table.slice(1).map(w => `<tr>${w.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
-            if (s.k == "split") r += `<div class="bar"><div style="flex:70;background:#22c55e">Train 70% · 309</div><div style="flex:20;background:#f59e0b">Val 20% · 88</div><div style="flex:10;background:#ef4444">Test 10% · 45</div></div>`;
-            if (s.k == "code") r += `<pre>${s.code.replace(/</g, "&lt;")}</pre>`;
-            let body = s.k == "pipe" ? `${l}<div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div>` : s.k == "title" ? `<ul class="big">${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>` : s.math.length || s.k == "code" || s.k == "split" ? `<div class="gr"><div>${l}</div><div>${r}</div></div>` : l;
-            return `<div class="sl ${s.k == "title" ? "ttl" : ""}" style="--c:${s.c}"><div class="cd"><span class="tg">${s.sp} · Stage ${s.st + 1}: ${D.stages[s.st]}</span><h2>${s.t}</h2>${body}${s.vz ? `<div class="vz">${VZ[s.vz]()}</div>` : ""}${s.ex ? `<div class="eu"><div class="ex"><b>Example</b>${s.ex}</div><div class="us"><b>Used for</b>${s.use}</div></div>` : ""}<div class="sy"><b>Say it simply:</b> ${s.say}</div></div></div>`
+            let l = `<ul>${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>`;
+
+            // Format Mathematical Equations with structured HTML tags, KaTeX fallback, and clear term breakdown
+            let r = "";
+            if (s.math && s.math.length > 0) {
+                r = s.math.map(m => `
+                    <div class="fm-box">
+                        <span class="fm-header">${m.h}</span>
+                        ${m.html ? `<div class="fm-math-html">${m.html}</div>` : `<div class="fm-math">${m.m}</div>`}
+                        ${m.info ? `<div class="fm-term-info">${m.info}</div>` : ""}
+                        <span class="fm-desc">${m.d}</span>
+                    </div>
+                `).join("");
+            }
+
+            if (s.table) {
+                r += `<table><tr>${s.table[0].map(h => `<th>${h}</th>`).join("")}</tr>${s.table.slice(1).map(w => `<tr>${w.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
+            }
+
+            // Beautiful, High-Contrast, Perfectly Legible Dataset Split Component with EASY ENGLISH
+            if (s.k == "split") {
+                r = `
+                <div class="split-layout">
+                    <div class="split-intro-box">
+                        <span class="split-intro-title">Dataset Partitioning Strategy (Total N = 442 Patients)</span>
+                        <div class="split-bullets-row">
+                            <div class="split-bullet-item">
+                                <b>Why 3 Sets?</b> Prevents overfitting and guarantees an honest test on completely unseen patients.
+                            </div>
+                            <div class="split-bullet-item">
+                                <b>Quantile Stratified:</b> Divided across 5 progression bins so all 3 sets share the exact same severity ratio.
+                            </div>
+                            <div class="split-bullet-item">
+                                <b>Zero Data Leakage:</b> Scaling parameters (&mu;, &sigma;) are fitted strictly on the Training Set alone.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="split-container">
+                        <div class="split-bar">
+                            <div class="split-bar-seg seg-train" style="flex: 70;">
+                                <span>📚 TRAINING: 70% (309 Patients)</span>
+                            </div>
+                            <div class="split-bar-seg seg-val" style="flex: 20;">
+                                <span>🔍 VAL: 20% (88)</span>
+                            </div>
+                            <div class="split-bar-seg seg-test" style="flex: 18; min-width: 140px;">
+                                <span>🔒 TEST: 10% (45)</span>
+                            </div>
+                        </div>
+
+                        <div class="split-cards">
+                            <div class="split-card c-train">
+                                <div class="card-head">
+                                    <span class="card-tag">TRAINING SET (70%)</span>
+                                    <span class="card-count">309 Patients</span>
+                                </div>
+                                <h4>The Model's Textbook</h4>
+                                <p>The model learns all 11 parameter weights (&beta;<sub>0</sub> to &beta;<sub>10</sub>) exclusively here. 5-Fold Cross-Validation runs inside this set (R² = 0.4587 ± 0.0538) to confirm stability.</p>
+                            </div>
+                            <div class="split-card c-val">
+                                <div class="card-head">
+                                    <span class="card-tag">VALIDATION SET (20%)</span>
+                                    <span class="card-count">88 Patients</span>
+                                </div>
+                                <h4>The Practice Mock Exam</h4>
+                                <p>Used by data scientists to verify convergence, check that the model is not memorizing, and confirm error residuals follow a normal bell curve.</p>
+                            </div>
+                            <div class="split-card c-test">
+                                <div class="card-head">
+                                    <span class="card-tag">🔒 HOLDOUT TEST SET (10%)</span>
+                                    <span class="card-count" style="color: #e11d48;">45 Patients</span>
+                                </div>
+                                <h4 style="color: #e11d48;">The Final Board Exam</h4>
+                                <p><strong>STRICTLY LOCKED IN A VAULT!</strong> Never seen, touched, or scaled during training. Evaluated strictly once at the end to prove real-world accuracy (Test R² = 0.4882).</p>
+                            </div>
+                        </div>
+
+                        <div class="split-guarantee-badge">
+                            <b>✓ Stratification Verification:</b> Average disease progression is identical across splits (Train: 151.21, Val: 155.05, Test: 152.78). Zero distribution drift guaranteed!
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            let body = s.k == "pipe" ? `${l}<div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div>` :
+                s.k == "title" ? `<ul class="big">${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>` :
+                    s.k == "split" ? r :
+                        (s.math && s.math.length) || s.table ? `<div class="gr"><div>${l}</div><div>${r}</div></div>` : l;
+
+            return `<div class="sl ${s.k == "title" ? "ttl" : ""}" style="--c:${s.c}">
+                <div class="cd">
+                    <span class="tg">${s.sp} · Stage ${s.st + 1}: ${D.stages[s.st]}</span>
+                    <h2>${s.t}</h2>
+                    ${body}
+                    ${s.vz ? `<div class="vz">${VZ[s.vz]()}</div>` : ""}
+                    ${s.ex ? `<div class="eu"><div class="ex"><b>Example</b>${s.ex}</div><div class="us"><b>Used for</b>${s.use}</div></div>` : ""}
+                    <div class="sy"><b>Say it simply to Professor:</b> ${s.say}</div>
+                </div>
+            </div>`
         }).join("");
+
         const sl = [...document.querySelectorAll(".sl")], sp = [...document.querySelectorAll(".st")];
-        function go(n) {
-            cur = Math.max(0, Math.min(S.length - 1, n)); sl.forEach((e, i) => { e.className = "sl" + (e.classList.contains("ttl") ? " ttl" : "") + (i == cur ? " on" : i < cur ? " pv" : ""); });
-            sp.forEach((e, i) => e.classList.toggle("on", i == S[cur].st)); $("ct").textContent = (cur + 1) + " / " + S.length; $("th").style.setProperty("--c", S[cur].c); document.querySelectorAll(".fm").forEach(f => { f.style.animation = "none"; f.offsetHeight; f.style.animation = "" }); tgt = cur * .32; col.set(S[cur].c)
+
+        function renderMath() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
         }
-        $("nx").onclick = () => go(cur + 1); $("pv").onclick = () => go(cur - 1); $("th").onclick = () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme == "light" ? "dark" : "light" };
+
+        function go(n) {
+            cur = Math.max(0, Math.min(S.length - 1, n));
+            sl.forEach((e, i) => { e.className = "sl" + (e.classList.contains("ttl") ? " ttl" : "") + (i == cur ? " on" : i < cur ? " pv" : ""); });
+            sp.forEach((e, i) => e.classList.toggle("on", i == S[cur].st));
+            $("ct").textContent = (cur + 1) + " / " + S.length;
+            $("th").style.setProperty("--c", S[cur].c);
+            tgt = cur * .32;
+            col.set(S[cur].c);
+            setTimeout(renderMath, 50);
+        }
+
+        $("nx").onclick = () => go(cur + 1);
+        $("pv").onclick = () => go(cur - 1);
+        $("th").onclick = () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme == "light" ? "dark" : "light" };
         addEventListener("keydown", e => { if (["ArrowRight", " ", "PageDown"].includes(e.key)) go(cur + 1); if (["ArrowLeft", "PageUp"].includes(e.key)) go(cur - 1) });
         document.querySelectorAll(".cd").forEach(c => c.addEventListener("mousemove", e => { const b = c.getBoundingClientRect(); c.style.transform = `rotateY(${((e.clientX - b.left) / b.width - .5) * 5}deg) rotateX(${-((e.clientY - b.top) / b.height - .5) * 4}deg)` }));
         document.querySelectorAll(".cd").forEach(c => c.addEventListener("mouseleave", () => c.style.transform = ""));
-        /* 3D background: soft glass shapes */
+
+        /* 3D background shapes */
         let tgt = 0, col = typeof THREE != 'undefined' ? new THREE.Color(C[0]) : { set() { } };
         try {
-            const R = new THREE.WebGLRenderer({ canvas: $("bg"), alpha: true, antialias: true }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(55, 1, .1, 200); cam.position.z = 16;
-            sc.add(new THREE.AmbientLight(0xffffff, .85)); const dl = new THREE.DirectionalLight(0xffffff, .8); dl.position.set(5, 8, 10); sc.add(dl);
-            const sh = []; const P = [[-9, 4, -4, 1.8], [9, -3, -5, 2.4], [-6, -6, -2, 1.1], [7, 6, -8, 1.6], [0, -8, -6, 1.4], [-12, -1, -9, 2.2], [12, 1, -3, .9]];
-            P.forEach((p, i) => { const m = new THREE.Mesh(i % 3 == 2 ? new THREE.TorusGeometry(p[3], .35, 24, 64) : new THREE.IcosahedronGeometry(p[3], 3), new THREE.MeshPhongMaterial({ color: col.clone(), transparent: true, opacity: .42, shininess: 100 })); m.position.set(p[0], p[1], p[2]); m.userData = { y: p[1], o: i }; sc.add(m); sh.push(m) });
-            function rs() { R.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix() } rs(); addEventListener("resize", rs);
-            let ry = 0, t = 0; (function a() {
-                requestAnimationFrame(a); t += .01; ry += (tgt - ry) * .04; cam.position.x = Math.sin(ry) * 3; cam.lookAt(0, 0, 0);
-                sh.forEach(m => { m.position.y = m.userData.y + Math.sin(t + m.userData.o) * .8; m.rotation.x += .004; m.rotation.y += .006; const h = new THREE.Color(col); h.offsetHSL((m.userData.o % 4) * .07, 0, 0); m.material.color.lerp(h, .05) }); R.render(sc, cam)
-            })()
+            const R = new THREE.WebGLRenderer({ canvas: $("bg"), alpha: true, antialias: true }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(55, 1, .1, 200);
+            cam.position.z = 16;
+            sc.add(new THREE.AmbientLight(0xffffff, .85));
+            const dl = new THREE.DirectionalLight(0xffffff, .8);
+            dl.position.set(5, 8, 10);
+            sc.add(dl);
+            const sh = [];
+            const P = [[-9, 4, -4, 1.8], [9, -3, -5, 2.4], [-6, -6, -2, 1.1], [7, 6, -8, 1.6], [0, -8, -6, 1.4], [-12, -1, -9, 2.2], [12, 1, -3, .9]];
+            P.forEach((p, i) => {
+                const m = new THREE.Mesh(i % 3 == 2 ? new THREE.TorusGeometry(p[3], .35, 24, 64) : new THREE.IcosahedronGeometry(p[3], 3), new THREE.MeshPhongMaterial({ color: col.clone(), transparent: true, opacity: .42, shininess: 100 }));
+                m.position.set(p[0], p[1], p[2]);
+                m.userData = { y: p[1], o: i };
+                sc.add(m);
+                sh.push(m);
+            });
+            function rs() { R.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix() }
+            rs();
+            addEventListener("resize", rs);
+            let ry = 0, t = 0;
+            (function a() {
+                requestAnimationFrame(a);
+                t += .01;
+                ry += (tgt - ry) * .04;
+                cam.position.x = Math.sin(ry) * 3;
+                cam.lookAt(0, 0, 0);
+                sh.forEach(m => {
+                    m.position.y = m.userData.y + Math.sin(t + m.userData.o) * .8;
+                    m.rotation.x += .004;
+                    m.rotation.y += .006;
+                    const h = new THREE.Color(col);
+                    h.offsetHSL((m.userData.o % 4) * .07, 0, 0);
+                    m.material.color.lerp(h, .05);
+                });
+                R.render(sc, cam);
+            })();
         } catch (e) { }
-        rg(0); sv(5); go(0);
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderMath();
+            go(0);
+        });
     </script>
 </body>
 

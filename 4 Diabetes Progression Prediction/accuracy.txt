@@ -2,34 +2,65 @@ Diabetes Progression Prediction Performance Report
 ======================================================
 Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
 Dataset: 442 Diabetes Patients • Split: 70% Train (309), 20% Val (88), 10% Test (45)
+Model Architecture: Multiple Linear Regression (Ordinary Least Squares - OLS)
+Explainability: 100% Transparent Linear Formulation (Zero Black-Box)
 
-1. REGRESSION BENCHMARK COMPARISON ON TEST SET (N=45):
+1. MULTIPLE LINEAR REGRESSION BENCHMARK PERFORMANCE:
 ---------------------------------------------------------------------------------------------------
-Algorithm                                Test R²     Test RMSE     Test MAE     Mean 5-Fold CV R²
+Dataset Split                  R² Score     RMSE (Loss)     MAE          Interpretation
 ---------------------------------------------------------------------------------------------------
-Multiple Linear Regression (OLS)          0.4079      58.88         49.72        0.4536 (±0.1311)
-Ridge Regression (L2, alpha=1.0)          0.3906      59.74         50.42        0.4562 (±0.1253)
-Linear Support Vector Regression (SVR)    0.3312      62.58         52.42        0.4501 (±0.0992)
-Random Forest Regressor (max_depth=5)     0.4227      58.14         48.67        0.4206 (±0.1741)
+Training Set (70%, N=309)      0.4967       54.16          43.70        Baseline fit on training cohort
+Validation Set (20%, N=88)     0.5894       50.71          41.69        Independent parameter verification
+Holdout Test Set (10%, N=45)   0.4882       55.17          44.92        Unseen generalization benchmark
+---------------------------------------------------------------------------------------------------
+5-Fold Cross Validation Mean R²: 0.4587 (±0.0538) -> Consistent stability across folds!
+
+Mathematical Formulation:
+  y_hat = beta_0 + sum_{j=1}^{10} (beta_j * z_j)
+  where z_j = (x_j - mu_j) / sigma_j (Standardized Z-Score)
+  Baseline Intercept (beta_0): 151.21
+
+2. FEATURE COEFFICIENTS & CLINICAL INTERPRETATION:
+---------------------------------------------------------------------------------------------------
+Biomarker    Beta Weight    Direction        Clinical / Physiological Significance
+---------------------------------------------------------------------------------------------------
+s5 (LTG)     +34.89         Accelerant       Serum triglycerides: Strong metabolic risk driver
+bmi          +23.72         Accelerant       Body mass index: Visceral obesity drives insulin resistance
+s2 (LDL)     +18.96         Accelerant       Low-density lipoprotein ('bad cholesterol')
+bp           +17.76         Accelerant       Mean arterial blood pressure: Vascular wall shear stress
+s4 (TCH)     +5.30         Accelerant       Total cholesterol / HDL ratio: Atherogenic index
+s6 (GLU)     +3.57         Accelerant       Fasting blood glucose: Active glycemic burden
+s3 (HDL)     +4.22         Collinear        HDL cholesterol (affected by collinearity with S1/S2)
+age          -1.05         Neutral          Patient age: Minimal marginal impact in this cohort
+sex          -10.08         Demographic      Binary sex [0=Female, 1=Male]: Baseline differential
+s1 (TC)      -31.89         Collinear        Total cholesterol (collinear with LDL and HDL)
 ---------------------------------------------------------------------------------------------------
 
-Primary Model Selected for Serving: Random Forest Regressor (max_depth=5)
-  - Test R² Score: 0.4227
-  - Test RMSE:     58.14
-  - Test MAE:      48.67
-
-2. DUAL CLINICAL RISK CLASSIFICATION (High Risk >= 150 vs Controlled < 150):
+3. MANAGING DATASET IMBALANCE: CLINICAL RISK TRIAGE (Severe Progression >= 200):
 ---------------------------------------------------------------------------------------------------
-  - Clinical Accuracy:   82.22%
-  - Clinical Sensitivity: 78.26% (High-risk patients correctly identified)
-  - Clinical Specificity: 86.36% (Controlled patients correctly cleared)
-  - Clinical Precision:   85.71%
-  - Clinical F1-Score:    0.8182
-  - Confusion Matrix:
-      [TN=19  FP= 3]
-      [FN= 5  TP=18]
+Clinical Context: 28.7% Severe Cases (Class Ratio ~ 1:2.5 imbalanced)
+Strategy: Balanced Cost-Sensitive Logistic Regression (class_weight='balanced')
 
-3. 5-FOLD CROSS-VALIDATION BREAKDOWN (Random Forest Regressor (max_depth=5)):
+Metric                     Unweighted Baseline     Balanced Model (Managing Imbalance)
 ---------------------------------------------------------------------------------------------------
-  - Fold Scores: [np.float64(0.5111), np.float64(0.1132), np.float64(0.5688), np.float64(0.5658), np.float64(0.3443)]
-  - Mean R²:     0.4206 (+/- 0.1741)
+Clinical Accuracy          84.44%                 82.22%
+Clinical Sensitivity       61.54%                 76.92% (CRITICAL: +15.4% recall)
+Clinical Specificity       93.75%                 84.38%
+Clinical Precision         80.00%                 66.67%
+Clinical F1-Score          0.6957                 0.7143
+Confusion Matrix           [TN=30 FP= 2]             [TN=27 FP= 5]
+                           [FN= 5 TP= 8]             [FN= 3 TP=10]
+---------------------------------------------------------------------------------------------------
+-> By managing imbalance via cost-sensitive weighting, False Negatives were reduced from 5 to 3.
+   In clinical medicine, missing a deteriorating diabetic patient (FN) is far more dangerous than a false alarm (FP)!
+
+4. SLICE-BASED CONTINUOUS ERROR ANALYSIS (TAIL SPARSITY):
+---------------------------------------------------------------------------------------------------
+Cohort Subgroup            Test Samples (N)    Mean Actual    Mean Predicted    MAE
+---------------------------------------------------------------------------------------------------
+Mild (<100)                16                    74.8          111.8          49.83
+Moderate (100-200)         17                   151.8          139.1          37.57
+Severe (>200)              12                   258.2          212.7          48.78
+---------------------------------------------------------------------------------------------------
+Observation: Moderate cases achieve lowest MAE (37.57). Extreme cases demonstrate 'regression to the mean'
+due to continuous tail sparsity in the training distribution.

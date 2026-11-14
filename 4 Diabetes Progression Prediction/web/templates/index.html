@@ -476,7 +476,7 @@
         <header>
             <div class="badge">M.Tech AI • Centre for AI, IUST • CAI504C</div>
             <h1>Diabetes Progression Prognostic Engine</h1>
-            <p class="subtitle">Clinical decision support system implementing an end-to-end Machine Learning pipeline: authentic physiological ingestion, domain enrichment, and Random Forest ensemble prognosis with real-time risk triage.</p>
+            <p class="subtitle">Interpretable clinical decision support system implementing an end-to-end Machine Learning pipeline: authentic clinical ingestion, zero-leakage feature scaling, and Multiple Linear Regression (OLS) prognosis with imbalance-managed risk triage.</p>
         </header>
 
         <div class="main-grid">
@@ -631,19 +631,19 @@
 
                         <!-- Mathematical Formulation Card (KaTeX) -->
                         <div class="math-card">
-                            <div class="math-title">📐 Mathematical Modeling & Feature Enrichment</div>
-                            The disease progression is inferred via Random Forest aggregation of $B=100$ decorrelated regression trees:
+                            <div class="math-title">📐 Transparent Multiple Linear Regression & Normal Equation</div>
+                            The disease progression metric is inferred via transparent multiple linear regression with zero black-box obscurity:
                             <div class="math-block">
-                                $$\hat{y}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x}) \quad \text{where } B = 100, \, \text{depth} = 5$$
+                                $$\hat{y}(\mathbf{x}) = \beta_0 + \sum_{j=1}^{10} \beta_j \left(\frac{x_j - \mu_j}{\sigma_j}\right) \quad \text{where } \boldsymbol{\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$$
                             </div>
-                            Three non-linear interaction features were enriched into the 13-dimensional vector:
+                            Trained via Ordinary Least Squares (OLS) minimizing Mean Squared Error (MSE):
                             <div class="math-block">
-                                $$\text{Insulin Proxy} = \text{BMI} \times S_6, \quad \text{Atherogenic Ratio} = \frac{S_2}{S_3}, \quad \text{Metabolic Triad} = \frac{\text{BMI} \times \text{BP}}{S_3}$$
+                                $$\text{Baseline Intercept } \beta_0 = {{ analysis.intercept }}, \quad \text{Severe Triage Probability} = {{ analysis.severe_prob }}\%$$
                             </div>
                             <div class="feature-eval-chips">
-                                <div class="eval-chip">Insulin Proxy: <span>{{ analysis.enriched.insulin_proxy }}</span></div>
-                                <div class="eval-chip">Atherogenic Ratio: <span>{{ analysis.enriched.athero_ratio }}</span></div>
-                                <div class="eval-chip">Metabolic Triad: <span>{{ analysis.enriched.metabolic_triad }}</span></div>
+                                {% for d in analysis.decomposition %}
+                                <div class="eval-chip">{{ d.feature|upper }}: <span>{{ "%+.2f"|format(d.impact) }}</span> (&beta;={{ "%+.2f"|format(d.weight) }})</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -653,7 +653,7 @@
                         <div style="font-size: 3.5rem; margin-bottom: 1rem;">🩺</div>
                         <h3 style="margin-top: 0; color: #38bdf8;">Awaiting Clinical Diagnostics</h3>
                         <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; max-width: 450px; margin: 0 auto;">
-                            Enter patient clinical laboratory values on the left. The engine will enrich the vector, evaluate against the trained Random Forest model, trigger the acoustic/visual triage beacon, and render personalized clinical care recommendations.
+                            Enter patient clinical laboratory values on the left. The engine evaluates against the trained Multiple Linear Regression model with zero black-box obscurity, computes the closed-form biomarker impacts, triggers the clinical triage alert, and renders personalized care recommendations.
                         </p>
                     </div>
                 {% endif %}
