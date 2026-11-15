@@ -35,8 +35,10 @@ To guarantee strict zero data leakage and 100% clinical explainability, the mach
 - **1. Strict Zero-Leakage Airlocks:** Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.
 - **2. Authentic Data Ingestion ($N=442$):** 442 authentic clinical records evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with **zero missing values** ($\text{NaN}=0$), requiring zero synthetic imputation.
 - **3. Dual-Track Feature Handling:** Biological sex is decoded into clean binary $\{0.0=\text{Female}, 1.0=\text{Male}\}$ adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1–S6) are standardized via Z-score so the math treats them fairly.
-- **4. Imbalance Management (Quantile Stratification):** Severe patients ($y > 200$) are rare. We sliced all 442 patients into 5 equal severity quantiles, taking 70% Train, 20% Val, and 10% Test from each pile—guaranteeing identical progression distribution (~152) across all sets.
-- **5. Transparent Modeling (OLS Normal Equation):** Zero black boxes (no Neural Nets, Random Forests, or SVR). Solved analytically via the Gauss-Markov Normal Equation $\boldsymbol{\beta}^* = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$ in $<1$ ms. Every beta weight is 100% explainable to Dr. Ayesha.
+- **4. Imbalance Management (Quantile Stratification):** Severe patients ($y > 200$) are rare. Slicing all 442 patients into 5 equal severity quantiles guarantees identical progression distribution (~152).
+- **5. Strict 70% / 20% / 10% Dataset Partitioning:** The cohort is partitioned **FIRST** into 309 Train (homework), 88 Val (mock test), and 45 Holdout Test (locked board exam).
+- **6. Zero-Leakage StandardScaler (Train Only):** The scaler ($\mu_{\text{train}}, \sigma_{\text{train}}$) is fitted strictly on the isolated 309 training patients only. Validation and Test sets are transformed using those frozen training statistics.
+- **7. Transparent Modeling (OLS Normal Equation):** Zero black boxes (no Neural Nets, Random Forests, or SVR). Solved analytically via the Gauss-Markov Normal Equation $\boldsymbol{\beta}^* = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$ in $<1$ ms. Every beta weight is 100% explainable to Dr. Ayesha.
 
 ---
 

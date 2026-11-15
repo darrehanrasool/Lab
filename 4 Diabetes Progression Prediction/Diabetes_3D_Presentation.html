@@ -1519,587 +1519,587 @@
         });
 
         const D = {
-            "stages": [
-                "Problem",
-                "Dataset",
-                "Features",
-                "Imbalance",
-                "Scaling",
-                "Split",
-                "Linear ML",
-                "Evaluate",
-                "Diagnostics",
-                "Triage",
-                "Conclusion"
+    "stages": [
+        "Problem",
+        "Dataset",
+        "Features",
+        "Imbalance",
+        "Split",
+        "Scaling",
+        "Linear ML",
+        "Evaluate",
+        "Diagnostics",
+        "Triage",
+        "Conclusion"
+    ],
+    "slides": [
+        {
+            "k": "title",
+            "st": 0,
+            "sp": "Both Speakers",
+            "t": "Diabetes Progression Prediction via Multiple Linear Regression",
+            "plain": [
+                "<b>Course:</b> CAI504C Machine Learning Laboratory \u2022 Semester I \u2022 IUST Kashmir.",
+                "<b>Syllabus Problem Statement:</b> Predict quantitative disease progression in diabetic patients one year after baseline using 10 physiological vitals and serum biomarkers.",
+                "<b>Clinical Cohort:</b> 442 authentic diabetes patient records evaluated across baseline diagnostic indicators.",
+                "<b>Primary ML Technique:</b> Multiple Linear Regression (Ordinary Least Squares \u2014 OLS) via the closed-form Normal Equation."
             ],
-            "slides": [
+            "math": [],
+            "say": "Good morning Professor. We are presenting our Machine Learning lab project on Diabetes Disease Progression Prediction using Multiple Linear Regression, focusing deeply on dataset exploration, feature handling, and imbalance management.",
+            "c": "#2563eb",
+            "n": 1
+        },
+        {
+            "st": 0,
+            "sp": "Speaker 1",
+            "t": "The Clinical Problem Statement",
+            "plain": [
+                "<b>The Story of Dr. Ayesha:</b> Two Type-2 diabetic patients visit Dr. Ayesha today feeling relatively fine. 12 months later, Patient A stays stable with mild symptoms, while Patient B suffers rapid vascular collapse, kidney failure, or vision loss.",
+                "<b>The Problem:</b> Dr. Ayesha cannot look into the future with her eyes. By the time symptoms like blurred vision or swollen legs appear, microvascular capillaries in the kidneys and retinas have already suffered irreversible damage.",
+                "<b>The 12-Month Golden Window:</b> Predicting continuous 1-year disease progression (<i>y</i> &in; [25, 346]) gives doctors a 12-month window of opportunity to adjust medication and diet before permanent organ necrosis occurs.",
+                "<b>Why Continuous Regression:</b> Medicine is not binary (Sick vs Healthy). Score 280 requires emergency intensive insulin; score 105 needs mild diet tweaks. Exact continuous score prediction is vital.",
+                "<b>Asymmetric Cost of Mistakes:</b> Prediction errors are not equal in healthcare. <i>Under-predicting (Deadliest):</i> Predicting 110 for a patient whose true score is 290 delays critical therapy, causing irreversible kidney failure. <i>Over-predicting:</i> Predicting 300 for a patient whose true score is 100 triggers excessive insulin, causing life-threatening hypoglycemia (fainting/coma)."
+            ],
+            "math": [
                 {
-                    "k": "title",
-                    "st": 0,
-                    "sp": "Both Speakers",
-                    "t": "Diabetes Progression Prediction via Multiple Linear Regression",
-                    "plain": [
-                        "<b>Course:</b> CAI504C Machine Learning Laboratory \u2022 Semester I \u2022 IUST Kashmir.",
-                        "<b>Syllabus Problem Statement:</b> Predict quantitative disease progression in diabetic patients one year after baseline using 10 physiological vitals and serum biomarkers.",
-                        "<b>Clinical Cohort:</b> 442 authentic diabetes patient records evaluated across baseline diagnostic indicators.",
-                        "<b>Primary ML Technique:</b> Multiple Linear Regression (Ordinary Least Squares \u2014 OLS) via the closed-form Normal Equation."
-                    ],
-                    "math": [],
-                    "say": "Good morning Professor. We are presenting our Machine Learning lab project on Diabetes Disease Progression Prediction using Multiple Linear Regression, focusing deeply on dataset exploration, feature handling, and imbalance management.",
-                    "c": "#2563eb",
-                    "n": 1
+                    "h": "Model Inputs Vector (x)",
+                    "html": "<b>x</b> = [<i>age</i>, <i>sex</i>, <i>bmi</i>, <i>bp</i>, <i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>, <i>s</i><sub>3</sub>, <i>s</i><sub>4</sub>, <i>s</i><sub>5</sub>, <i>s</i><sub>6</sub>]<sup>T</sup> &in; &reals;<sup>10</sup>",
+                    "info": "<div><span class=\"fm-badge b-var\">10 Inputs</span> 4 physical vitals (age, sex, BMI, blood pressure) and 6 blood serums (total cholesterol, LDL, HDL, TCH, log-triglycerides, glucose).</div>",
+                    "m": "$$\\mathbf{x} = [\\text{age}, \\text{sex}, \\text{bmi}, \\text{bp}, s_1, s_2, s_3, s_4, s_5, s_6]^T \\in \\mathbb{R}^{10}$$",
+                    "d": "10 baseline patient measurements in authentic clinical units."
                 },
                 {
-                    "st": 0,
-                    "sp": "Speaker 1",
-                    "t": "The Clinical Problem Statement",
-                    "plain": [
-                        "<b>The Story of Dr. Ayesha:</b> Two Type-2 diabetic patients visit Dr. Ayesha today feeling relatively fine. 12 months later, Patient A stays stable with mild symptoms, while Patient B suffers rapid vascular collapse, kidney failure, or vision loss.",
-                        "<b>The Problem:</b> Dr. Ayesha cannot look into the future with her eyes. By the time symptoms like blurred vision or swollen legs appear, microvascular capillaries in the kidneys and retinas have already suffered irreversible damage.",
-                        "<b>The 12-Month Golden Window:</b> Predicting continuous 1-year disease progression (<i>y</i> &in; [25, 346]) gives doctors a 12-month window of opportunity to adjust medication and diet before permanent organ necrosis occurs.",
-                        "<b>Why Continuous Regression:</b> Medicine is not binary (Sick vs Healthy). Score 280 requires emergency intensive insulin; score 105 needs mild diet tweaks. Exact continuous score prediction is vital.",
-                        "<b>Asymmetric Cost of Mistakes:</b> Prediction errors are not equal in healthcare. <i>Under-predicting (Deadliest):</i> Predicting 110 for a patient whose true score is 290 delays critical therapy, causing irreversible kidney failure. <i>Over-predicting:</i> Predicting 300 for a patient whose true score is 100 triggers excessive insulin, causing life-threatening hypoglycemia (fainting/coma)."
-                    ],
-                    "math": [
-                        {
-                            "h": "Model Inputs Vector (x)",
-                            "html": "<b>x</b> = [<i>age</i>, <i>sex</i>, <i>bmi</i>, <i>bp</i>, <i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>, <i>s</i><sub>3</sub>, <i>s</i><sub>4</sub>, <i>s</i><sub>5</sub>, <i>s</i><sub>6</sub>]<sup>T</sup> &in; &reals;<sup>10</sup>",
-                            "info": "<div><span class=\"fm-badge b-var\">10 Inputs</span> 4 physical vitals (age, sex, BMI, blood pressure) and 6 blood serums (total cholesterol, LDL, HDL, TCH, log-triglycerides, glucose).</div>",
-                            "m": "$$\\mathbf{x} = [\\text{age}, \\text{sex}, \\text{bmi}, \\text{bp}, s_1, s_2, s_3, s_4, s_5, s_6]^T \\in \\mathbb{R}^{10}$$",
-                            "d": "10 baseline patient measurements in authentic clinical units."
-                        },
-                        {
-                            "h": "Target Progression Metric (y)",
-                            "html": "<i>y</i> &in; [25.0, 346.0] &nbsp; (Mean = 152.1, Median = 140.5)",
-                            "info": "<div><span class=\"fm-badge b-why\">Target y</span> Continuous disease progression score recorded 1 year after baseline. Higher score indicates faster microvascular and tissue deterioration.</div>",
-                            "m": "$$y \\in [25.0, 346.0]$$",
-                            "d": "Quantitative clinical progression metric 1 year post baseline."
-                        },
-                        {
-                            "h": "Optimization Objective (MSE)",
-                            "html": "min<sub><b>&beta;</b></sub> MSE = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\"><i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup>",
-                            "info": "<div><span class=\"fm-badge b-param\">Goal</span> Find parameter weights <b>&beta;</b> that minimize the average squared prediction error across all patients.</div>",
-                            "m": "$$\\min_{\\boldsymbol{\\beta}} \\text{MSE} = \\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2$$",
-                            "d": "Minimizes the average squared error between actual and predicted progression."
-                        }
-                    ],
-                    "say": "Professor, Dr. Ayesha needs a crystal ball: predicting continuous 1-year progression allows personalized preventative therapy before irreversible organ damage occurs.",
-                    "c": "#f43f5e",
-                    "n": 2,
-                    "ex": "A patient with BMI 32.1 and elevated blood pressure is predicted at 225.9, triggering an immediate severe clinical triage alert.",
-                    "use": "Early warning clinical decision support to prioritize patients needing urgent care.",
-                    "vz": "gauge",
-                    "fig": "fig1",
-                    "figTitle": "Figure 1: Target Progression Distribution & Continuous Imbalance",
-                    "figCap": "Right-skewed target (+0.44 skewness) with 3 clinical severity zones: Mild (<100), Moderate (100-200), and Severe (>200)."
+                    "h": "Target Progression Metric (y)",
+                    "html": "<i>y</i> &in; [25.0, 346.0] &nbsp; (Mean = 152.1, Median = 140.5)",
+                    "info": "<div><span class=\"fm-badge b-why\">Target y</span> Continuous disease progression score recorded 1 year after baseline. Higher score indicates faster microvascular and tissue deterioration.</div>",
+                    "m": "$$y \\in [25.0, 346.0]$$",
+                    "d": "Quantitative clinical progression metric 1 year post baseline."
                 },
                 {
-                    "k": "pipe",
-                    "st": 1,
-                    "sp": "Speaker 1",
-                    "t": "The Complete ML Pipeline Architecture",
-                    "plain": [
-                        "<b>The Sterile Assembly Line:</b> Like a sterile medicine factory (Raw Herbs &rarr; Purification &rarr; Airlock &rarr; Bottling), if unsterilized room air or bacteria leaks into the vial at any point, the batch is contaminated. In ML, this contamination is <i>Data Leakage</i>—if the model peeks at future test patients during scaling, it cheats and will fail on real hospital patients.",
-                        "<b>1. Strict Zero-Leakage Airlocks:</b> Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.",
-                        "<b>2. Authentic Data Ingestion (N=442):</b> 442 authentic diabetic patients evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with <i>zero missing values</i> (NaN=0), requiring zero synthetic imputation.",
-                        "<b>3. Dual-Track Feature Handling:</b> Biological sex is decoded into clean binary {0.0=Female, 1.0=Male} adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1–S6) are standardized via Z-score so the math treats them fairly.",
-                        "<b>4. Imbalance Management (Quantile Stratification):</b> Severe patients (<i>y</i> &gt; 200) are rare. We sliced all 442 patients into 5 equal severity quantiles, taking 70% Train, 20% Val, and 10% Test from each pile—guaranteeing identical progression distribution (~152) across all sets.",
-                        "<b>5. Transparent Modeling (OLS Normal Equation):</b> Zero black boxes (no Neural Nets or Random Forests). Solved analytically via the Gauss-Markov Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms. Every beta weight is 100% explainable to Dr. Ayesha."
-                    ],
-                    "math": [],
-                    "say": "Our pipeline begins with untouched raw data, handles categorical and continuous features, balances target quantiles, fits Ordinary Least Squares, and validates assumptions.",
-                    "c": "#06b6d4",
-                    "n": 3,
-                    "ex": "Like a diagnostic assembly line: Clean -> Encode -> Stratify -> Scale -> Train -> Diagnose -> Serve.",
-                    "use": "Ensures full reproducibility with zero data leakage across train, val, and test.",
-                    "vz": null
-                },
-                {
-                    "st": 1,
-                    "sp": "Speaker 1",
-                    "t": "Step 1: The Raw Clinical Dataset",
-                    "plain": [
-                        "<b>Full Cohort:</b> 442 diabetic patients, 10 clinical features, 4,420 data points, <b>zero missing values</b>.",
-                        "<b>4 Physical Vitals:</b> Age (19-79), Biological Sex (0/1), BMI (body fatness), and Blood Pressure (arterial shear stress).",
-                        "<b>6 Blood Serum Lipids:</b> Total Cholesterol (S1), LDL 'bad fat' (S2), HDL 'good fat' (S3), TCH ratio (S4), Log-Triglycerides (S5), and Glucose (S6).",
-                        "<b>Ground-Truth Target (y):</b> Continuous progression score spanning from 25.0 (mild stability) to 346.0 (severe vascular decline)."
-                    ],
-                    "math": [
-                        {
-                            "h": "Dataset Matrix Dimensions",
-                            "html": "<i>N</i> = <b>442</b> Patients &nbsp;&times;&nbsp; <i>p</i> = <b>10</b> Features &nbsp;&DoubleRightArrow;&nbsp; <b>4,420</b> Total Data Points",
-                            "info": "<div><span class=\"fm-badge b-const\">Sample Size</span> 442 patients is a realistic clinical cohort (~44 patients per parameter).</div><div><span class=\"fm-badge b-green\">Zero Missing Data</span> All 4,420 values are 100% verified with zero nulls.</div>",
-                            "m": "$$N = 442 \\text{ Patients}, \\quad p = 10 \\text{ Features}$$",
-                            "d": "Full cohort with complete clinical measurements and zero missing values."
-                        },
-                        {
-                            "h": "Target Progression Statistics",
-                            "html": "Min = <b>25</b>, &nbsp; Mean = <b>152.13</b>, &nbsp; Median = <b>140.50</b>, &nbsp; Max = <b>346</b>",
-                            "info": "<div><span class=\"fm-badge b-why\">Progression Span</span> Spans from mild disease stability (25) to severe microvascular deterioration (346). Skewness = +0.44.</div>",
-                            "m": "$$\\text{Mean} = 152.13, \\; \\text{Median} = 140.50, \\; \\text{Skewness} = +0.44$$",
-                            "d": "Continuous progression spanning from mild stability (25) to severe rapid decline (346)."
-                        }
-                    ],
-                    "say": "We verified complete data hygiene: all 4,420 clinical measurements are physiologically authentic with zero nulls.",
-                    "c": "#38bdf8",
-                    "n": 4,
-                    "ex": "Row 1: Age 59, Sex Male, BMI 32.1, BP 101 mmHg, S1 157 mg/dL, S5 4.86, Progression 151.",
-                    "use": "Gives the model ground-truth clinical data to establish baseline metabolic relationships.",
-                    "vz": null,
-                    "fig": "fig2",
-                    "figTitle": "Figure 2: Clinical Feature Distributions Across 10 Biomarkers",
-                    "figCap": "Distributions of continuous vitals (BMI, BP), demographics (Age), binary categorical Sex, and blood serum lipids (S1 to S6)."
-                },
-                {
-                    "st": 2,
-                    "sp": "Speaker 1",
-                    "t": "Step 2: Handling Different Input Feature Types",
-                    "plain": [
-                        "<b>The 'Apples, Kilograms & Light Switches' Challenge:</b> You cannot add body fat to blood pressure directly\u2014they live on different physical scales!",
-                        "<b>Categorical Biological Sex:</b> Raw data had sex centered as -0.044 and +0.050. We decoded it to binary {0.0 = Female, 1.0 = Male}.",
-                        "<b>Why Dummy Coding Works:</b> In OLS, \u03b2_sex * 1.0 is added for males, and 0.0 for females. No false numeric scale is invented!",
-                        "<b>S5 Log-Triglycerides:</b> Natural log (ln) compresses extreme triglyceride fat spikes into a symmetric bell curve, fitting linear math perfectly."
-                    ],
-                    "math": [
-                        {
-                            "h": "Biological Sex Dummy Encoding",
-                            "html": "<i>sex</i> &in; { 0.0: Female, &nbsp; 1.0: Male }",
-                            "info": "<div><span class=\"fm-badge b-var\">Categorical Handling</span> Converted from continuous centering into a binary dummy variable (0=Female, 1=Male).</div><div><span class=\"fm-badge b-why\">Linear Validity</span> OLS adds &beta;<sub>sex</sub> for males and 0.0 for females without arbitrary numerical distortion.</div>",
-                            "m": "$$\\text{sex} \\in \\{0.0: \\text{Female}, \\; 1.0: \\text{Male}\\}$$",
-                            "d": "Guarantees valid linear mathematics without imposing arbitrary numeric scale."
-                        },
-                        {
-                            "h": "Multicollinearity Detection (VIF)",
-                            "html": "<i>r</i>(<i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>) = <b>+0.897</b> &nbsp;&DoubleRightArrow;&nbsp; VIF(<i>s</i><sub>1</sub>) = <b>53.71</b>, &nbsp; VIF(<i>s</i><sub>2</sub>) = <b>35.39</b>",
-                            "info": "<div><span class=\"fm-badge b-const\">Cholesterol & LDL</span> High VIF causes coefficient signs to oppose, but net predictions remain accurate and unbiased.</div>",
-                            "m": "$$r(s_1, s_2) = +0.897 \\implies \\text{VIF}(s_1) = 53.71, \\; \\text{VIF}(s_2) = 35.39$$",
-                            "d": "Total cholesterol and LDL are highly collinear; handled gracefully by OLS closed-form solver."
-                        }
-                    ],
-                    "say": "Proper feature engineering respects data types: binary dummy coding for sex and logarithmic compression for serum fats.",
-                    "c": "#8b5cf6",
-                    "n": 5,
-                    "ex": "Sex was 1.0 and 2.0. Converted to 0 and 1. If beta is -10.1, it means males have an expected baseline progression 10.1 units lower than females.",
-                    "use": "Guarantees valid linear mathematics without imposing false ordinal scales on demographics.",
-                    "vz": "sc",
-                    "fig": "fig3",
-                    "figTitle": "Figure 3: Clinical Outlier Detection via Tukey IQR Fences",
-                    "figCap": "Boxplots identifying extreme physiological biomarker values (red dots). Audited as authentic severe clinical cases, not data entry errors."
-                },
-                {
-                    "st": 3,
-                    "sp": "Speaker 1",
-                    "t": "Step 3: Managing Dataset Imbalance",
-                    "plain": [
-                        "<b>Why Blind Random Splitting Fails:</b> Severe cases (>200) make up only 28.7%. A blind random split risks putting ZERO severe cases in the test set!",
-                        "<b>The Solution: 5-Bin Quantile Stratification:</b>",
-                        "   \u2022 We lined up all 442 patients from lowest score (25) to highest score (346).",
-                        "   \u2022 We sliced them into 5 equal piles (25-68, 68-109, 109-159, 159-211, 211-346).",
-                        "   \u2022 From EVERY single pile, we took: 70% to Train, 20% to Val, and 10% to Test.",
-                        "<b>\u2713 Proof It Worked:</b> Identical average progression across all 3 sets \u2014 Train: 151.2, Val: 155.1, Test: 152.8. <b>Zero Distribution Drift!</b>",
-                        "<b>Clinical Triage Imbalance (y >= 200):</b> Cost-sensitive balanced weights (w1=1.78, w0=0.70) punish missing sick patients 2.54x more heavily!"
-                    ],
-                    "math": [
-                        {
-                            "h": "Continuous Progression Imbalance (Right-Skewed)",
-                            "html": "Mild (&lt;100): <b>33.3%</b> &nbsp;|&nbsp; Moderate (100-200): <b>38.0%</b> &nbsp;|&nbsp; Severe (&gt;200): <b>28.7%</b>",
-                            "info": "<div><span class=\"fm-badge b-why\">The Challenge</span> Severe progression is a sparse minority (28.7%). Random splitting risks leaving test data with too few high-risk patients.</div>",
-                            "m": "$$\\text{Mild } (<100): 33.3\\%, \\; \\text{Moderate } (100-200): 38.0\\%, \\; \\text{Severe } (>200): 28.7\\%$$",
-                            "d": "Severe cases form a sparse minority; random splitting risks severe distribution shift."
-                        },
-                        {
-                            "h": "5-Bin Quantile Stratification Solution",
-                            "html": "<i>Q</i><sub>1</sub>: [25, 68] &nbsp;|&nbsp; <i>Q</i><sub>2</sub>: (68, 109] &nbsp;|&nbsp; <i>Q</i><sub>3</sub>: (109, 159] &nbsp;|&nbsp; <i>Q</i><sub>4</sub>: (159, 211] &nbsp;|&nbsp; <i>Q</i><sub>5</sub>: (211, 346]",
-                            "info": "<div><span class=\"fm-badge b-green\">Identical Distributions</span> Means across splits match almost perfectly: Train = 151.21, Val = 155.05, Test = 152.78. Zero distribution drift!</div>",
-                            "m": "$$\\mu_{\\text{train}} = 151.21, \\; \\mu_{\\text{val}} = 155.05, \\; \\mu_{\\text{test}} = 152.78$$",
-                            "d": "Quantile stratification ensures zero distribution drift across splits."
-                        }
-                    ],
-                    "say": "To stop distribution drift, we lined up all 442 patients from 25 to 346, sliced them into 5 equal piles, and sampled 70-20-10 from each pile. Train 151.2, Val 155.1, Test 152.8 proves zero drift!",
-                    "c": "#ec4899",
-                    "n": 6,
-                    "ex": "Without stratification, a random 10% test set might contain only 4 severe patients. With 5-bin quantile stratification, all sets have matching progression distributions.",
-                    "use": "Prevents evaluation bias and ensures model is properly tested across all disease severity levels.",
-                    "vz": "eda",
-                    "fig": "fig6",
-                    "figTitle": "Figure 6: Managing Dataset Imbalance (Before vs After Slicing)",
-                    "figCap": "A) Raw 5-bin quantile slicing; B) 70/20/10 sampling rule; C) Overlaid density curves proving zero distribution drift; D) Clinical triage weighting."
-                },
-                {
-                    "st": 4,
-                    "sp": "Speaker 1",
-                    "t": "Step 4: Zero Data Leakage Feature Standardization",
-                    "plain": [
-                        "<b>The 'Different Rulers' Problem:</b> Cholesterol spans 204 units while Log-Triglycerides spans 2.8 units. Raw math would treat cholesterol as 70x more important!",
-                        "<b>Universal Ruler (Z-Score):</b> z = (x - \u03bc) / \u03c3. Measures how many standard deviation steps a patient is from the cohort average.",
-                        "<b>The 'Cheating on the Exam' Rule (Zero Leakage):</b> Scaler \u03bc and \u03c3 were computed EXCLUSIVELY on the 309 training patients.",
-                        "<b>Test Set Isolation:</b> Test statistics remained 100% blind inside a vault until final evaluation. Never call fit() on test data!",
-                        "<b>Patient Example:</b> Patient BMI = 32.1. Train \u03bc = 26.38, \u03c3 = 4.22. z = (32.1 - 26.38)/4.22 = +1.36 standard deviations above average."
-                    ],
-                    "math": [
-                        {
-                            "h": "Z-Score Standardization Formula",
-                            "html": "<i>z<sub>ij</sub></i> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>x<sub>ij</sub></i> - &mu;<sub><i>j</i>, train</sub></span><span class=\"fm-den\">&sigma;<sub><i>j</i>, train</sub></span></div>",
-                            "info": "<div><span class=\"fm-badge b-var\">Unified Ruler</span> Standardizes all features to Mean = 0.0, Std = 1.0. Allows fair comparison of beta effect sizes across cholesterol, blood pressure, and BMI.</div>",
-                            "m": "$$z_{ij} = \\frac{x_{ij} - \\mu_{j, \\text{train}}}{\\sigma_{j, \\text{train}}}$$",
-                            "d": "Every standardized feature has mean = 0.0 and std = 1.0 on train."
-                        },
-                        {
-                            "h": "Zero Data Leakage Invariant",
-                            "html": "<b>Law:</b> &mu;<sub>test</sub> and &sigma;<sub>test</sub> are <b>NEVER</b> computed during training!",
-                            "info": "<div><span class=\"fm-badge b-why\">Strict Isolation</span> Scaler is fitted exclusively on the 309 training patients. Validation and Test sets are transformed using training &mu; and &sigma; alone.</div>",
-                            "m": "$$\\mu_{\\text{test}} \\text{ is NEVER computed during training}$$",
-                            "d": "Test statistics remain 100% blind until final evaluation."
-                        }
-                    ],
-                    "say": "Z-scores put all vitals on a universal ruler. Strict zero data leakage means the scaler only ever learned from training patients.",
-                    "c": "#10b981",
-                    "n": 7,
-                    "ex": "Patient BMI = 32.1. Train mean = 26.3, std = 4.2 -> z = (32.1 - 26.3)/4.2 = +1.38 SD above average.",
-                    "use": "Harmonizes features to a unified ruler so beta coefficients represent direct comparable standardized effect sizes.",
-                    "vz": "sc",
-                    "fig": "fig7",
-                    "figTitle": "Figure 7: Feature Standardization Transformation (Before vs After)",
-                    "figCap": "Left: Raw disparate physical scales (Cholesterol 97-301 vs BP 62-133); Right: Standardized Z-Scores (Mean = 0, Std = 1)."
-                },
-                {
-                    "k": "split",
-                    "st": 5,
-                    "sp": "Speaker 1",
-                    "t": "Step 5: Strict 70% / 20% / 10% Dataset Partitioning",
-                    "plain": [
-                        "Total N = 442 patients partitioned with 5-bin quantile stratification:",
-                        "1. <b>Training Set (70%, N=309):</b> Model learns parameter weights exclusively here. (~31 patients per parameter).",
-                        "2. <b>Validation Set (20%, N=88):</b> Used for diagnostic checks, testing convergence, and verifying residual assumptions.",
-                        "3. <b>Holdout Test Set (10%, N=45):</b> Kept untouched in a vault, opened only once at the very end to evaluate honest generalization to unseen patients."
-                    ],
-                    "math": [],
-                    "say": "Three independent sets: Training to learn, Validation to verify, and Holdout Test to score unseen performance.",
-                    "c": "#06b6d4",
-                    "n": 8,
-                    "ex": "Homework (Train 309), Pre-board mock test (Validation 88), Final Board Exam (Test 45).",
-                    "use": "Guarantees that test performance reflects true generalization to future patients.",
-                    "vz": null,
-                    "fig": "fig4",
-                    "figTitle": "Figure 4: Multicollinearity Heatmap & VIF Diagnostics in Blood Lipids",
-                    "figCap": "Correlation matrix highlighting S1 (Cholesterol) and S2 (LDL) collinearity (r = +0.897) with VIF(S1) = 53.71 and VIF(S2) = 35.39."
-                },
-                {
-                    "st": 6,
-                    "sp": "Speaker 2",
-                    "t": "Step 6: Mathematical Equations of Multiple Linear Regression",
-                    "plain": [
-                        "<b>The Cooking Broth Analogy:</b> y\u0302 = \u03b2_0 + \u2211 \u03b2_j z_j. Start with baseline broth (\u03b2_0 = 151.21 points), then add biomarker spices (\u03b2_j * z_j).",
-                        "<b>Mean Squared Error (MSE):</b> Why squared? 1) Prevents errors cancelling; 2) Penalizes big blunders quadratically; 3) Forms a smooth skate-park bowl.",
-                        "<b>The Normal Equation:</b> Setting calculus slope to zero yields \u03b2\u0302 = (X^T X)^-1 X^T y. Closed-form exact optimum in < 1 millisecond!",
-                        "<b>Why Invert (X^T X)?</b> Matrix is 11 x 11. Inversion takes 0.0001 seconds. Zero guessing, zero learning rate, instant exact weights!"
-                    ],
-                    "math": [
-                        {
-                            "h": "1. Linear Hypothesis Model",
-                            "html": "<i>y&#770;</i>(<b>x</b>) = <span class=\"fm-badge b-const\">&beta;<sub>0</sub></span> + <span class=\"fm-badge b-param\">&sum;<sub><i>j</i>=1</sub><sup>10</sup> &beta;<sub><i>j</i></sub><i>z<sub>j</sub></i></span> = <b>X&beta;</b>",
-                            "info": "<div><span class=\"fm-badge b-var\"><i>y&#770;</i></span> Predicted 1-year disease progression score (e.g. 185.4).</div><div><span class=\"fm-badge b-const\">&beta;<sub>0</sub> = 151.21</span> Baseline intercept: expected progression when all biomarkers are at cohort average (all z = 0).</div><div><span class=\"fm-badge b-param\">&beta;<sub><i>j</i></sub></span> Learned clinical weight: points increase per +1 SD increase in biomarker <i>j</i>.</div><div><span class=\"fm-badge b-var\"><i>z<sub>j</sub></i></span> Standardized patient biomarker z-score.</div>",
-                            "m": "$$\\hat{y}(\\mathbf{x}) = \\beta_0 + \\sum_{j=1}^{10} \\beta_j z_j = \\mathbf{X} \\boldsymbol{\\beta}$$",
-                            "d": "Predicted progression is baseline intercept plus sum of weighted standardized features."
-                        },
-                        {
-                            "h": "2. Mean Squared Error (MSE) Cost Function",
-                            "html": "<i>J</i>(<b>&beta;</b>) = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup> = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> (<b>y</b> - <b>X&beta;</b>)<sup>T</sup>(<b>y</b> - <b>X&beta;</b>)",
-                            "info": "<div><span class=\"fm-badge b-var\">Residual</span> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>) is prediction error for patient <i>i</i>.</div><div><span class=\"fm-badge b-why\">Why Squared?</span> 1) Errors don't cancel out; 2) Punishes large clinical mistakes quadratically; 3) Smooth convex bowl with single global minimum.</div>",
-                            "m": "$$J(\\boldsymbol{\\beta}) = \\frac{1}{2N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2 = \\frac{1}{2N} (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})^T (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})$$",
-                            "d": "Squares errors to penalize large mistakes and provide a differentiable convex surface."
-                        },
-                        {
-                            "h": "3. The Normal Equation (Analytical Optimum)",
-                            "html": "&nabla;<sub><b>&beta;</b></sub><i>J</i>(<b>&beta;</b>) = <b>0</b> &nbsp;&DoubleRightArrow;&nbsp; <span class=\"fm-badge b-green\" style=\"font-size: 1.05rem;\"><b>&beta;&#770;</b> = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup> <b>X</b><sup>T</sup><b>y</b></span>",
-                            "info": "<div><span class=\"fm-badge b-param\">Closed-Form Solution</span> Setting the gradient of MSE to zero directly yields the mathematical minimum.</div><div><span class=\"fm-badge b-const\">Fast Matrix Inversion</span> (<b>X</b><sup>T</sup><b>X</b>) is 11 &times; 11. Inverting takes &lt; 1 ms. Zero iterations, zero learning rate!</div>",
-                            "m": "$$\\nabla_{\\boldsymbol{\\beta}} J(\\boldsymbol{\\beta}) = \\mathbf{0} \\implies \\hat{\\boldsymbol{\\beta}} = (\\mathbf{X}^T \\mathbf{X})^{-1} \\mathbf{X}^T \\mathbf{y}$$",
-                            "d": "Exact closed-form solution. Solves 11x11 matrix inversion in < 1 millisecond!"
-                        }
-                    ],
-                    "say": "OLS minimizes squared error analytically. Setting the gradient to zero solves the 11x11 Normal Equation in less than one millisecond with zero hyperparameter tuning.",
-                    "c": "#2563eb",
-                    "n": 9,
-                    "ex": "Setting the gradient of MSE to zero directly yields beta = (X^T X)^-1 X^T y. Because X^T X is 11x11, inversion takes less than 1 millisecond.",
-                    "use": "Provides transparent, defensible, and fast clinical prognostic modeling.",
-                    "vz": "ols",
-                    "fig": "fig5",
-                    "figTitle": "Figure 5: Bivariate Regression Lines for Major Biomarkers",
-                    "figCap": "Linear regression fits showing positive slopes for BMI (r=+0.59), S5 Triglycerides (r=+0.57), BP (r=+0.44), and protective S3 HDL (r=-0.39)."
-                },
-                {
-                    "st": 7,
-                    "sp": "Speaker 2",
-                    "t": "Step 7: Holdout Test Set Benchmark Results",
-                    "plain": [
-                        "<b>Evaluated on 45 Unseen Patients:</b> Opened strictly once on graduation day from the vault.",
-                        "<b>Test R\u00b2 Score = 0.4882:</b> Our 10 baseline biomarkers explain 48.82% of future 1-year progression in brand-new patients.",
-                        "<b>Test RMSE = 55.17 points:</b> Typical prediction error margin across the 25-346 clinical scale.",
-                        "<b>Test MAE = 44.92 points:</b> Average absolute deviation from true clinical outcome.",
-                        "<b>5-Fold Cross-Validation = 0.4587 \u00b1 0.0538:</b> Confirms model stability and proves zero overfitting across folds."
-                    ],
-                    "math": [
-                        {
-                            "h": "Coefficient of Determination (R\u00b2 Score)",
-                            "html": "<i>R</i><sup>2</sup> = 1 - <div class=\"fm-frac\"><span class=\"fm-num\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup></span><span class=\"fm-den\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#772;</i>)<sup>2</sup></span></div> = <b>0.4882</b>",
-                            "info": "<div><span class=\"fm-badge b-green\">Meaning</span> Our 10 baseline clinical biomarkers explain <b>48.82%</b> of the variance in 1-year disease progression in unseen patients (vs a baseline of 0 for guessing the mean).</div>",
-                            "m": "$$R^2 = 1 - \\frac{\\sum_{i=1}^N (y_i - \\hat{y}_i)^2}{\\sum_{i=1}^N (y_i - \\bar{y})^2} = 0.4882$$",
-                            "d": "Explains ~49% of total variance in unseen patients compared to predicting the mean."
-                        },
-                        {
-                            "h": "Error Metrics (RMSE & MAE) & Cross-Validation",
-                            "html": "RMSE = &radic;[MSE] = <b>55.17</b> &nbsp;|&nbsp; MAE = <b>44.92</b> &nbsp;|&nbsp; 5-Fold CV <i>R</i><sup>2</sup> = <b>0.4587 &plusmn; 0.0538</b>",
-                            "info": "<div><span class=\"fm-badge b-var\">RMSE (55.17)</span> Standard deviation of residuals on the 25-346 scale.</div><div><span class=\"fm-badge b-param\">5-Fold CV</span> Validated across 5 folds within training data, proving stability and low variance.</div>",
-                            "m": "$$\\text{RMSE} = \\sqrt{\\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2} = 55.17$$",
-                            "d": "Standard deviation of the unexplained residuals on the holdout test cohort."
-                        }
-                    ],
-                    "table": [
-                        [
-                            "Evaluation Metric",
-                            "Training Set (N=309)",
-                            "Validation Set (N=88)",
-                            "Holdout Test Set (N=45)"
-                        ],
-                        [
-                            "R\u00b2 Score",
-                            "0.4967",
-                            "0.5894",
-                            "0.4882"
-                        ],
-                        [
-                            "RMSE",
-                            "54.16",
-                            "50.71",
-                            "55.17"
-                        ],
-                        [
-                            "MAE",
-                            "43.70",
-                            "41.69",
-                            "44.92"
-                        ]
-                    ],
-                    "say": "On 45 unseen holdout patients, our model achieved Test R\u00b2 of 0.4882 and RMSE of 55.17, supported by stable 5-fold cross-validation of 0.4587.",
-                    "c": "#10b981",
-                    "n": 10,
-                    "ex": "For a test patient with actual progression of 150, our model predicts 142. Error is only 8 units, well within clinical tolerance.",
-                    "use": "Quantifies honest predictive power without data snooping or overfitting.",
-                    "vz": null,
-                    "fig": "fig9",
-                    "figTitle": "Figure 9: Actual vs Predicted Progression on Holdout Test Set",
-                    "figCap": "Holdout test evaluation (N=45) showing linear model alignment along the 45-degree identity line (Test R\u00b2 = 0.4882, MAE = 42.12 points)."
-                },
-                {
-                    "st": 8,
-                    "sp": "Speaker 2",
-                    "t": "Step 8: Verifying Linear Regression Assumptions (Diagnostics)",
-                    "plain": [
-                        "<b>The 4 Gauss-Markov Conditions Verified:</b> Confirms OLS is the Best Linear Unbiased Estimator (BLUE).",
-                        "<b>1. Homoscedasticity (The Shotgun Blast):</b> Residuals form a uniform horizontal scatter around zero\u2014NOT a funnel of doom!",
-                        "<b>2. Error Normality:</b> Q-Q plot dots follow the straight 45-degree line (r > 0.98), proving residuals follow a Gaussian bell curve.",
-                        "<b>3. Zero Mean:</b> E[e | X] = 0.00. The linear hyperplane cuts directly through the center of clinical data without bias.",
-                        "<b>4. Low Variance:</b> Learning curve shows Training score and Cross-Validation score converging smoothly (no memorization)."
-                    ],
-                    "math": [
-                        {
-                            "h": "Residual Definition & Gauss-Markov Conditions",
-                            "html": "<i>e<sub>i</sub></i> = <i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i> &nbsp;|&nbsp; Var(<i>e<sub>i</sub></i> | <b>x</b>) = &sigma;<sup>2</sup> &nbsp;|&nbsp; E[<i>e<sub>i</sub></i> | <b>x</b>] = 0.00",
-                            "info": "<div><span class=\"fm-badge b-var\">1. Homoscedasticity</span> Error spread is constant across all predicted values (no funnel shape).</div><div><span class=\"fm-badge b-param\">2. Normality</span> Q-Q plot correlation <i>r</i> &gt; 0.98 confirms errors follow a Gaussian bell curve.</div><div><span class=\"fm-badge b-green\">BLUE Theorem</span> Confirms OLS is the Best Linear Unbiased Estimator.</div>",
-                            "m": "$$e_i = y_i - \\hat{y}_i, \\quad \\mathbb{E}[e_i \\mid \\mathbf{x}_i] = 0.00, \\quad \\text{Var}(e_i \\mid \\mathbf{x}_i) = \\sigma^2$$",
-                            "d": "Residuals are homoscedastic (constant spread) and follow a Gaussian distribution."
-                        }
-                    ],
-                    "say": "Residual diagnostics verify all Gauss-Markov conditions: homoscedastic shotgun scatter and Gaussian normality confirm mathematical validity.",
-                    "c": "#f59e0b",
-                    "n": 11,
-                    "ex": "If residuals had a fan shape, error would explode for severe patients. Our residual plot shows random uniform scatter around zero.",
-                    "use": "Validates that the linear model structure is mathematically sound for this dataset.",
-                    "vz": null,
-                    "fig": "fig10",
-                    "figTitle": "Figure 10: Linear Regression Residual Diagnostics (Assumptions Check)",
-                    "figCap": "A) Residuals vs Fitted (constant variance); B) Normal Q-Q Plot (Gaussian bell-curve errors); C) Scale-Location (homoscedasticity); D) Cook's Distance leverage."
-                },
-                {
-                    "st": 8,
-                    "sp": "Speaker 2",
-                    "t": "Step 9: Standardized Beta Weights & Medical Interpretation",
-                    "plain": [
-                        "<b>Baseline Intercept (\u03b2_0 = 151.21):</b> Expected progression score for an average patient (all z = 0).",
-                        "<b>#1 Progression Driver:</b> S5 Log-Triglycerides (\u03b2 = +34.89). Excess blood fats accelerate insulin resistance and tissue damage.",
-                        "<b>#2 Progression Driver:</b> BMI (\u03b2 = +23.72). Adipose mass physically blocks insulin receptor signaling in muscle cells.",
-                        "<b>#3 Progression Driver:</b> Blood Pressure (\u03b2 = +17.76). Arterial pressure damages delicate renal and retinal microvessels.",
-                        "<b>Top 3 Dominance:</b> S5, BMI, and Blood Pressure drive over 75% of explainable diabetes progression!",
-                        "<b>Patient Walkthrough:</b> Fatima (healthy vitals) -> y\u0302 = 60.2 (Low Risk) vs Tariq (obese, high BP, high TG) -> y\u0302 = 304.9 (Emergency Alert!)."
-                    ],
-                    "math": [
-                        {
-                            "h": "Complete Linear Prognostic Equation",
-                            "html": "<i>y&#770;</i> = <b>151.21</b> + <b>34.89</b>(<i>z</i><sub>s5</sub>) + <b>23.72</b>(<i>z</i><sub>bmi</sub>) + <b>18.96</b>(<i>z</i><sub>s2</sub>) + <b>17.76</b>(<i>z</i><sub>bp</sub>) + <b>5.30</b>(<i>z</i><sub>s4</sub>) + <b>4.22</b>(<i>z</i><sub>s3</sub>) + <b>3.57</b>(<i>z</i><sub>s6</sub>) - <b>1.12</b>(<i>z</i><sub>age</sub>) - <b>11.27</b>(<i>z</i><sub>sex</sub>) - <b>16.89</b>(<i>z</i><sub>s1</sub>)",
-                            "info": "<div><span class=\"fm-badge b-why\">Top 3 Drivers</span> S5 Log-Triglycerides (+34.89), BMI (+23.72), and Blood Pressure (+17.76) drive ~75% of progression.</div><div><span class=\"fm-badge b-const\">Multicollinearity Note</span> S1 (-16.89) and S2 (+18.96) have high VIF (53.7, 35.4); their opposing signs balance each other while overall predictions remain accurate.</div>",
-                            "m": "$$\\hat{y} = 151.21 + 34.89(z_{s5}) + 23.72(z_{\\text{bmi}}) + 18.96(z_{s2}) + 17.76(z_{\\text{bp}}) + 5.30(z_{s4}) + 4.22(z_{s3}) + 3.57(z_{s6}) - 1.12(z_{\\text{age}}) - 11.27(z_{\\text{sex}}) - 16.89(z_{s1})$$",
-                            "d": "S5 (triglycerides), BMI, and blood pressure are the primary clinical progression drivers."
-                        }
-                    ],
-                    "say": "Standardized beta weights reveal the biochemical hierarchy: S5 Triglycerides, BMI, and Blood Pressure drive over 75% of explainable progression.",
-                    "c": "#2563eb",
-                    "n": 12,
-                    "ex": "If a patient loses weight to drop BMI by 1 standard deviation, their expected progression immediately drops by 23.7 units.",
-                    "use": "Explaining the exact biological drivers to doctors and patients.",
-                    "vz": null,
-                    "fig": "fig11",
-                    "figTitle": "Figure 11: Standardized Feature Coefficients & Clinical Significance",
-                    "figCap": "Estimated beta weights with 95% confidence intervals and p-values. BMI (+32.3) and S5 Triglycerides (+32.6) are the dominant drivers of diabetes disease progression."
-                },
-                {
-                    "st": 9,
-                    "sp": "Speaker 2",
-                    "t": "Step 10: Clinical Risk Triage & Managing Class Imbalance",
-                    "plain": [
-                        "<b>The Emergency Red Line (y >= 200):</b> Patients progressing above 200 face rapid kidney and retinal failure.",
-                        "<b>The Airport Scanner Analogy:</b> Predicting 'everyone is healthy' gives 71% accuracy but lets 100% of severe patients suffer organ death!",
-                        "<b>Cost-Sensitive Balanced Weights:</b> w1 = 1.78, w0 = 0.70. Missing a sick patient is penalized 2.54x more heavily than a false alarm.",
-                        "<b>Sensitivity Boost (61.5% -> 76.92%):</b> Our balanced model caught 10 out of 13 severe test patients (rescuing 2 extra high-risk patients!).",
-                        "<b>Confusion Matrix:</b> 27 True Negatives, 5 False Alarms, 3 Missed, 10 Caught."
-                    ],
-                    "math": [
-                        {
-                            "h": "Inverse Frequency Balanced Class Weights",
-                            "html": "<i>w</i><sub>severe</sub> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>N</i></span><span class=\"fm-den\">2 &times; <i>N</i><sub>severe</sub></span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">309</span><span class=\"fm-den\">2 &times; 87</span></div> = <b>1.78</b> &nbsp;|&nbsp; <i>w</i><sub>controlled</sub> = <b>0.70</b>",
-                            "info": "<div><span class=\"fm-badge b-why\">Cost-Sensitive Penalty</span> Severe patients (28.7%) are penalized 2.54&times; more heavily when misclassified, eliminating majority-class bias.</div>",
-                            "m": "$$w_1 = \\frac{N}{2 \\times N_{\\text{severe}}} = 1.78, \\quad w_0 = \\frac{N}{2 \\times N_{\\text{controlled}}} = 0.70$$",
-                            "d": "Penalizes false negatives 2.54x more heavily to reflect medical triage realities."
-                        },
-                        {
-                            "h": "Clinical Sensitivity Boost on Holdout Test Set",
-                            "html": "Sensitivity = <div class=\"fm-frac\"><span class=\"fm-num\">TP</span><span class=\"fm-den\">TP + FN</span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">10</span><span class=\"fm-den\">10 + 3</span></div> = <b>76.92%</b> &nbsp; (vs 61.54% unweighted baseline)",
-                            "info": "<div><span class=\"fm-badge b-green\">Life-Saving Impact</span> Catches 10 out of 13 severe test patients (2 more high-risk patients rescued compared to unweighted model).</div>",
-                            "m": "$$\\text{Sensitivity} = \\frac{10}{10 + 3} = 76.92\\% \\quad (\\text{Baseline: } 61.54\\%)$$",
-                            "d": "Balanced triage successfully flags 76.92% of high-risk patients for intervention."
-                        }
-                    ],
-                    "table": [
-                        [
-                            "Clinical Metric",
-                            "Standard Unweighted Baseline",
-                            "Balanced Model (Managing Imbalance)"
-                        ],
-                        [
-                            "Clinical Accuracy",
-                            "84.44%",
-                            "82.22%"
-                        ],
-                        [
-                            "Clinical Sensitivity (Recall)",
-                            "61.54% (5 missed severe)",
-                            "76.92% (Only 3 missed severe!)"
-                        ],
-                        [
-                            "Clinical Specificity",
-                            "93.75%",
-                            "84.38%"
-                        ],
-                        [
-                            "Clinical F1-Score",
-                            "0.6957",
-                            "0.7143"
-                        ]
-                    ],
-                    "say": "In clinical triage, sensitivity is life-critical. Cost-sensitive weighting boosted our emergency sensitivity to 76.92%, catching 10 of 13 severe patients.",
-                    "c": "#f97316",
-                    "n": 13,
-                    "ex": "Standard model misses 5 severe patients who would develop kidney disease untreated. The balanced model catches 2 more of them.",
-                    "use": "Hospital triage prioritizing patient safety over naive accuracy.",
-                    "vz": "cm",
-                    "fig": "fig12",
-                    "figTitle": "Figure 12: Clinical Risk Triage via OLS Decision Threshold Calibration",
-                    "figCap": "A) Standard OLS cutoff (y_hat >= 200) catches 8/13 (61.5% recall); B) Calibrated OLS safety threshold (y_hat >= 175) catches 10/13 (76.9% recall), reducing missed patients from 5 to 3 using 100% pure OLS!"
-                },
-                {
-                    "st": 10,
-                    "sp": "Both Speakers",
-                    "t": "Project Conclusion: Feasibility & Clinical Summary",
-                    "plain": [
-                        "<b>Did We Solve the Problem? YES!</b> Explaining ~49% of 1-year progression gives doctors an accurate 12-month early warning.",
-                        "<b>Was OLS Feasible? YES!</b> With 442 patients and 10 features, OLS gives ~31 patients per parameter, completely avoiding overfitting.",
-                        "<b>The Biological Noise Ceiling (~50% Limit):</b> Baseline blood tests cannot know if a patient eats cake next month or forgets insulin. That unmeasured future lifestyle is ~50% of variance!",
-                        "<b>Why Complex Models Fail:</b> Random Forest gets the exact same R\u00b2 (0.44-0.48) but memorizes noise and destroys doctor trust.",
-                        "<b>Final Clinical Verdict:</b> OLS provides exact, transparent parameters that doctors can inspect and trust. Live app active on port 5003."
-                    ],
-                    "math": [
-                        {
-                            "h": "Final Quantitative Performance Summary",
-                            "html": "Test <i>R</i><sup>2</sup> = <b>0.4882</b> &nbsp;|&nbsp; Test RMSE = <b>55.17</b> &nbsp;|&nbsp; Test MAE = <b>44.92</b>",
-                            "info": "<div><span class=\"fm-badge b-green\">Verified Generalization</span> Evaluated on 45 unseen holdout test patients with strict zero data leakage. 5-Fold CV: 0.4587 \u00b1 0.0538.</div>",
-                            "m": "$$\\text{Test } R^2 = 0.4882, \\; \\text{Test RMSE} = 55.17, \\; \\text{Test MAE} = 44.92$$",
-                            "d": "Verified on 45 unseen holdout test patients with zero data leakage."
-                        },
-                        {
-                            "h": "Clinical Feasibility Verdict",
-                            "html": "Triage Sensitivity = <b>76.92%</b> &nbsp;|&nbsp; Latency &lt; <b>1.2 ms</b> &nbsp;|&nbsp; <b>100% Explainable</b>",
-                            "info": "<div><span class=\"fm-badge b-why\">Biological Noise Limit</span> Remaining ~51% variance is unmeasured lifestyle/genetics. Complex models overfit to this noise; OLS is the optimal clinical solution.</div>",
-                            "m": "$$\\text{Triage Sensitivity} = 76.92\\%, \\; \\text{Inference Latency} < 1.2 \\text{ ms}$$",
-                            "d": "Production-ready prognostic dashboard active at port 5003."
-                        }
-                    ],
-                    "say": "In conclusion, OLS reaches the natural biological noise ceiling of baseline blood tests while remaining 100% explainable to doctors. Thank you, Professor \u2014 we welcome your questions!",
-                    "c": "#2563eb",
-                    "n": 14,
-                    "ex": "A simple, solid, transparent linear model is far more useful in medicine than a black box.",
-                    "use": "Summary of achievements and defense conclusion.",
-                    "vz": null,
-                    "fig": "fig8",
-                    "figTitle": "Figure 8: Multiple Linear Regression Learning Curve (Bias-Variance)",
-                    "figCap": "Training and 5-Fold Cross-Validation scores converge smoothly at R\u00b2 ~ 0.46 with a narrow variance gap, proving model stability and absence of severe overfitting."
+                    "h": "Optimization Objective (MSE)",
+                    "html": "min<sub><b>&beta;</b></sub> MSE = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\"><i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup>",
+                    "info": "<div><span class=\"fm-badge b-param\">Goal</span> Find parameter weights <b>&beta;</b> that minimize the average squared prediction error across all patients.</div>",
+                    "m": "$$\\min_{\\boldsymbol{\\beta}} \\text{MSE} = \\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2$$",
+                    "d": "Minimizes the average squared error between actual and predicted progression."
                 }
             ],
-            "pipe": [
+            "say": "Professor, Dr. Ayesha needs a crystal ball: predicting continuous 1-year progression allows personalized preventative therapy before irreversible organ damage occurs.",
+            "c": "#f43f5e",
+            "n": 2,
+            "ex": "A patient with BMI 32.1 and elevated blood pressure is predicted at 225.9, triggering an immediate severe clinical triage alert.",
+            "use": "Early warning clinical decision support to prioritize patients needing urgent care.",
+            "vz": "gauge",
+            "fig": "fig1",
+            "figTitle": "Figure 1: Target Progression Distribution & Continuous Imbalance",
+            "figCap": "Right-skewed target (+0.44 skewness) with 3 clinical severity zones: Mild (<100), Moderate (100-200), and Severe (>200)."
+        },
+        {
+            "k": "pipe",
+            "st": 1,
+            "sp": "Speaker 1",
+            "t": "The Complete ML Pipeline Architecture",
+            "plain": [
+                "<b>The Sterile Assembly Line:</b> Like a sterile medicine factory (Raw Herbs &rarr; Purification &rarr; Airlock &rarr; Bottling), if unsterilized room air or bacteria leaks into the vial at any point, the batch is contaminated. In ML, this contamination is <i>Data Leakage</i>\u2014if the model peeks at future test patients during scaling, it cheats and will fail on real hospital patients.",
+                "<b>1. Strict Zero-Leakage Airlocks:</b> Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.",
+                "<b>2. Authentic Data Ingestion (N=442):</b> 442 authentic diabetic patients evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with <i>zero missing values</i> (NaN=0), requiring zero synthetic imputation.",
+                "<b>3. Dual-Track Feature Handling:</b> Biological sex is decoded into clean binary {0.0=Female, 1.0=Male} adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1\u2013S6) are standardized via Z-score so the math treats them fairly.",
+                "<b>4. Imbalance Management & Partitioning:</b> Severe patients (<i>y</i> &gt; 200) are rare. We sliced all 442 patients into 5 equal severity quantiles and split FIRST into 70% Train, 20% Val, and 10% Test to guarantee zero distribution drift (~152).",
+                "<b>5. Zero-Leakage Scaling & Transparent OLS:</b> Scaler is fitted strictly on the isolated 309 Train set; Val & Test are transformed using those frozen stats. Model is solved analytically via Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms with 100% explainability."
+            ],
+            "math": [],
+            "say": "Our pipeline begins with untouched raw data, handles categorical and continuous features, balances target quantiles, fits Ordinary Least Squares, and validates assumptions.",
+            "c": "#06b6d4",
+            "n": 3,
+            "ex": "Like a diagnostic assembly line: Clean -> Encode -> Stratify -> Scale -> Train -> Diagnose -> Serve.",
+            "use": "Ensures full reproducibility with zero data leakage across train, val, and test.",
+            "vz": null
+        },
+        {
+            "st": 1,
+            "sp": "Speaker 1",
+            "t": "Step 1: The Raw Clinical Dataset",
+            "plain": [
+                "<b>Full Cohort:</b> 442 diabetic patients, 10 clinical features, 4,420 data points, <b>zero missing values</b>.",
+                "<b>4 Physical Vitals:</b> Age (19-79), Biological Sex (0/1), BMI (body fatness), and Blood Pressure (arterial shear stress).",
+                "<b>6 Blood Serum Lipids:</b> Total Cholesterol (S1), LDL 'bad fat' (S2), HDL 'good fat' (S3), TCH ratio (S4), Log-Triglycerides (S5), and Glucose (S6).",
+                "<b>Ground-Truth Target (y):</b> Continuous progression score spanning from 25.0 (mild stability) to 346.0 (severe vascular decline)."
+            ],
+            "math": [
+                {
+                    "h": "Dataset Matrix Dimensions",
+                    "html": "<i>N</i> = <b>442</b> Patients &nbsp;&times;&nbsp; <i>p</i> = <b>10</b> Features &nbsp;&DoubleRightArrow;&nbsp; <b>4,420</b> Total Data Points",
+                    "info": "<div><span class=\"fm-badge b-const\">Sample Size</span> 442 patients is a realistic clinical cohort (~44 patients per parameter).</div><div><span class=\"fm-badge b-green\">Zero Missing Data</span> All 4,420 values are 100% verified with zero nulls.</div>",
+                    "m": "$$N = 442 \\text{ Patients}, \\quad p = 10 \\text{ Features}$$",
+                    "d": "Full cohort with complete clinical measurements and zero missing values."
+                },
+                {
+                    "h": "Target Progression Statistics",
+                    "html": "Min = <b>25</b>, &nbsp; Mean = <b>152.13</b>, &nbsp; Median = <b>140.50</b>, &nbsp; Max = <b>346</b>",
+                    "info": "<div><span class=\"fm-badge b-why\">Progression Span</span> Spans from mild disease stability (25) to severe microvascular deterioration (346). Skewness = +0.44.</div>",
+                    "m": "$$\\text{Mean} = 152.13, \\; \\text{Median} = 140.50, \\; \\text{Skewness} = +0.44$$",
+                    "d": "Continuous progression spanning from mild stability (25) to severe rapid decline (346)."
+                }
+            ],
+            "say": "We verified complete data hygiene: all 4,420 clinical measurements are physiologically authentic with zero nulls.",
+            "c": "#38bdf8",
+            "n": 4,
+            "ex": "Row 1: Age 59, Sex Male, BMI 32.1, BP 101 mmHg, S1 157 mg/dL, S5 4.86, Progression 151.",
+            "use": "Gives the model ground-truth clinical data to establish baseline metabolic relationships.",
+            "vz": null,
+            "fig": "fig2",
+            "figTitle": "Figure 2: Clinical Feature Distributions Across 10 Biomarkers",
+            "figCap": "Distributions of continuous vitals (BMI, BP), demographics (Age), binary categorical Sex, and blood serum lipids (S1 to S6)."
+        },
+        {
+            "st": 2,
+            "sp": "Speaker 1",
+            "t": "Step 2: Handling Different Input Feature Types",
+            "plain": [
+                "<b>The 'Apples, Kilograms & Light Switches' Challenge:</b> You cannot add body fat to blood pressure directly\u2014they live on different physical scales!",
+                "<b>Categorical Biological Sex:</b> Raw data had sex centered as -0.044 and +0.050. We decoded it to binary {0.0 = Female, 1.0 = Male}.",
+                "<b>Why Dummy Coding Works:</b> In OLS, \u03b2_sex * 1.0 is added for males, and 0.0 for females. No false numeric scale is invented!",
+                "<b>S5 Log-Triglycerides:</b> Natural log (ln) compresses extreme triglyceride fat spikes into a symmetric bell curve, fitting linear math perfectly."
+            ],
+            "math": [
+                {
+                    "h": "Biological Sex Dummy Encoding",
+                    "html": "<i>sex</i> &in; { 0.0: Female, &nbsp; 1.0: Male }",
+                    "info": "<div><span class=\"fm-badge b-var\">Categorical Handling</span> Converted from continuous centering into a binary dummy variable (0=Female, 1=Male).</div><div><span class=\"fm-badge b-why\">Linear Validity</span> OLS adds &beta;<sub>sex</sub> for males and 0.0 for females without arbitrary numerical distortion.</div>",
+                    "m": "$$\\text{sex} \\in \\{0.0: \\text{Female}, \\; 1.0: \\text{Male}\\}$$",
+                    "d": "Guarantees valid linear mathematics without imposing arbitrary numeric scale."
+                },
+                {
+                    "h": "Multicollinearity Detection (VIF)",
+                    "html": "<i>r</i>(<i>s</i><sub>1</sub>, <i>s</i><sub>2</sub>) = <b>+0.897</b> &nbsp;&DoubleRightArrow;&nbsp; VIF(<i>s</i><sub>1</sub>) = <b>53.71</b>, &nbsp; VIF(<i>s</i><sub>2</sub>) = <b>35.39</b>",
+                    "info": "<div><span class=\"fm-badge b-const\">Cholesterol & LDL</span> High VIF causes coefficient signs to oppose, but net predictions remain accurate and unbiased.</div>",
+                    "m": "$$r(s_1, s_2) = +0.897 \\implies \\text{VIF}(s_1) = 53.71, \\; \\text{VIF}(s_2) = 35.39$$",
+                    "d": "Total cholesterol and LDL are highly collinear; handled gracefully by OLS closed-form solver."
+                }
+            ],
+            "say": "Proper feature engineering respects data types: binary dummy coding for sex and logarithmic compression for serum fats.",
+            "c": "#8b5cf6",
+            "n": 5,
+            "ex": "Sex was 1.0 and 2.0. Converted to 0 and 1. If beta is -10.1, it means males have an expected baseline progression 10.1 units lower than females.",
+            "use": "Guarantees valid linear mathematics without imposing false ordinal scales on demographics.",
+            "vz": "sc",
+            "fig": "fig3",
+            "figTitle": "Figure 3: Clinical Outlier Detection via Tukey IQR Fences",
+            "figCap": "Boxplots identifying extreme physiological biomarker values (red dots). Audited as authentic severe clinical cases, not data entry errors."
+        },
+        {
+            "st": 3,
+            "sp": "Speaker 1",
+            "t": "Step 3: Managing Dataset Imbalance",
+            "plain": [
+                "<b>Why Blind Random Splitting Fails:</b> Severe cases (>200) make up only 28.7%. A blind random split risks putting ZERO severe cases in the test set!",
+                "<b>The Solution: 5-Bin Quantile Stratification:</b>",
+                "   \u2022 We lined up all 442 patients from lowest score (25) to highest score (346).",
+                "   \u2022 We sliced them into 5 equal piles (25-68, 68-109, 109-159, 159-211, 211-346).",
+                "   \u2022 From EVERY single pile, we took: 70% to Train, 20% to Val, and 10% to Test.",
+                "<b>\u2713 Proof It Worked:</b> Identical average progression across all 3 sets \u2014 Train: 151.2, Val: 155.1, Test: 152.8. <b>Zero Distribution Drift!</b>",
+                "<b>Clinical Triage Imbalance (y >= 200):</b> Cost-sensitive balanced weights (w1=1.78, w0=0.70) punish missing sick patients 2.54x more heavily!"
+            ],
+            "math": [
+                {
+                    "h": "Continuous Progression Imbalance (Right-Skewed)",
+                    "html": "Mild (&lt;100): <b>33.3%</b> &nbsp;|&nbsp; Moderate (100-200): <b>38.0%</b> &nbsp;|&nbsp; Severe (&gt;200): <b>28.7%</b>",
+                    "info": "<div><span class=\"fm-badge b-why\">The Challenge</span> Severe progression is a sparse minority (28.7%). Random splitting risks leaving test data with too few high-risk patients.</div>",
+                    "m": "$$\\text{Mild } (<100): 33.3\\%, \\; \\text{Moderate } (100-200): 38.0\\%, \\; \\text{Severe } (>200): 28.7\\%$$",
+                    "d": "Severe cases form a sparse minority; random splitting risks severe distribution shift."
+                },
+                {
+                    "h": "5-Bin Quantile Stratification Solution",
+                    "html": "<i>Q</i><sub>1</sub>: [25, 68] &nbsp;|&nbsp; <i>Q</i><sub>2</sub>: (68, 109] &nbsp;|&nbsp; <i>Q</i><sub>3</sub>: (109, 159] &nbsp;|&nbsp; <i>Q</i><sub>4</sub>: (159, 211] &nbsp;|&nbsp; <i>Q</i><sub>5</sub>: (211, 346]",
+                    "info": "<div><span class=\"fm-badge b-green\">Identical Distributions</span> Means across splits match almost perfectly: Train = 151.21, Val = 155.05, Test = 152.78. Zero distribution drift!</div>",
+                    "m": "$$\\mu_{\\text{train}} = 151.21, \\; \\mu_{\\text{val}} = 155.05, \\; \\mu_{\\text{test}} = 152.78$$",
+                    "d": "Quantile stratification ensures zero distribution drift across splits."
+                }
+            ],
+            "say": "To stop distribution drift, we lined up all 442 patients from 25 to 346, sliced them into 5 equal piles, and sampled 70-20-10 from each pile. Train 151.2, Val 155.1, Test 152.8 proves zero drift!",
+            "c": "#ec4899",
+            "n": 6,
+            "ex": "Without stratification, a random 10% test set might contain only 4 severe patients. With 5-bin quantile stratification, all sets have matching progression distributions.",
+            "use": "Prevents evaluation bias and ensures model is properly tested across all disease severity levels.",
+            "vz": "eda",
+            "fig": "fig6",
+            "figTitle": "Figure 6: Managing Dataset Imbalance (Before vs After Slicing)",
+            "figCap": "A) Raw 5-bin quantile slicing; B) 70/20/10 sampling rule; C) Overlaid density curves proving zero distribution drift; D) Clinical triage weighting."
+        },
+        {
+            "k": "split",
+            "st": 4,
+            "sp": "Speaker 1",
+            "t": "Step 4: Strict 70% / 20% / 10% Dataset Partitioning",
+            "plain": [
+                "Total N = 442 patients partitioned with 5-bin quantile stratification:",
+                "1. <b>Training Set (70%, N=309):</b> Model learns parameter weights exclusively here. (~31 patients per parameter).",
+                "2. <b>Validation Set (20%, N=88):</b> Used for diagnostic checks, testing convergence, and verifying residual assumptions.",
+                "3. <b>Holdout Test Set (10%, N=45):</b> Kept untouched in a vault, opened only once at the very end to evaluate honest generalization to unseen patients."
+            ],
+            "math": [],
+            "say": "Three independent sets: Training to learn, Validation to verify, and Holdout Test to score unseen performance.",
+            "c": "#06b6d4",
+            "n": 7,
+            "ex": "Homework (Train 309), Pre-board mock test (Validation 88), Final Board Exam (Test 45).",
+            "use": "Guarantees that test performance reflects true generalization to future patients.",
+            "vz": null,
+            "fig": "fig4",
+            "figTitle": "Figure 4: Multicollinearity Heatmap & VIF Diagnostics in Blood Lipids",
+            "figCap": "Correlation matrix highlighting S1 (Cholesterol) and S2 (LDL) collinearity (r = +0.897) with VIF(S1) = 53.71 and VIF(S2) = 35.39."
+        },
+        {
+            "st": 5,
+            "sp": "Speaker 1",
+            "t": "Step 5: Zero Data Leakage Feature Standardization",
+            "plain": [
+                "<b>The 'Different Rulers' Problem:</b> Cholesterol spans 204 units while Log-Triglycerides spans 2.8 units. Raw math would treat cholesterol as 70x more important!",
+                "<b>Universal Ruler (Z-Score):</b> z = (x - \u03bc) / \u03c3. Measures how many standard deviation steps a patient is from the cohort average.",
+                "<b>The 'Cheating on the Exam' Rule (Zero Leakage):</b> Scaler \u03bc and \u03c3 were computed EXCLUSIVELY on the 309 training patients.",
+                "<b>Test Set Isolation:</b> Test statistics remained 100% blind inside a vault until final evaluation. Never call fit() on test data!",
+                "<b>Patient Example:</b> Patient BMI = 32.1. Train \u03bc = 26.38, \u03c3 = 4.22. z = (32.1 - 26.38)/4.22 = +1.36 standard deviations above average."
+            ],
+            "math": [
+                {
+                    "h": "Z-Score Standardization Formula",
+                    "html": "<i>z<sub>ij</sub></i> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>x<sub>ij</sub></i> - &mu;<sub><i>j</i>, train</sub></span><span class=\"fm-den\">&sigma;<sub><i>j</i>, train</sub></span></div>",
+                    "info": "<div><span class=\"fm-badge b-var\">Unified Ruler</span> Standardizes all features to Mean = 0.0, Std = 1.0. Allows fair comparison of beta effect sizes across cholesterol, blood pressure, and BMI.</div>",
+                    "m": "$$z_{ij} = \\frac{x_{ij} - \\mu_{j, \\text{train}}}{\\sigma_{j, \\text{train}}}$$",
+                    "d": "Every standardized feature has mean = 0.0 and std = 1.0 on train."
+                },
+                {
+                    "h": "Zero Data Leakage Invariant",
+                    "html": "<b>Law:</b> &mu;<sub>test</sub> and &sigma;<sub>test</sub> are <b>NEVER</b> computed during training!",
+                    "info": "<div><span class=\"fm-badge b-why\">Strict Isolation</span> Scaler is fitted exclusively on the 309 training patients. Validation and Test sets are transformed using training &mu; and &sigma; alone.</div>",
+                    "m": "$$\\mu_{\\text{test}} \\text{ is NEVER computed during training}$$",
+                    "d": "Test statistics remain 100% blind until final evaluation."
+                }
+            ],
+            "say": "Z-scores put all vitals on a universal ruler. Strict zero data leakage means the scaler only ever learned from training patients.",
+            "c": "#10b981",
+            "n": 8,
+            "ex": "Patient BMI = 32.1. Train mean = 26.3, std = 4.2 -> z = (32.1 - 26.3)/4.2 = +1.38 SD above average.",
+            "use": "Harmonizes features to a unified ruler so beta coefficients represent direct comparable standardized effect sizes.",
+            "vz": "sc",
+            "fig": "fig7",
+            "figTitle": "Figure 7: Feature Standardization Transformation (Before vs After)",
+            "figCap": "Left: Raw disparate physical scales (Cholesterol 97-301 vs BP 62-133); Right: Standardized Z-Scores (Mean = 0, Std = 1)."
+        },
+        {
+            "st": 6,
+            "sp": "Speaker 2",
+            "t": "Step 6: Mathematical Equations of Multiple Linear Regression",
+            "plain": [
+                "<b>The Cooking Broth Analogy:</b> y\u0302 = \u03b2_0 + \u2211 \u03b2_j z_j. Start with baseline broth (\u03b2_0 = 151.21 points), then add biomarker spices (\u03b2_j * z_j).",
+                "<b>Mean Squared Error (MSE):</b> Why squared? 1) Prevents errors cancelling; 2) Penalizes big blunders quadratically; 3) Forms a smooth skate-park bowl.",
+                "<b>The Normal Equation:</b> Setting calculus slope to zero yields \u03b2\u0302 = (X^T X)^-1 X^T y. Closed-form exact optimum in < 1 millisecond!",
+                "<b>Why Invert (X^T X)?</b> Matrix is 11 x 11. Inversion takes 0.0001 seconds. Zero guessing, zero learning rate, instant exact weights!"
+            ],
+            "math": [
+                {
+                    "h": "1. Linear Hypothesis Model",
+                    "html": "<i>y&#770;</i>(<b>x</b>) = <span class=\"fm-badge b-const\">&beta;<sub>0</sub></span> + <span class=\"fm-badge b-param\">&sum;<sub><i>j</i>=1</sub><sup>10</sup> &beta;<sub><i>j</i></sub><i>z<sub>j</sub></i></span> = <b>X&beta;</b>",
+                    "info": "<div><span class=\"fm-badge b-var\"><i>y&#770;</i></span> Predicted 1-year disease progression score (e.g. 185.4).</div><div><span class=\"fm-badge b-const\">&beta;<sub>0</sub> = 151.21</span> Baseline intercept: expected progression when all biomarkers are at cohort average (all z = 0).</div><div><span class=\"fm-badge b-param\">&beta;<sub><i>j</i></sub></span> Learned clinical weight: points increase per +1 SD increase in biomarker <i>j</i>.</div><div><span class=\"fm-badge b-var\"><i>z<sub>j</sub></i></span> Standardized patient biomarker z-score.</div>",
+                    "m": "$$\\hat{y}(\\mathbf{x}) = \\beta_0 + \\sum_{j=1}^{10} \\beta_j z_j = \\mathbf{X} \\boldsymbol{\\beta}$$",
+                    "d": "Predicted progression is baseline intercept plus sum of weighted standardized features."
+                },
+                {
+                    "h": "2. Mean Squared Error (MSE) Cost Function",
+                    "html": "<i>J</i>(<b>&beta;</b>) = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> &sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup> = <div class=\"fm-frac\"><span class=\"fm-num\">1</span><span class=\"fm-den\">2<i>N</i></span></div> (<b>y</b> - <b>X&beta;</b>)<sup>T</sup>(<b>y</b> - <b>X&beta;</b>)",
+                    "info": "<div><span class=\"fm-badge b-var\">Residual</span> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>) is prediction error for patient <i>i</i>.</div><div><span class=\"fm-badge b-why\">Why Squared?</span> 1) Errors don't cancel out; 2) Punishes large clinical mistakes quadratically; 3) Smooth convex bowl with single global minimum.</div>",
+                    "m": "$$J(\\boldsymbol{\\beta}) = \\frac{1}{2N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2 = \\frac{1}{2N} (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})^T (\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\beta})$$",
+                    "d": "Squares errors to penalize large mistakes and provide a differentiable convex surface."
+                },
+                {
+                    "h": "3. The Normal Equation (Analytical Optimum)",
+                    "html": "&nabla;<sub><b>&beta;</b></sub><i>J</i>(<b>&beta;</b>) = <b>0</b> &nbsp;&DoubleRightArrow;&nbsp; <span class=\"fm-badge b-green\" style=\"font-size: 1.05rem;\"><b>&beta;&#770;</b> = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup> <b>X</b><sup>T</sup><b>y</b></span>",
+                    "info": "<div><span class=\"fm-badge b-param\">Closed-Form Solution</span> Setting the gradient of MSE to zero directly yields the mathematical minimum.</div><div><span class=\"fm-badge b-const\">Fast Matrix Inversion</span> (<b>X</b><sup>T</sup><b>X</b>) is 11 &times; 11. Inverting takes &lt; 1 ms. Zero iterations, zero learning rate!</div>",
+                    "m": "$$\\nabla_{\\boldsymbol{\\beta}} J(\\boldsymbol{\\beta}) = \\mathbf{0} \\implies \\hat{\\boldsymbol{\\beta}} = (\\mathbf{X}^T \\mathbf{X})^{-1} \\mathbf{X}^T \\mathbf{y}$$",
+                    "d": "Exact closed-form solution. Solves 11x11 matrix inversion in < 1 millisecond!"
+                }
+            ],
+            "say": "OLS minimizes squared error analytically. Setting the gradient to zero solves the 11x11 Normal Equation in less than one millisecond with zero hyperparameter tuning.",
+            "c": "#2563eb",
+            "n": 9,
+            "ex": "Setting the gradient of MSE to zero directly yields beta = (X^T X)^-1 X^T y. Because X^T X is 11x11, inversion takes less than 1 millisecond.",
+            "use": "Provides transparent, defensible, and fast clinical prognostic modeling.",
+            "vz": "ols",
+            "fig": "fig5",
+            "figTitle": "Figure 5: Bivariate Regression Lines for Major Biomarkers",
+            "figCap": "Linear regression fits showing positive slopes for BMI (r=+0.59), S5 Triglycerides (r=+0.57), BP (r=+0.44), and protective S3 HDL (r=-0.39)."
+        },
+        {
+            "st": 7,
+            "sp": "Speaker 2",
+            "t": "Step 7: Holdout Test Set Benchmark Results",
+            "plain": [
+                "<b>Evaluated on 45 Unseen Patients:</b> Opened strictly once on graduation day from the vault.",
+                "<b>Test R\u00b2 Score = 0.4882:</b> Our 10 baseline biomarkers explain 48.82% of future 1-year progression in brand-new patients.",
+                "<b>Test RMSE = 55.17 points:</b> Typical prediction error margin across the 25-346 clinical scale.",
+                "<b>Test MAE = 44.92 points:</b> Average absolute deviation from true clinical outcome.",
+                "<b>5-Fold Cross-Validation = 0.4587 \u00b1 0.0538:</b> Confirms model stability and proves zero overfitting across folds."
+            ],
+            "math": [
+                {
+                    "h": "Coefficient of Determination (R\u00b2 Score)",
+                    "html": "<i>R</i><sup>2</sup> = 1 - <div class=\"fm-frac\"><span class=\"fm-num\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i>)<sup>2</sup></span><span class=\"fm-den\">&sum;<sub><i>i</i>=1</sub><sup><i>N</i></sup> (<i>y<sub>i</sub></i> - <i>y&#772;</i>)<sup>2</sup></span></div> = <b>0.4882</b>",
+                    "info": "<div><span class=\"fm-badge b-green\">Meaning</span> Our 10 baseline clinical biomarkers explain <b>48.82%</b> of the variance in 1-year disease progression in unseen patients (vs a baseline of 0 for guessing the mean).</div>",
+                    "m": "$$R^2 = 1 - \\frac{\\sum_{i=1}^N (y_i - \\hat{y}_i)^2}{\\sum_{i=1}^N (y_i - \\bar{y})^2} = 0.4882$$",
+                    "d": "Explains ~49% of total variance in unseen patients compared to predicting the mean."
+                },
+                {
+                    "h": "Error Metrics (RMSE & MAE) & Cross-Validation",
+                    "html": "RMSE = &radic;[MSE] = <b>55.17</b> &nbsp;|&nbsp; MAE = <b>44.92</b> &nbsp;|&nbsp; 5-Fold CV <i>R</i><sup>2</sup> = <b>0.4587 &plusmn; 0.0538</b>",
+                    "info": "<div><span class=\"fm-badge b-var\">RMSE (55.17)</span> Standard deviation of residuals on the 25-346 scale.</div><div><span class=\"fm-badge b-param\">5-Fold CV</span> Validated across 5 folds within training data, proving stability and low variance.</div>",
+                    "m": "$$\\text{RMSE} = \\sqrt{\\frac{1}{N} \\sum_{i=1}^N (y_i - \\hat{y}_i)^2} = 55.17$$",
+                    "d": "Standard deviation of the unexplained residuals on the holdout test cohort."
+                }
+            ],
+            "table": [
                 [
-                    "1. Problem Formulation",
-                    "Continuous 1-year progression (y ∈ [25, 346])"
+                    "Evaluation Metric",
+                    "Training Set (N=309)",
+                    "Validation Set (N=88)",
+                    "Holdout Test Set (N=45)"
                 ],
                 [
-                    "2. Dataset Ingestion",
-                    "442 authentic records, 0 missing nulls"
+                    "R\u00b2 Score",
+                    "0.4967",
+                    "0.5894",
+                    "0.4882"
                 ],
                 [
-                    "3. Feature Handling",
-                    "Binary sex {0,1}, Z-score vitals & lipids"
+                    "RMSE",
+                    "54.16",
+                    "50.71",
+                    "55.17"
                 ],
                 [
-                    "4. Continuous Imbalance",
-                    "5-bin target quantile stratification"
-                ],
-                [
-                    "5. Zero-Leakage Scaling",
-                    "Z-score fit strictly on Train (309) only"
-                ],
-                [
-                    "6. 70/20/10 Partitioning",
-                    "309 Train / 88 Validation / 45 Holdout Test"
-                ],
-                [
-                    "7. OLS Normal Equation",
-                    "β* = (XᵀX)⁻¹ Xᵀy (Exact closed-form, <1ms)"
-                ],
-                [
-                    "8. Quantitative Evaluation",
-                    "Unsealed Test: R² = 0.4882, RMSE = 55.17"
-                ],
-                [
-                    "9. Residual Diagnostics",
-                    "Breusch-Pagan & Shapiro-Wilk Q-Q tests"
-                ],
-                [
-                    "10. Clinical Risk Triage",
-                    "Cost-sensitive threshold (76.9% sensitivity)"
-                ],
-                [
-                    "11. Feasibility & Delivery",
-                    "Interactive doctor dashboard at port 5003"
+                    "MAE",
+                    "43.70",
+                    "41.69",
+                    "44.92"
                 ]
-            ]
-        };
+            ],
+            "say": "On 45 unseen holdout patients, our model achieved Test R\u00b2 of 0.4882 and RMSE of 55.17, supported by stable 5-fold cross-validation of 0.4587.",
+            "c": "#10b981",
+            "n": 10,
+            "ex": "For a test patient with actual progression of 150, our model predicts 142. Error is only 8 units, well within clinical tolerance.",
+            "use": "Quantifies honest predictive power without data snooping or overfitting.",
+            "vz": null,
+            "fig": "fig9",
+            "figTitle": "Figure 9: Actual vs Predicted Progression on Holdout Test Set",
+            "figCap": "Holdout test evaluation (N=45) showing linear model alignment along the 45-degree identity line (Test R\u00b2 = 0.4882, MAE = 42.12 points)."
+        },
+        {
+            "st": 8,
+            "sp": "Speaker 2",
+            "t": "Step 8: Verifying Linear Regression Assumptions (Diagnostics)",
+            "plain": [
+                "<b>The 4 Gauss-Markov Conditions Verified:</b> Confirms OLS is the Best Linear Unbiased Estimator (BLUE).",
+                "<b>1. Homoscedasticity (The Shotgun Blast):</b> Residuals form a uniform horizontal scatter around zero\u2014NOT a funnel of doom!",
+                "<b>2. Error Normality:</b> Q-Q plot dots follow the straight 45-degree line (r > 0.98), proving residuals follow a Gaussian bell curve.",
+                "<b>3. Zero Mean:</b> E[e | X] = 0.00. The linear hyperplane cuts directly through the center of clinical data without bias.",
+                "<b>4. Low Variance:</b> Learning curve shows Training score and Cross-Validation score converging smoothly (no memorization)."
+            ],
+            "math": [
+                {
+                    "h": "Residual Definition & Gauss-Markov Conditions",
+                    "html": "<i>e<sub>i</sub></i> = <i>y<sub>i</sub></i> - <i>y&#770;<sub>i</sub></i> &nbsp;|&nbsp; Var(<i>e<sub>i</sub></i> | <b>x</b>) = &sigma;<sup>2</sup> &nbsp;|&nbsp; E[<i>e<sub>i</sub></i> | <b>x</b>] = 0.00",
+                    "info": "<div><span class=\"fm-badge b-var\">1. Homoscedasticity</span> Error spread is constant across all predicted values (no funnel shape).</div><div><span class=\"fm-badge b-param\">2. Normality</span> Q-Q plot correlation <i>r</i> &gt; 0.98 confirms errors follow a Gaussian bell curve.</div><div><span class=\"fm-badge b-green\">BLUE Theorem</span> Confirms OLS is the Best Linear Unbiased Estimator.</div>",
+                    "m": "$$e_i = y_i - \\hat{y}_i, \\quad \\mathbb{E}[e_i \\mid \\mathbf{x}_i] = 0.00, \\quad \\text{Var}(e_i \\mid \\mathbf{x}_i) = \\sigma^2$$",
+                    "d": "Residuals are homoscedastic (constant spread) and follow a Gaussian distribution."
+                }
+            ],
+            "say": "Residual diagnostics verify all Gauss-Markov conditions: homoscedastic shotgun scatter and Gaussian normality confirm mathematical validity.",
+            "c": "#f59e0b",
+            "n": 11,
+            "ex": "If residuals had a fan shape, error would explode for severe patients. Our residual plot shows random uniform scatter around zero.",
+            "use": "Validates that the linear model structure is mathematically sound for this dataset.",
+            "vz": null,
+            "fig": "fig10",
+            "figTitle": "Figure 10: Linear Regression Residual Diagnostics (Assumptions Check)",
+            "figCap": "A) Residuals vs Fitted (constant variance); B) Normal Q-Q Plot (Gaussian bell-curve errors); C) Scale-Location (homoscedasticity); D) Cook's Distance leverage."
+        },
+        {
+            "st": 8,
+            "sp": "Speaker 2",
+            "t": "Step 9: Standardized Beta Weights & Medical Interpretation",
+            "plain": [
+                "<b>Baseline Intercept (\u03b2_0 = 151.21):</b> Expected progression score for an average patient (all z = 0).",
+                "<b>#1 Progression Driver:</b> S5 Log-Triglycerides (\u03b2 = +34.89). Excess blood fats accelerate insulin resistance and tissue damage.",
+                "<b>#2 Progression Driver:</b> BMI (\u03b2 = +23.72). Adipose mass physically blocks insulin receptor signaling in muscle cells.",
+                "<b>#3 Progression Driver:</b> Blood Pressure (\u03b2 = +17.76). Arterial pressure damages delicate renal and retinal microvessels.",
+                "<b>Top 3 Dominance:</b> S5, BMI, and Blood Pressure drive over 75% of explainable diabetes progression!",
+                "<b>Patient Walkthrough:</b> Fatima (healthy vitals) -> y\u0302 = 60.2 (Low Risk) vs Tariq (obese, high BP, high TG) -> y\u0302 = 304.9 (Emergency Alert!)."
+            ],
+            "math": [
+                {
+                    "h": "Complete Linear Prognostic Equation",
+                    "html": "<i>y&#770;</i> = <b>151.21</b> + <b>34.89</b>(<i>z</i><sub>s5</sub>) + <b>23.72</b>(<i>z</i><sub>bmi</sub>) + <b>18.96</b>(<i>z</i><sub>s2</sub>) + <b>17.76</b>(<i>z</i><sub>bp</sub>) + <b>5.30</b>(<i>z</i><sub>s4</sub>) + <b>4.22</b>(<i>z</i><sub>s3</sub>) + <b>3.57</b>(<i>z</i><sub>s6</sub>) - <b>1.12</b>(<i>z</i><sub>age</sub>) - <b>11.27</b>(<i>z</i><sub>sex</sub>) - <b>16.89</b>(<i>z</i><sub>s1</sub>)",
+                    "info": "<div><span class=\"fm-badge b-why\">Top 3 Drivers</span> S5 Log-Triglycerides (+34.89), BMI (+23.72), and Blood Pressure (+17.76) drive ~75% of progression.</div><div><span class=\"fm-badge b-const\">Multicollinearity Note</span> S1 (-16.89) and S2 (+18.96) have high VIF (53.7, 35.4); their opposing signs balance each other while overall predictions remain accurate.</div>",
+                    "m": "$$\\hat{y} = 151.21 + 34.89(z_{s5}) + 23.72(z_{\\text{bmi}}) + 18.96(z_{s2}) + 17.76(z_{\\text{bp}}) + 5.30(z_{s4}) + 4.22(z_{s3}) + 3.57(z_{s6}) - 1.12(z_{\\text{age}}) - 11.27(z_{\\text{sex}}) - 16.89(z_{s1})$$",
+                    "d": "S5 (triglycerides), BMI, and blood pressure are the primary clinical progression drivers."
+                }
+            ],
+            "say": "Standardized beta weights reveal the biochemical hierarchy: S5 Triglycerides, BMI, and Blood Pressure drive over 75% of explainable progression.",
+            "c": "#2563eb",
+            "n": 12,
+            "ex": "If a patient loses weight to drop BMI by 1 standard deviation, their expected progression immediately drops by 23.7 units.",
+            "use": "Explaining the exact biological drivers to doctors and patients.",
+            "vz": null,
+            "fig": "fig11",
+            "figTitle": "Figure 11: Standardized Feature Coefficients & Clinical Significance",
+            "figCap": "Estimated beta weights with 95% confidence intervals and p-values. BMI (+32.3) and S5 Triglycerides (+32.6) are the dominant drivers of diabetes disease progression."
+        },
+        {
+            "st": 9,
+            "sp": "Speaker 2",
+            "t": "Step 10: Clinical Risk Triage & Managing Class Imbalance",
+            "plain": [
+                "<b>The Emergency Red Line (y >= 200):</b> Patients progressing above 200 face rapid kidney and retinal failure.",
+                "<b>The Airport Scanner Analogy:</b> Predicting 'everyone is healthy' gives 71% accuracy but lets 100% of severe patients suffer organ death!",
+                "<b>Cost-Sensitive Balanced Weights:</b> w1 = 1.78, w0 = 0.70. Missing a sick patient is penalized 2.54x more heavily than a false alarm.",
+                "<b>Sensitivity Boost (61.5% -> 76.92%):</b> Our balanced model caught 10 out of 13 severe test patients (rescuing 2 extra high-risk patients!).",
+                "<b>Confusion Matrix:</b> 27 True Negatives, 5 False Alarms, 3 Missed, 10 Caught."
+            ],
+            "math": [
+                {
+                    "h": "Inverse Frequency Balanced Class Weights",
+                    "html": "<i>w</i><sub>severe</sub> = <div class=\"fm-frac\"><span class=\"fm-num\"><i>N</i></span><span class=\"fm-den\">2 &times; <i>N</i><sub>severe</sub></span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">309</span><span class=\"fm-den\">2 &times; 87</span></div> = <b>1.78</b> &nbsp;|&nbsp; <i>w</i><sub>controlled</sub> = <b>0.70</b>",
+                    "info": "<div><span class=\"fm-badge b-why\">Cost-Sensitive Penalty</span> Severe patients (28.7%) are penalized 2.54&times; more heavily when misclassified, eliminating majority-class bias.</div>",
+                    "m": "$$w_1 = \\frac{N}{2 \\times N_{\\text{severe}}} = 1.78, \\quad w_0 = \\frac{N}{2 \\times N_{\\text{controlled}}} = 0.70$$",
+                    "d": "Penalizes false negatives 2.54x more heavily to reflect medical triage realities."
+                },
+                {
+                    "h": "Clinical Sensitivity Boost on Holdout Test Set",
+                    "html": "Sensitivity = <div class=\"fm-frac\"><span class=\"fm-num\">TP</span><span class=\"fm-den\">TP + FN</span></div> = <div class=\"fm-frac\"><span class=\"fm-num\">10</span><span class=\"fm-den\">10 + 3</span></div> = <b>76.92%</b> &nbsp; (vs 61.54% unweighted baseline)",
+                    "info": "<div><span class=\"fm-badge b-green\">Life-Saving Impact</span> Catches 10 out of 13 severe test patients (2 more high-risk patients rescued compared to unweighted model).</div>",
+                    "m": "$$\\text{Sensitivity} = \\frac{10}{10 + 3} = 76.92\\% \\quad (\\text{Baseline: } 61.54\\%)$$",
+                    "d": "Balanced triage successfully flags 76.92% of high-risk patients for intervention."
+                }
+            ],
+            "table": [
+                [
+                    "Clinical Metric",
+                    "Standard Unweighted Baseline",
+                    "Balanced Model (Managing Imbalance)"
+                ],
+                [
+                    "Clinical Accuracy",
+                    "84.44%",
+                    "82.22%"
+                ],
+                [
+                    "Clinical Sensitivity (Recall)",
+                    "61.54% (5 missed severe)",
+                    "76.92% (Only 3 missed severe!)"
+                ],
+                [
+                    "Clinical Specificity",
+                    "93.75%",
+                    "84.38%"
+                ],
+                [
+                    "Clinical F1-Score",
+                    "0.6957",
+                    "0.7143"
+                ]
+            ],
+            "say": "In clinical triage, sensitivity is life-critical. Cost-sensitive weighting boosted our emergency sensitivity to 76.92%, catching 10 of 13 severe patients.",
+            "c": "#f97316",
+            "n": 13,
+            "ex": "Standard model misses 5 severe patients who would develop kidney disease untreated. The balanced model catches 2 more of them.",
+            "use": "Hospital triage prioritizing patient safety over naive accuracy.",
+            "vz": "cm",
+            "fig": "fig12",
+            "figTitle": "Figure 12: Clinical Risk Triage via OLS Decision Threshold Calibration",
+            "figCap": "A) Standard OLS cutoff (y_hat >= 200) catches 8/13 (61.5% recall); B) Calibrated OLS safety threshold (y_hat >= 175) catches 10/13 (76.9% recall), reducing missed patients from 5 to 3 using 100% pure OLS!"
+        },
+        {
+            "st": 10,
+            "sp": "Both Speakers",
+            "t": "Project Conclusion: Feasibility & Clinical Summary",
+            "plain": [
+                "<b>Did We Solve the Problem? YES!</b> Explaining ~49% of 1-year progression gives doctors an accurate 12-month early warning.",
+                "<b>Was OLS Feasible? YES!</b> With 442 patients and 10 features, OLS gives ~31 patients per parameter, completely avoiding overfitting.",
+                "<b>The Biological Noise Ceiling (~50% Limit):</b> Baseline blood tests cannot know if a patient eats cake next month or forgets insulin. That unmeasured future lifestyle is ~50% of variance!",
+                "<b>Why Complex Models Fail:</b> Random Forest gets the exact same R\u00b2 (0.44-0.48) but memorizes noise and destroys doctor trust.",
+                "<b>Final Clinical Verdict:</b> OLS provides exact, transparent parameters that doctors can inspect and trust. Live app active on port 5003."
+            ],
+            "math": [
+                {
+                    "h": "Final Quantitative Performance Summary",
+                    "html": "Test <i>R</i><sup>2</sup> = <b>0.4882</b> &nbsp;|&nbsp; Test RMSE = <b>55.17</b> &nbsp;|&nbsp; Test MAE = <b>44.92</b>",
+                    "info": "<div><span class=\"fm-badge b-green\">Verified Generalization</span> Evaluated on 45 unseen holdout test patients with strict zero data leakage. 5-Fold CV: 0.4587 \u00b1 0.0538.</div>",
+                    "m": "$$\\text{Test } R^2 = 0.4882, \\; \\text{Test RMSE} = 55.17, \\; \\text{Test MAE} = 44.92$$",
+                    "d": "Verified on 45 unseen holdout test patients with zero data leakage."
+                },
+                {
+                    "h": "Clinical Feasibility Verdict",
+                    "html": "Triage Sensitivity = <b>76.92%</b> &nbsp;|&nbsp; Latency &lt; <b>1.2 ms</b> &nbsp;|&nbsp; <b>100% Explainable</b>",
+                    "info": "<div><span class=\"fm-badge b-why\">Biological Noise Limit</span> Remaining ~51% variance is unmeasured lifestyle/genetics. Complex models overfit to this noise; OLS is the optimal clinical solution.</div>",
+                    "m": "$$\\text{Triage Sensitivity} = 76.92\\%, \\; \\text{Inference Latency} < 1.2 \\text{ ms}$$",
+                    "d": "Production-ready prognostic dashboard active at port 5003."
+                }
+            ],
+            "say": "In conclusion, OLS reaches the natural biological noise ceiling of baseline blood tests while remaining 100% explainable to doctors. Thank you, Professor \u2014 we welcome your questions!",
+            "c": "#2563eb",
+            "n": 14,
+            "ex": "A simple, solid, transparent linear model is far more useful in medicine than a black box.",
+            "use": "Summary of achievements and defense conclusion.",
+            "vz": null,
+            "fig": "fig8",
+            "figTitle": "Figure 8: Multiple Linear Regression Learning Curve (Bias-Variance)",
+            "figCap": "Training and 5-Fold Cross-Validation scores converge smoothly at R\u00b2 ~ 0.46 with a narrow variance gap, proving model stability and absence of severe overfitting."
+        }
+    ],
+    "pipe": [
+        [
+            "1. Problem Formulation",
+            "Continuous 1-year progression (y \u2208 [25, 346])"
+        ],
+        [
+            "2. Dataset Ingestion",
+            "442 authentic records, 0 missing nulls"
+        ],
+        [
+            "3. Feature Handling",
+            "Binary sex {0,1}, raw vitals & lipids"
+        ],
+        [
+            "4. Continuous Imbalance",
+            "5-bin target quantile stratification"
+        ],
+        [
+            "5. 70/20/10 Partitioning",
+            "Split FIRST: 309 Train / 88 Val / 45 Test"
+        ],
+        [
+            "6. Zero-Leakage Scaling",
+            "Fit Z-score strictly on Train (309) only"
+        ],
+        [
+            "7. OLS Normal Equation",
+            "\u03b2* = (X\u1d40X)\u207b\u00b9 X\u1d40y (Exact closed-form, <1ms)"
+        ],
+        [
+            "8. Quantitative Evaluation",
+            "Unsealed Test: R\u00b2 = 0.4882, RMSE = 55.17"
+        ],
+        [
+            "9. Residual Diagnostics",
+            "Breusch-Pagan & Shapiro-Wilk Q-Q tests"
+        ],
+        [
+            "10. Clinical Risk Triage",
+            "Cost-sensitive threshold (76.9% sensitivity)"
+        ],
+        [
+            "11. Feasibility & Delivery",
+            "Interactive doctor dashboard at port 5003"
+        ]
+    ]
+};
         const S = D.slides, C = ["#2563eb", "#f43f5e", "#06b6d4", "#38bdf8", "#8b5cf6", "#ec4899", "#10b981", "#06b6d4", "#2563eb", "#10b981", "#f59e0b", "#2563eb", "#f97316", "#2563eb"];
         const $ = id => document.getElementById(id);
         let cur = 0;

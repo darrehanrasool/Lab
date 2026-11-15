@@ -406,11 +406,12 @@ def main():
         <div class="formula-desc">
             <span class="term-badge b-blue">1. Ingest (N=442)</span> 442 authentic clinical records, 10 features, zero missing values (NaN=0).<br>
             <span class="term-badge b-teal">2. Feature Encoding</span> Binary dummy sex {0.0=Female, 1.0=Male} adding exact physiological offset; continuous vitals preserved.<br>
-            <span class="term-badge b-amber">3. Quantile Stratification</span> 5 equal target severity quantiles guarantee zero distribution drift across 70/20/10 splits.<br>
-            <span class="term-badge b-rose">4. Zero-Leakage Scaler</span> StandardScaler fitted strictly on Train (309) only; transform applied to Val (88) and Test (45).<br>
-            <span class="term-badge b-purple">5. Pure Linear ML (OLS)</span> Solved analytically via Gauss-Markov Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms.<br>
-            <span class="term-badge b-indigo">6. Residual Diagnostics</span> 7 Gauss-Markov assumption tests (Breusch-Pagan homoscedasticity, Shapiro-Wilk Q-Q normality).<br>
-            <span class="term-badge b-green">7. Clinical Triage</span> Cost-sensitive threshold tuning achieves 76.9% sensitivity on high-risk patients, deployed at port 5003.
+            <span class="term-badge b-amber">3. Quantile Stratification</span> 5 equal target severity quantiles guarantee zero distribution drift.<br>
+            <span class="term-badge b-blue">4. 70/20/10 Partitioning</span> Cohort split FIRST into 309 Train, 88 Val, 45 Holdout Test.<br>
+            <span class="term-badge b-rose">5. Zero-Leakage Scaler</span> StandardScaler fitted strictly on the isolated 309 Train set; transform applied to Val and Test.<br>
+            <span class="term-badge b-purple">6. Pure Linear ML (OLS)</span> Solved analytically via Gauss-Markov Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms.<br>
+            <span class="term-badge b-indigo">7. Residual Diagnostics</span> 7 Gauss-Markov assumption tests (Breusch-Pagan homoscedasticity, Shapiro-Wilk Q-Q normality).<br>
+            <span class="term-badge b-green">8. Clinical Triage</span> Cost-sensitive threshold tuning achieves 76.9% sensitivity on high-risk patients, deployed at port 5003.
         </div>
     </div>
 
@@ -584,44 +585,9 @@ def main():
     </div>
 
     <!-- Section 6 -->
-    <h2>6. Feature Standardization & The Zero Data Leakage Law</h2>
+    <h2>6. Strict 70% / 20% / 10% Dataset Partitioning</h2>
     <p>
-        Features live on vastly different scales: cholesterol spans 204 units while log-triglycerides spans 2.8. We standardized all features to z-scores:
-    </p>
-
-    <div class="formula-card">
-        <div class="formula-title">Z-Score Normalization Formula</div>
-        <div class="formula-body">
-            <i>z<sub>ij</sub></i> = 
-            <div class="frac"><span class="num"><i>x<sub>ij</sub></i> - &mu;<sub><i>j</i>, train</sub></span><span class="den">&sigma;<sub><i>j</i>, train</sub></span></div>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            &mu;<sub><i>j</i>, train</sub> = <div class="frac"><span class="num">1</span><span class="den"><i>N</i><sub>tr</sub></span></div> &sum; <i>x<sub>ij</sub></i>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            &sigma;<sub><i>j</i>, train</sub> = &radic;[<div class="frac"><span class="num">1</span><span class="den"><i>N</i><sub>tr</sub></span></div> &sum; (<i>x<sub>ij</sub></i> - &mu;)<sup>2</sup>]
-        </div>
-        <div class="formula-desc">
-            <span class="term-badge b-teal">The Zero Data Leakage Rule</span> The mean &mu; and standard deviation &sigma; are computed <strong>strictly on the 309 training patients</strong>. Validation and Test sets are transformed using the training parameters alone. Never call <code>fit()</code> or <code>fit_transform()</code> on validation or test sets!
-        </div>
-    </div>
-
-    <p>
-        <strong>Concrete Example:</strong> Consider a patient with BMI = 32.1 kg/m². Using training statistics (&mu;<sub>bmi</sub> = 26.38, &sigma;<sub>bmi</sub> = 4.22), the standardized z-score is <i>z</i> = (32.1 - 26.38) / 4.22 = <strong>+1.36</strong> standard deviations above the average.
-    </p>
-
-    <!-- Figure 7 -->
-    <div class="figure-box">
-        <img class="figure-img" src="__IMG7__" alt="Figure 7: Feature Scaling Transformation">
-        <div class="figure-caption">
-            <b>Figure 7:</b> Feature scaling transformation. All 10 features are mapped to standard normal distributions (Mean = 0.0, Std = 1.0) while preserving relative clinical distances and skewness.
-        </div>
-    </div>
-
-    <div class="page-break"></div>
-
-    <!-- Section 7 -->
-    <h2>7. Strict 70% / 20% / 10% Dataset Partitioning</h2>
-    <p>
-        To ensure scientific rigor and avoid overfitting, the dataset of 442 patients was partitioned into three strictly isolated sets:
+        To ensure scientific rigor and prevent evaluation bias, the cohort of 442 patients was partitioned <strong>FIRST</strong> into three strictly isolated sets using 5-bin target quantile stratification:
     </p>
 
     <!-- Dataset Split Diagram -->
@@ -646,6 +612,41 @@ def main():
             <span class="term-badge b-rose">🔒 Holdout Test Set (10%)</span>
             <h4 style="color: #e11d48;">45 Patients · The Board Exam</h4>
             <p style="margin: 0; color: #475569;"><strong>Strictly locked in a vault!</strong> Never seen, touched, or scaled during training. Evaluated strictly once at the end to prove real-world accuracy (R² = 0.4882).</p>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7 -->
+    <h2>7. Feature Standardization & The Zero Data Leakage Law</h2>
+    <p>
+        Features live on vastly different scales: cholesterol spans 204 units while log-triglycerides spans 2.8. Following dataset partitioning, we standardized all features to z-scores using the isolated training cohort:
+    </p>
+
+    <div class="formula-card">
+        <div class="formula-title">Z-Score Normalization Formula (Train Only)</div>
+        <div class="formula-body">
+            <i>z<sub>ij</sub></i> = 
+            <div class="frac"><span class="num"><i>x<sub>ij</sub></i> - &mu;<sub><i>j</i>, train</sub></span><span class="den">&sigma;<sub><i>j</i>, train</sub></span></div>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            &mu;<sub><i>j</i>, train</sub> = <div class="frac"><span class="num">1</span><span class="den"><i>N</i><sub>tr</sub></span></div> &sum; <i>x<sub>ij</sub></i>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            &sigma;<sub><i>j</i>, train</sub> = &radic;[<div class="frac"><span class="num">1</span><span class="den"><i>N</i><sub>tr</sub></span></div> &sum; (<i>x<sub>ij</sub></i> - &mu;)<sup>2</sup>]
+        </div>
+        <div class="formula-desc">
+            <span class="term-badge b-teal">The Zero Data Leakage Rule</span> The mean &mu; and standard deviation &sigma; are computed <strong>strictly on the 309 training patients</strong>. Validation and Test sets are transformed using the training parameters alone. Never call <code>fit()</code> or <code>fit_transform()</code> on validation or test sets!
+        </div>
+    </div>
+
+    <p>
+        <strong>Concrete Example:</strong> Consider a patient with BMI = 32.1 kg/m². Using training statistics (&mu;<sub>bmi</sub> = 26.38, &sigma;<sub>bmi</sub> = 4.22), the standardized z-score is <i>z</i> = (32.1 - 26.38) / 4.22 = <strong>+1.36</strong> standard deviations above the average.
+    </p>
+
+    <!-- Figure 7 -->
+    <div class="figure-box">
+        <img class="figure-img" src="__IMG7__" alt="Figure 7: Feature Scaling Transformation">
+        <div class="figure-caption">
+            <b>Figure 7:</b> Feature scaling transformation. All 10 features are mapped to standard normal distributions (Mean = 0.0, Std = 1.0) while preserving relative clinical distances and skewness.
         </div>
     </div>
 
