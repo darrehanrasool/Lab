@@ -365,10 +365,13 @@ def main():
     <!-- Section 1 -->
     <h2>1. The Clinical Problem Statement & Objectives</h2>
     <p>
-        Diabetes mellitus is a progressive metabolic disorder characterized by chronic hyperglycemia resulting from defects in insulin secretion, insulin action, or both. Over time, poorly managed diabetes leads to microvascular damage (diabetic retinopathy, nephropathy, neuropathy) and macrovascular events (myocardial infarction, stroke). Predicting disease progression enables early therapeutic intervention, lifestyle modifications, and risk stratification.
+        <b>The Story of Dr. Ayesha (The Clinical Dilemma):</b> Consider an endocrinologist reviewing diabetic patients today. Two patients—Patient A and Patient B—walk into her clinic with Type-2 diabetes, both feeling relatively normal. Yet 12 months later, their physiological trajectories diverge drastically: Patient A remains stable with mild progression, while Patient B suffers rapid microvascular collapse, acute nephropathy (kidney impairment), and retinopathy (vision loss). 
     </p>
     <p>
-        <strong>The Regression Target (y):</strong> The response variable <i>y</i> is a continuous quantitative index of disease progression recorded exactly <strong>one year post-baseline</strong> for each patient. In the authentic clinical cohort, <i>y</i> spans from <strong>25.0</strong> (mild disease stability) to <strong>346.0</strong> (severe rapid microvascular deterioration), with a mean of <strong>152.13</strong> and a median of <strong>140.50</strong>.
+        <b>The Irreversibility Problem & The 12-Month Golden Window:</b> Dr. Ayesha cannot diagnose future deterioration with a physical exam alone. By the time clinical symptoms like blurred vision or protein in the urine manifest, microvascular tissue damage is permanent and irreversible. A reliable machine learning model provides a vital 12-month early-warning prognostic window, enabling targeted preventative drug escalation and lifestyle therapy before irreversible organ failure occurs.
+    </p>
+    <p>
+        <strong>The Regression Target (y):</strong> The response variable <i>y</i> is a continuous quantitative index of disease progression recorded exactly <strong>one year post-baseline</strong> for each patient. In the authentic clinical cohort, <i>y</i> spans from <strong>25.0</strong> (mild disease stability) to <strong>346.0</strong> (severe rapid microvascular deterioration), with a mean of <strong>152.13</strong> and a median of <strong>140.50</strong>. Continuous regression is mandatory because clinical severity is a spectrum: score 280 requires emergency intensive insulin, whereas score 105 requires mild dietary adjustments.
     </p>
 
     <div class="formula-card">
