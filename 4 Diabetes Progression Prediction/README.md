@@ -12,6 +12,7 @@ An end-to-end Machine Learning laboratory project that predicts quantitative 1-y
   - Two Type-2 diabetic patients visit an endocrinologist today, both feeling relatively normal. Yet 12 months later, Patient A remains stable with mild progression, while Patient B suffers rapid microvascular collapse, acute nephropathy (kidney damage), or retinopathy (vision loss).
   - A doctor cannot see future deterioration with a physical exam alone. By the time clinical symptoms manifest, microvascular tissue damage is permanent and irreversible.
   - An accurate Machine Learning model provides a vital **12-month early-warning window**, enabling proactive therapy adjustments before permanent organ failure occurs.
+  - **Asymmetric Cost of Mistakes:** Prediction errors are not equal in healthcare. *Under-predicting* (e.g., predicting 110 for a patient whose true score is 290) delays critical therapy, causing irreversible kidney failure. *Over-predicting* (e.g., predicting 300 for a score of 100) triggers excessive insulin, causing life-threatening hypoglycemia (fainting/coma).
 - **Objective:** Predict quantitative disease progression in diabetic patients one year after baseline using 10 diagnostic clinical vitals and blood serum biomarkers.
 - **Target Variable ($y$):** Quantitative measure of disease progression 1 year post baseline (continuous scale from 25.0 to 346.0).
 - **Core ML Technique:** Multiple Linear Regression (Ordinary Least Squares — OLS) — 100% transparent, closed-form Normal Equation, and fully explainable.
