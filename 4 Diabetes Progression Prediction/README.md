@@ -19,6 +19,27 @@ An end-to-end Machine Learning laboratory project that predicts quantitative 1-y
 
 ---
 
+## 🏗️ The Complete ML Pipeline Architecture: A Sterile 11-Stage Assembly Line
+
+To guarantee strict zero data leakage and 100% clinical explainability, the machine learning workflow was engineered as a modular, 11-stage assembly line:
+
+```
+[1. Problem Formulation] ➔ [2. Cohort Ingestion] ➔ [3. Feature Encoding] ➔ [4. Quantile Stratification]
+                                                                                      ↓
+[8. Test Evaluation] 🠔 [7. OLS Normal Eq.] 🠔 [6. Scaler on Train Only] 🠔 [5. 70/20/10 Partitioning]
+       ↓
+[9. Residual Diagnostics] ➔ [10. Clinical Triage] ➔ [11. Interactive Dashboard Deployment]
+```
+
+- **The Sterile Assembly Line Analogy:** Like a pharmaceutical facility manufacturing sterile injectable medicine ($\text{Raw Herbs} \longrightarrow \text{Purification} \longrightarrow \text{Airlock} \longrightarrow \text{Bottling}$), if unsterilized outside air touches the vial at any point, the medicine is contaminated. In Machine Learning, this contamination is **Data Leakage**. If the model peeks at future test patients during scaling, it cheats and will fail on real hospital patients.
+- **1. Strict Zero-Leakage Airlocks:** Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.
+- **2. Authentic Data Ingestion ($N=442$):** 442 authentic clinical records evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with **zero missing values** ($\text{NaN}=0$), requiring zero synthetic imputation.
+- **3. Dual-Track Feature Handling:** Biological sex is decoded into clean binary $\{0.0=\text{Female}, 1.0=\text{Male}\}$ adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1–S6) are standardized via Z-score so the math treats them fairly.
+- **4. Imbalance Management (Quantile Stratification):** Severe patients ($y > 200$) are rare. We sliced all 442 patients into 5 equal severity quantiles, taking 70% Train, 20% Val, and 10% Test from each pile—guaranteeing identical progression distribution (~152) across all sets.
+- **5. Transparent Modeling (OLS Normal Equation):** Zero black boxes (no Neural Nets, Random Forests, or SVR). Solved analytically via the Gauss-Markov Normal Equation $\boldsymbol{\beta}^* = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$ in $<1$ ms. Every beta weight is 100% explainable to Dr. Ayesha.
+
+---
+
 ## 🔬 Mathematical Formulation & Theory
 
 ### 1. Multivariate Linear Regression Model

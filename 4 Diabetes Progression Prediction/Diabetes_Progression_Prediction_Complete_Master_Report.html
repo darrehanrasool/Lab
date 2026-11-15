@@ -365,6 +365,23 @@
         </div>
     </div>
 
+    <!-- Complete Pipeline Architecture -->
+    <div class="formula-card" style="margin-top: 18pt;">
+        <div class="formula-title">The Complete ML Pipeline Architecture: A Sterile 11-Stage Assembly Line</div>
+        <p style="margin: 6pt 0 8pt 0; font-size: 9pt; color: #334155; line-height: 1.45;">
+            <strong>The Sterile Pharmaceutical Analogy:</strong> Like a sterile medicine factory (Raw Herbs &rarr; Purification &rarr; Airlock &rarr; Bottling), if unsterilized outside room air touches the vial at any point, the batch is contaminated and discarded. In Machine Learning, this contamination is <em>Data Leakage</em>—if the training model peeks at future test patients during scaling, it cheats and will fail on real patients in a clinic. Every junction of our 11-stage pipeline is an airtight, sterile airlock.
+        </p>
+        <div class="formula-desc">
+            <span class="term-badge b-blue">1. Ingest (N=442)</span> 442 authentic clinical records, 10 features, zero missing values (NaN=0).<br>
+            <span class="term-badge b-teal">2. Feature Encoding</span> Binary dummy sex {0.0=Female, 1.0=Male} adding exact physiological offset; continuous vitals preserved.<br>
+            <span class="term-badge b-amber">3. Quantile Stratification</span> 5 equal target severity quantiles guarantee zero distribution drift across 70/20/10 splits.<br>
+            <span class="term-badge b-rose">4. Zero-Leakage Scaler</span> StandardScaler fitted strictly on Train (309) only; transform applied to Val (88) and Test (45).<br>
+            <span class="term-badge b-purple">5. Pure Linear ML (OLS)</span> Solved analytically via Gauss-Markov Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms.<br>
+            <span class="term-badge b-indigo">6. Residual Diagnostics</span> 7 Gauss-Markov assumption tests (Breusch-Pagan homoscedasticity, Shapiro-Wilk Q-Q normality).<br>
+            <span class="term-badge b-green">7. Clinical Triage</span> Cost-sensitive threshold tuning achieves 76.9% sensitivity on high-risk patients, deployed at port 5003.
+        </div>
+    </div>
+
     <!-- Section 2 -->
     <h2>2. Clinical Cohort Description & The 10 Baseline Biomarkers</h2>
     <p>

@@ -1599,11 +1599,12 @@
                     "sp": "Speaker 1",
                     "t": "The Complete ML Pipeline Architecture",
                     "plain": [
-                        "Every step in our pipeline is built modularly with strict zero-leakage enforcement.",
-                        "1. <b>Data Ingestion:</b> Authentic unscaled clinical measurements (N=442).",
-                        "2. <b>Feature Handling:</b> Binary dummy encoding for sex, continuous scaling for vitals.",
-                        "3. <b>Imbalance Management:</b> Target quantile stratification across 70/20/10 splits.",
-                        "4. <b>Simple Modeling:</b> Multiple Linear Regression solved via Ordinary Least Squares (Normal Equation)."
+                        "<b>The Sterile Assembly Line:</b> Like a sterile medicine factory (Raw Herbs &rarr; Purification &rarr; Airlock &rarr; Bottling), if unsterilized room air or bacteria leaks into the vial at any point, the batch is contaminated. In ML, this contamination is <i>Data Leakage</i>—if the model peeks at future test patients during scaling, it cheats and will fail on real hospital patients.",
+                        "<b>1. Strict Zero-Leakage Airlocks:</b> Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.",
+                        "<b>2. Authentic Data Ingestion (N=442):</b> 442 authentic diabetic patients evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with <i>zero missing values</i> (NaN=0), requiring zero synthetic imputation.",
+                        "<b>3. Dual-Track Feature Handling:</b> Biological sex is decoded into clean binary {0.0=Female, 1.0=Male} adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1–S6) are standardized via Z-score so the math treats them fairly.",
+                        "<b>4. Imbalance Management (Quantile Stratification):</b> Severe patients (<i>y</i> &gt; 200) are rare. We sliced all 442 patients into 5 equal severity quantiles, taking 70% Train, 20% Val, and 10% Test from each pile—guaranteeing identical progression distribution (~152) across all sets.",
+                        "<b>5. Transparent Modeling (OLS Normal Equation):</b> Zero black boxes (no Neural Nets or Random Forests). Solved analytically via the Gauss-Markov Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms. Every beta weight is 100% explainable to Dr. Ayesha."
                     ],
                     "math": [],
                     "say": "Our pipeline begins with untouched raw data, handles categorical and continuous features, balances target quantiles, fits Ordinary Least Squares, and validates assumptions.",
@@ -2054,48 +2055,48 @@
             ],
             "pipe": [
                 [
-                    "1 Problem",
-                    "Predict disease progression"
+                    "1. Problem Formulation",
+                    "Continuous 1-year progression (y ∈ [25, 346])"
                 ],
                 [
-                    "2 Dataset",
-                    "442 authentic clinical records"
+                    "2. Dataset Ingestion",
+                    "442 authentic records, 0 missing nulls"
                 ],
                 [
-                    "3 Features",
-                    "Encode sex, scale continuous vitals"
+                    "3. Feature Handling",
+                    "Binary sex {0,1}, Z-score vitals & lipids"
                 ],
                 [
-                    "4 Imbalance",
-                    "Quantile stratification & class weights"
+                    "4. Continuous Imbalance",
+                    "5-bin target quantile stratification"
                 ],
                 [
-                    "5 Scale",
-                    "Z-score, fit on train only"
+                    "5. Zero-Leakage Scaling",
+                    "Z-score fit strictly on Train (309) only"
                 ],
                 [
-                    "6 Split",
-                    "70% Train / 20% Val / 10% Test"
+                    "6. 70/20/10 Partitioning",
+                    "309 Train / 88 Validation / 45 Holdout Test"
                 ],
                 [
-                    "7 Linear ML",
-                    "Ordinary Least Squares (OLS)"
+                    "7. OLS Normal Equation",
+                    "β* = (XᵀX)⁻¹ Xᵀy (Exact closed-form, <1ms)"
                 ],
                 [
-                    "8 Evaluate",
-                    "R\u00b2 = 0.4882, RMSE = 55.17"
+                    "8. Quantitative Evaluation",
+                    "Unsealed Test: R² = 0.4882, RMSE = 55.17"
                 ],
                 [
-                    "9 Diagnostics",
-                    "Homoscedasticity & Q-Q normality"
+                    "9. Residual Diagnostics",
+                    "Breusch-Pagan & Shapiro-Wilk Q-Q tests"
                 ],
                 [
-                    "10 Triage",
-                    "Balanced risk classification"
+                    "10. Clinical Risk Triage",
+                    "Cost-sensitive threshold (76.9% sensitivity)"
                 ],
                 [
-                    "11 Conclusion",
-                    "Feasibility & clinical summary"
+                    "11. Feasibility & Delivery",
+                    "Interactive doctor dashboard at port 5003"
                 ]
             ]
         };
@@ -2269,7 +2270,7 @@
 
             let rightCol = `<div class="right-col">${figHtml}${r}</div>`;
 
-            let body = s.k == "pipe" ? `<div class="gr">${l}<div class="right-col"><div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div></div></div>` :
+            let body = s.k == "pipe" ? `<div class="gr">${l}<div class="right-col"><div style="font-size:0.74rem; font-weight:800; color:var(--c); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.25rem;">THE 11-STAGE CLINICAL ASSEMBLY LINE</div><div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div></div></div>` :
                 s.k == "title" ? `<div class="title-wrap" style="display:flex;flex-direction:column;justify-content:center;height:100%;"><ul class="big" style="gap:0.8rem;">${s.plain.map(p => `<li style="font-size:1.1rem;line-height:1.5;">${p}</li>`).join("")}</ul></div>` :
                     s.k == "split" ? `<div class="gr">${l}<div class="right-col">${figHtml}${r}</div></div>` :
                         `<div class="gr">${l}${rightCol}</div>`;
@@ -2359,7 +2360,12 @@
 
         window.addEventListener("DOMContentLoaded", () => {
             renderMath();
-            go(0);
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (!isNaN(hash) && hash >= 1 && hash <= S.length) {
+                go(hash - 1);
+            } else {
+                go(0);
+            }
         });
     </script>
 
