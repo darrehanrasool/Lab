@@ -1730,21 +1730,19 @@
                     "sp": "Speaker 1",
                     "t": "Step 4: Strict 70% / 20% / 10% Dataset Partitioning",
                     "plain": [
-                        "Total N = 442 patients partitioned with 5-bin quantile stratification:",
-                        "1. <b>Training Set (70%, N=309):</b> Model learns parameter weights exclusively here. (~31 patients per parameter).",
-                        "2. <b>Validation Set (20%, N=88):</b> Used for diagnostic checks, testing convergence, and verifying residual assumptions.",
-                        "3. <b>Holdout Test Set (10%, N=45):</b> Kept untouched in a vault, opened only once at the very end to evaluate honest generalization to unseen patients."
+                        "<b>1. Pre-Scaling Partitioning:</b> All 442 patients are split FIRST into 3 independent sets before any scaling to protect test data integrity.",
+                        "<b>2. Training Set (70%, N=309):</b> The <i>Textbook</i>. The model learns all baseline weights (&beta;<sub>0</sub> to &beta;<sub>10</sub>) strictly here (~31 patients per parameter).",
+                        "<b>3. Validation Set (20%, N=88):</b> The <i>Mock Exam</i>. Used to check residual normality, test convergence, and confirm zero overfitting.",
+                        "<b>4. Holdout Test Set (10%, N=45):</b> The <i>Final Board Exam</i>. Strictly locked in a digital vault! Evaluated only once at the end to prove honest real-world accuracy.",
+                        "<b>5. Zero Distribution Drift:</b> Quantile stratification guarantees matching progression averages across all splits (Train: 151.2, Val: 155.1, Test: 152.8)."
                     ],
                     "math": [],
-                    "say": "Three independent sets: Training to learn, Validation to verify, and Holdout Test to score unseen performance.",
+                    "say": "Three independent sets: Training to learn, Validation to verify, and Holdout Test locked in a digital vault to score honest unseen performance.",
                     "c": "#06b6d4",
                     "n": 7,
                     "ex": "Homework (Train 309), Pre-board mock test (Validation 88), Final Board Exam (Test 45).",
                     "use": "Guarantees that test performance reflects true generalization to future patients.",
-                    "vz": null,
-                    "fig": "fig4",
-                    "figTitle": "Figure 4: Multicollinearity Heatmap & VIF Diagnostics in Blood Lipids",
-                    "figCap": "Correlation matrix highlighting S1 (Cholesterol) and S2 (LDL) collinearity (r = +0.897) with VIF(S1) = 53.71 and VIF(S2) = 35.39."
+                    "vz": null
                 },
                 {
                     "st": 5,
