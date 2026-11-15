@@ -469,6 +469,112 @@
             font-family: 'JetBrains Mono', monospace;
         }
         .eval-chip span { color: #38bdf8; font-weight: 700; }
+
+        /* Quick Clinical Case Presets Bar */
+        .preset-section {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 0.85rem;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .preset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.65rem;
+        }
+        .preset-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .preset-subtitle {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.65rem;
+        }
+        .preset-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            background: rgba(30, 41, 59, 0.75);
+            border: 1.5px solid rgba(148, 163, 184, 0.2);
+            border-radius: 0.65rem;
+            padding: 0.65rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+        }
+        .preset-mild:hover, .preset-mild.active {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.14);
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+        }
+        .preset-moderate:hover, .preset-moderate.active {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.14);
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+        }
+        .preset-severe:hover, .preset-severe.active {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.16);
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.3);
+        }
+        .preset-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .ind-mild {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .ind-moderate {
+            background: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+        .ind-severe {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+        .preset-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .preset-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+        .preset-score {
+            font-size: 0.69rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .preset-btn.active .preset-name {
+            color: #ffffff;
+        }
+        @media (max-width: 640px) {
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -487,6 +593,50 @@
                     <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Authentic Clinical Units</span>
                 </h2>
                 <form method="POST" action="/" id="prognosisForm">
+                    <!-- Quick Clinical Case Presets Selector -->
+                    <div class="preset-section">
+                        <div class="preset-header">
+                            <span class="preset-title">⚡ Quick Clinical Test Cases</span>
+                            <span class="preset-subtitle">1-Click Test All 3 Clinical Stages</span>
+                        </div>
+                        <div class="preset-grid">
+                            <button type="button" 
+                                    class="preset-btn preset-mild {% if selected_case == 'mild' %}active{% endif %}" 
+                                    onclick="loadClinicalCase('mild')"
+                                    title="Load Patient 31: Normal weight female, optimal BP, high HDL">
+                                <span class="preset-indicator ind-mild"></span>
+                                <div class="preset-info">
+                                    <span class="preset-name">Case 1: Mild / Controlled</span>
+                                    <span class="preset-score">Progression ~68 (Safe)</span>
+                                </div>
+                            </button>
+
+                            <button type="button" 
+                                    class="preset-btn preset-moderate {% if selected_case == 'moderate' %}active{% endif %}" 
+                                    onclick="loadClinicalCase('moderate')"
+                                    title="Load Patient 66: Normal weight male, moderate BP, borderline lipids">
+                                <span class="preset-indicator ind-moderate"></span>
+                                <div class="preset-info">
+                                    <span class="preset-name">Case 2: Moderate</span>
+                                    <span class="preset-score">Progression ~142 (Cohort Avg)</span>
+                                </div>
+                            </button>
+
+                            <button type="button" 
+                                    class="preset-btn preset-severe {% if selected_case == 'severe' %}active{% endif %}" 
+                                    onclick="loadClinicalCase('severe')"
+                                    title="Load Patient 138: Obese male, hypertension, dyslipidemia">
+                                <span class="preset-indicator ind-severe"></span>
+                                <div class="preset-info">
+                                    <span class="preset-name">Case 3: Severe Triage</span>
+                                    <span class="preset-score">Progression ~259 (Critical)</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="selectedCase" name="selectedCase" value="{{ selected_case|default('severe') }}">
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="age">Patient Age</label>
@@ -728,6 +878,40 @@
                 }
             } catch (e) {
                 console.warn("Audio playback not supported or blocked by policy:", e);
+            }
+        }
+
+        // Clinical Case Presets Data & 1-Click Interactive Switcher
+        const CLINICAL_PRESETS = {{ presets|tojson }};
+
+        function loadClinicalCase(caseId) {
+            const preset = CLINICAL_PRESETS[caseId];
+            if (!preset) return;
+
+            const inputs = preset.inputs;
+            document.getElementById('age').value = inputs.age;
+            document.getElementById('sex').value = String(Number(inputs.sex).toFixed(1));
+            document.getElementById('bmi').value = inputs.bmi;
+            document.getElementById('bp').value = inputs.bp;
+            document.getElementById('s1').value = inputs.s1;
+            document.getElementById('s2').value = inputs.s2;
+            document.getElementById('s3').value = inputs.s3;
+            document.getElementById('s4').value = inputs.s4;
+            document.getElementById('s5').value = inputs.s5;
+            document.getElementById('s6').value = inputs.s6;
+
+            const hiddenCase = document.getElementById('selectedCase');
+            if (hiddenCase) hiddenCase.value = caseId;
+
+            // Highlight active button immediately
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.preset-${caseId}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Submit form to trigger instant recalculation, gauge animation, and alert sound
+            const form = document.getElementById('prognosisForm');
+            if (form) {
+                form.submit();
             }
         }
 

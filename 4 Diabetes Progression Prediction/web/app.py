@@ -279,43 +279,112 @@ def generate_clinical_analysis(pred_val, inputs, scaled_features):
     }
 
 
+CLINICAL_PRESETS = {
+    "mild": {
+        "id": "mild",
+        "name": "Case 1: Mild / Controlled",
+        "badge": "Safe • Low Risk",
+        "target_range": "< 100",
+        "expected_score": 68.4,
+        "description": "Patient 31: Young/middle-aged female with lean BMI (20.3), normotensive BP (71 mmHg), and high protective HDL (66 mg/dL).",
+        "inputs": {
+            "age": 42.0,
+            "sex": 1.0,
+            "bmi": 20.3,
+            "bp": 71.0,
+            "s1": 161.0,
+            "s2": 81.2,
+            "s3": 66.0,
+            "s4": 2.0,
+            "s5": 4.23,
+            "s6": 81.0,
+        },
+    },
+    "moderate": {
+        "id": "moderate",
+        "name": "Case 2: Moderate Progression",
+        "badge": "Cohort Avg • Monitor",
+        "target_range": "100 – 200",
+        "expected_score": 141.8,
+        "description": "Patient 66: Middle-aged male with normal BMI (24.7), moderate BP (85 mmHg), borderline elevated LDL, and average triglycerides.",
+        "inputs": {
+            "age": 46.0,
+            "sex": 2.0,
+            "bmi": 24.7,
+            "bp": 85.0,
+            "s1": 174.0,
+            "s2": 123.2,
+            "s3": 30.0,
+            "s4": 6.0,
+            "s5": 4.64,
+            "s6": 96.0,
+        },
+    },
+    "severe": {
+        "id": "severe",
+        "name": "Case 3: Severe Emergency",
+        "badge": "Critical Triage Alert",
+        "target_range": "≥ 200",
+        "expected_score": 258.6,
+        "description": "Patient 138: Older male with Class-II obesity (BMI 36.7), Stage-2 hypertension (BP 117 mmHg), hyperlipidemia, and hyperglycemia.",
+        "inputs": {
+            "age": 58.0,
+            "sex": 2.0,
+            "bmi": 36.7,
+            "bp": 117.0,
+            "s1": 166.0,
+            "s2": 93.8,
+            "s3": 44.0,
+            "s4": 4.0,
+            "s5": 4.95,
+            "s6": 109.0,
+        },
+    },
+}
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     prediction = None
     analysis = None
-    input_data = {
-        "age": 59.0,
-        "sex": 2.0,
-        "bmi": 32.1,
-        "bp": 101.0,
-        "s1": 157.0,
-        "s2": 93.2,
-        "s3": 38.0,
-        "s4": 4.0,
-        "s5": 4.86,
-        "s6": 87.0,
-    }
+    selected_case = request.args.get("case") or request.form.get("selectedCase", "severe")
+
+    if selected_case in CLINICAL_PRESETS:
+        input_data = CLINICAL_PRESETS[selected_case]["inputs"].copy()
+    else:
+        input_data = CLINICAL_PRESETS["severe"]["inputs"].copy()
+        selected_case = "severe"
 
     if request.method == "POST":
-        try:
-            for k in input_data:
-                if k in request.form:
+        selected_case = request.form.get("selectedCase", selected_case)
+        for k in list(input_data.keys()):
+            if k in request.form:
+                try:
                     input_data[k] = float(request.form[k])
+                except (ValueError, TypeError):
+                    pass
 
-            vec = prepare_input_vector(input_data)
-            df_in = pd.DataFrame([vec], columns=FEATURE_NAMES)
-            vec_scaled = scaler.transform(df_in)
-            df_scaled = pd.DataFrame(vec_scaled, columns=FEATURE_NAMES)
-            pred_val = float(model.predict(df_scaled)[0])
+    # Always compute prognostic evaluation so dashboard is immediately active and informative
+    try:
+        vec = prepare_input_vector(input_data)
+        df_in = pd.DataFrame([vec], columns=FEATURE_NAMES)
+        vec_scaled = scaler.transform(df_in)
+        df_scaled = pd.DataFrame(vec_scaled, columns=FEATURE_NAMES)
+        pred_val = float(model.predict(df_scaled)[0])
 
-            prediction = f"{pred_val:.1f}"
-            analysis = generate_clinical_analysis(pred_val, input_data, df_scaled)
-        except (ValueError, TypeError, KeyError, AttributeError, RuntimeError) as e:
-            prediction = f"Error: {e!s}"
-            analysis = None
+        prediction = f"{pred_val:.1f}"
+        analysis = generate_clinical_analysis(pred_val, input_data, df_scaled)
+    except (ValueError, TypeError, KeyError, AttributeError, RuntimeError) as e:
+        prediction = f"Error: {e!s}"
+        analysis = None
 
     return render_template(
-        "index.html", prediction=prediction, analysis=analysis, input_data=input_data
+        "index.html",
+        prediction=prediction,
+        analysis=analysis,
+        input_data=input_data,
+        selected_case=selected_case,
+        presets=CLINICAL_PRESETS,
     )
 
 
