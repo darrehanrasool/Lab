@@ -1654,10 +1654,11 @@
             "sp": "Speaker 1",
             "t": "Step 2: Handling Different Input Feature Types",
             "plain": [
-                "<b>The 'Apples, Kilograms & Light Switches' Challenge:</b> You cannot add body fat to blood pressure directly\u2014they live on different physical scales!",
-                "<b>Categorical Biological Sex:</b> Raw data had sex centered as -0.044 and +0.050. We decoded it to binary {0.0 = Female, 1.0 = Male}.",
-                "<b>Why Dummy Coding Works:</b> In OLS, \u03b2_sex * 1.0 is added for males, and 0.0 for females. No false numeric scale is invented!",
-                "<b>S5 Log-Triglycerides:</b> Natural log (ln) compresses extreme triglyceride fat spikes into a symmetric bell curve, fitting linear math perfectly."
+                "<b>Diverse Feature Scales:</b> Clinical data mixes physical vitals (BMI, BP), binary demographics (Sex), and blood serum lipids (S1&ndash;S6) on completely different scales.",
+                "<b>Binary Dummy Sex {0, 1}:</b> Decoded from raw floats into {0.0=Female, 1.0=Male}. In OLS, &beta;<sub>sex</sub> &times; 1.0 adds an exact linear male offset with zero false numeric scaling.",
+                "<b>Log-Transformed Lipids (S5):</b> Natural log compresses extreme triglyceride spikes into a symmetric Gaussian bell curve, perfectly linearizing the math.",
+                "<b>Clinical Outlier Auditing (Tukey IQR):</b> Extreme biomarker values (red dots beyond 1.5 &times; IQR) were audited against medical limits&mdash;verified as genuine severe patients, not typos, and retained.",
+                "<b>Multicollinearity & VIF:</b> Total Cholesterol and LDL share heavy overlap (<i>r</i> = +0.897, VIF = 53.71); OLS handles this natively while preserving accurate global predictions."
             ],
             "math": [
                 {
