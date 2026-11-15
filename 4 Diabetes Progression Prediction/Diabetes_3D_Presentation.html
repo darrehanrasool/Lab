@@ -1786,10 +1786,11 @@
                     "sp": "Speaker 2",
                     "t": "Step 6: Mathematical Equations of Multiple Linear Regression",
                     "plain": [
-                        "<b>The Cooking Broth Analogy:</b> y\u0302 = \u03b2_0 + \u2211 \u03b2_j z_j. Start with baseline broth (\u03b2_0 = 151.21 points), then add biomarker spices (\u03b2_j * z_j).",
-                        "<b>Mean Squared Error (MSE):</b> Why squared? 1) Prevents errors cancelling; 2) Penalizes big blunders quadratically; 3) Forms a smooth skate-park bowl.",
-                        "<b>The Normal Equation:</b> Setting calculus slope to zero yields \u03b2\u0302 = (X^T X)^-1 X^T y. Closed-form exact optimum in < 1 millisecond!",
-                        "<b>Why Invert (X^T X)?</b> Matrix is 11 x 11. Inversion takes 0.0001 seconds. Zero guessing, zero learning rate, instant exact weights!"
+                        "<b>1. Linear Prediction Formula:</b> <i>y&#770;</i> = &beta;<sub>0</sub> + &sum; &beta;<sub>j</sub><i>z<sub>j</sub></i>. Starts at baseline average (&beta;<sub>0</sub> = 151.21 points), then adds or subtracts points for each biomarker z-score.",
+                        "<b>2. Cost Function (MSE):</b> Measures prediction mistakes. Squaring stops positive and negative errors cancelling, penalizes big blunders quadratically, and creates a smooth convex bowl.",
+                        "<b>3. The Normal Equation:</b> Setting calculus slope to zero yields &beta;&#770; = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b>. Solves the exact global minimum in one step without gradient descent.",
+                        "<b>4. Instant Solution (&lt;1 ms):</b> Because <b>X</b><sup>T</sup><b>X</b> is only an 11 &times; 11 matrix, inverting it takes 0.0001 seconds with zero guessing and zero learning rate.",
+                        "<b>5. Clinical Trends (Figure 5):</b> Proves strong linear slopes: BMI (+0.59), S5 Triglycerides (+0.57), and BP (+0.44) push disease up, while HDL S3 (-0.39) protects and pushes disease down."
                     ],
                     "math": [
                         {
