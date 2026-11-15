@@ -1,66 +1,117 @@
 import os
+
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import stats
 import seaborn as sns
-from sklearn.linear_model import LinearRegression, Ridge, LogisticRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import confusion_matrix
-import scipy.stats as stats
 
 # High-resolution aesthetic styling
-plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
-plt.rcParams['font.sans-serif'] = 'DejaVu Sans'
-plt.rcParams['font.family'] = 'sans-serif'
+plt.style.use(
+    "seaborn-v0_8-whitegrid"
+    if "seaborn-v0_8-whitegrid" in plt.style.available
+    else "default"
+)
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+plt.rcParams["font.family"] = "sans-serif"
+
 
 def main():
     print("==========================================================")
     print("STEP 4: ADVANCED DATASET VISUALIZATIONS & ML DIAGNOSTICS")
     print("==========================================================")
-    os.makedirs('reports/figures', exist_ok=True)
-    
+    os.makedirs("reports/figures", exist_ok=True)
+
     # Load raw clinical dataset
-    df_raw = pd.read_csv('data/raw/diabetes.csv')
-    df_raw['sex_label'] = df_raw['sex'].map({1.0: 'Female', 2.0: 'Male'})
-    df_raw['sex_bin'] = df_raw['sex'].map({1.0: 0.0, 2.0: 1.0})
-    
+    df_raw = pd.read_csv("data/raw/diabetes.csv")
+    df_raw["sex_label"] = df_raw["sex"].map({1.0: "Female", 2.0: "Male"})
+    df_raw["sex_bin"] = df_raw["sex"].map({1.0: 0.0, 2.0: 1.0})
+
     # Load processed splits
-    X_train = pd.read_csv('data/processed/X_train.csv')
-    y_train = pd.read_csv('data/processed/y_train.csv').values.ravel()
-    X_val   = pd.read_csv('data/processed/X_val.csv')
-    y_val   = pd.read_csv('data/processed/y_val.csv').values.ravel()
-    X_test  = pd.read_csv('data/processed/X_test.csv')
-    y_test  = pd.read_csv('data/processed/y_test.csv').values.ravel()
-    
+    X_train = pd.read_csv("data/processed/X_train.csv")
+    y_train = pd.read_csv("data/processed/y_train.csv").values.ravel()
+    X_val = pd.read_csv("data/processed/X_val.csv")
+    y_val = pd.read_csv("data/processed/y_val.csv").values.ravel()
+    X_test = pd.read_csv("data/processed/X_test.csv")
+    y_test = pd.read_csv("data/processed/y_test.csv").values.ravel()
+
     feature_cols = list(X_train.columns)
-    
+
     # -------------------------------------------------------------
     # FIGURE 1: TARGET PROGRESSION DISTRIBUTION & CONTINUOUS IMBALANCE
     # -------------------------------------------------------------
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
-    sns.histplot(df_raw['progression'], kde=True, color='#0284c7', bins=25, stat='density', alpha=0.6, ax=ax)
-    
-    mean_val = df_raw['progression'].mean()
-    median_val = df_raw['progression'].median()
-    skew_val = df_raw['progression'].skew()
-    
-    ax.axvline(mean_val, color='#ef4444', linestyle='--', lw=2.5, label=f'Mean: {mean_val:.1f}')
-    ax.axvline(median_val, color='#10b981', linestyle='-', lw=2.5, label=f'Median: {median_val:.1f}')
-    
+    sns.histplot(
+        df_raw["progression"],
+        kde=True,
+        color="#0284c7",
+        bins=25,
+        stat="density",
+        alpha=0.6,
+        ax=ax,
+    )
+
+    mean_val = df_raw["progression"].mean()
+    median_val = df_raw["progression"].median()
+    skew_val = df_raw["progression"].skew()
+
+    ax.axvline(
+        mean_val, color="#ef4444", linestyle="--", lw=2.5, label=f"Mean: {mean_val:.1f}"
+    )
+    ax.axvline(
+        median_val,
+        color="#10b981",
+        linestyle="-",
+        lw=2.5,
+        label=f"Median: {median_val:.1f}",
+    )
+
     # Clinical zones
-    ax.axvspan(25, 100, color='#10b981', alpha=0.10, label='Mild Progression (<100) [33.3%]')
-    ax.axvspan(100, 200, color='#f59e0b', alpha=0.10, label='Moderate Progression (100-200) [38.0%]')
-    ax.axvspan(200, 350, color='#ef4444', alpha=0.10, label='Severe / Accelerated (>200) [28.7% Imbalanced Tail]')
-    
-    ax.text(0.03, 0.90, f"Skewness: +{skew_val:.2f} (Right-Skewed Tail)\nN = 442 Patients\nRange: [25, 346]",
-            transform=ax.transAxes, fontsize=11, bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='#cbd5e1', alpha=0.9))
-    
-    ax.set_title('Figure 1: Target Progression Distribution & Continuous Imbalance', fontsize=14, fontweight='bold', pad=12)
-    ax.set_xlabel('Quantitative Diabetes Disease Progression (1-Year Post Baseline)', fontsize=12)
-    ax.set_ylabel('Empirical Probability Density', fontsize=12)
-    ax.legend(loc='upper right', frameon=True, facecolor='white', framealpha=0.9)
+    ax.axvspan(
+        25, 100, color="#10b981", alpha=0.10, label="Mild Progression (<100) [33.3%]"
+    )
+    ax.axvspan(
+        100,
+        200,
+        color="#f59e0b",
+        alpha=0.10,
+        label="Moderate Progression (100-200) [38.0%]",
+    )
+    ax.axvspan(
+        200,
+        350,
+        color="#ef4444",
+        alpha=0.10,
+        label="Severe / Accelerated (>200) [28.7% Imbalanced Tail]",
+    )
+
+    ax.text(
+        0.03,
+        0.90,
+        f"Skewness: +{skew_val:.2f} (Right-Skewed Tail)\nN = 442 Patients\nRange: [25, 346]",
+        transform=ax.transAxes,
+        fontsize=11,
+        bbox=dict(
+            boxstyle="round,pad=0.5", facecolor="white", edgecolor="#cbd5e1", alpha=0.9
+        ),
+    )
+
+    ax.set_title(
+        "Figure 1: Target Progression Distribution & Continuous Imbalance",
+        fontsize=14,
+        fontweight="bold",
+        pad=12,
+    )
+    ax.set_xlabel(
+        "Quantitative Diabetes Disease Progression (1-Year Post Baseline)", fontsize=12
+    )
+    ax.set_ylabel("Empirical Probability Density", fontsize=12)
+    ax.legend(loc="upper right", frameon=True, facecolor="white", framealpha=0.9)
     plt.tight_layout()
-    plt.savefig('reports/figures/01_target_progression_distribution.png')
+    plt.savefig("reports/figures/01_target_progression_distribution.png")
     plt.close()
     print("✓ Saved 01_target_progression_distribution.png")
 
@@ -69,47 +120,81 @@ def main():
     # -------------------------------------------------------------
     fig, axes = plt.subplots(3, 4, figsize=(18, 12), dpi=300)
     axes = axes.flatten()
-    
+
     feature_meta = [
-        ('age', 'Age (Years)', '#6366f1', 'Continuous Demographics'),
-        ('sex_bin', 'Sex (0=Female, 1=Male)', '#ec4899', 'Categorical Binary Indicator'),
-        ('bmi', 'BMI (kg/m²)', '#0ea5e9', 'Continuous Anthropometric'),
-        ('bp', 'Mean Arterial BP (mmHg)', '#f43f5e', 'Continuous Vitals'),
-        ('s1', 'Total Cholesterol (mg/dL)', '#eab308', 'Continuous Serum Lipid'),
-        ('s2', 'LDL Cholesterol (mg/dL)', '#f97316', 'Continuous Serum Lipid'),
-        ('s3', 'HDL Cholesterol (mg/dL)', '#10b981', 'Protective Serum Lipid'),
-        ('s4', 'TCH Ratio (Total/HDL)', '#8b5cf6', 'Biochemical Ratio'),
-        ('s5', 'Log Triglycerides (LTG)', '#14b8a6', 'Log-Transformed Lipid'),
-        ('s6', 'Fasting Blood Glucose (mg/dL)', '#06b6d4', 'Continuous Serum Glucose')
+        ("age", "Age (Years)", "#6366f1", "Continuous Demographics"),
+        (
+            "sex_bin",
+            "Sex (0=Female, 1=Male)",
+            "#ec4899",
+            "Categorical Binary Indicator",
+        ),
+        ("bmi", "BMI (kg/m²)", "#0ea5e9", "Continuous Anthropometric"),
+        ("bp", "Mean Arterial BP (mmHg)", "#f43f5e", "Continuous Vitals"),
+        ("s1", "Total Cholesterol (mg/dL)", "#eab308", "Continuous Serum Lipid"),
+        ("s2", "LDL Cholesterol (mg/dL)", "#f97316", "Continuous Serum Lipid"),
+        ("s3", "HDL Cholesterol (mg/dL)", "#10b981", "Protective Serum Lipid"),
+        ("s4", "TCH Ratio (Total/HDL)", "#8b5cf6", "Biochemical Ratio"),
+        ("s5", "Log Triglycerides (LTG)", "#14b8a6", "Log-Transformed Lipid"),
+        ("s6", "Fasting Blood Glucose (mg/dL)", "#06b6d4", "Continuous Serum Glucose"),
     ]
-    
+
     for i, (col, label, color, f_type) in enumerate(feature_meta):
         ax = axes[i]
-        if col == 'sex_bin':
-            counts = df_raw['sex_label'].value_counts()
-            ax.bar(counts.index, counts.values, color=['#ec4899', '#3b82f6'], alpha=0.75, edgecolor='black', width=0.5)
+        if col == "sex_bin":
+            counts = df_raw["sex_label"].value_counts()
+            ax.bar(
+                counts.index,
+                counts.values,
+                color=["#ec4899", "#3b82f6"],
+                alpha=0.75,
+                edgecolor="black",
+                width=0.5,
+            )
             for x_pos, cnt in enumerate(counts.values):
-                ax.text(x_pos, cnt + 5, f"{cnt} ({cnt/len(df_raw)*100:.1f}%)", ha='center', fontweight='bold', fontsize=9)
+                ax.text(
+                    x_pos,
+                    cnt + 5,
+                    f"{cnt} ({cnt / len(df_raw) * 100:.1f}%)",
+                    ha="center",
+                    fontweight="bold",
+                    fontsize=9,
+                )
             ax.set_ylim(0, max(counts.values) + 30)
         else:
-            sns.histplot(df_raw[col], kde=True, color=color, ax=ax, alpha=0.6, stat='density')
+            sns.histplot(
+                df_raw[col], kde=True, color=color, ax=ax, alpha=0.6, stat="density"
+            )
             mean_c = df_raw[col].mean()
             median_c = df_raw[col].median()
-            ax.axvline(mean_c, color='red', linestyle='--', lw=1.5, label=f'Mean {mean_c:.1f}')
-            ax.axvline(median_c, color='green', linestyle=':', lw=1.5, label=f'Med {median_c:.1f}')
-            ax.legend(fontsize=8, loc='upper right')
-            
-        ax.set_title(f"{label}\n[{f_type}]", fontsize=10, fontweight='bold')
-        ax.set_xlabel('')
-        ax.set_ylabel('Density' if col != 'sex_bin' else 'Patient Count')
+            ax.axvline(
+                mean_c, color="red", linestyle="--", lw=1.5, label=f"Mean {mean_c:.1f}"
+            )
+            ax.axvline(
+                median_c,
+                color="green",
+                linestyle=":",
+                lw=1.5,
+                label=f"Med {median_c:.1f}",
+            )
+            ax.legend(fontsize=8, loc="upper right")
+
+        ax.set_title(f"{label}\n[{f_type}]", fontsize=10, fontweight="bold")
+        ax.set_xlabel("")
+        ax.set_ylabel("Density" if col != "sex_bin" else "Patient Count")
 
     # Remove extra subplots
-    axes[10].axis('off')
-    axes[11].axis('off')
-    
-    plt.suptitle('Figure 2: Clinical Input Feature Distributions (Continuous vs Binary Categorical)', fontsize=15, fontweight='bold', y=0.98)
+    axes[10].axis("off")
+    axes[11].axis("off")
+
+    plt.suptitle(
+        "Figure 2: Clinical Input Feature Distributions (Continuous vs Binary Categorical)",
+        fontsize=15,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/02_clinical_feature_distributions.png')
+    plt.savefig("reports/figures/02_clinical_feature_distributions.png")
     plt.close()
     print("✓ Saved 02_clinical_feature_distributions.png")
 
@@ -118,15 +203,35 @@ def main():
     # -------------------------------------------------------------
     fig, axes = plt.subplots(2, 5, figsize=(18, 8), dpi=300)
     axes = axes.flatten()
-    
-    continuous_cols = ['age', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
-    col_labels = ['Age (Yrs)', 'BMI (kg/m²)', 'Blood Pressure', 'S1 Total Chol', 'S2 LDL', 'S3 HDL', 'S4 TCH Ratio', 'S5 Log Trig', 'S6 Glucose']
-    
+
+    continuous_cols = ["age", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
+    col_labels = [
+        "Age (Yrs)",
+        "BMI (kg/m²)",
+        "Blood Pressure",
+        "S1 Total Chol",
+        "S2 LDL",
+        "S3 HDL",
+        "S4 TCH Ratio",
+        "S5 Log Trig",
+        "S6 Glucose",
+    ]
+
     for i, (col, lbl) in enumerate(zip(continuous_cols, col_labels)):
         ax = axes[i]
-        sns.boxplot(y=df_raw[col], ax=ax, color='#38bdf8', width=0.4,
-                    flierprops=dict(marker='o', markersize=6, markerfacecolor='#ef4444', markeredgecolor='black'))
-        
+        sns.boxplot(
+            y=df_raw[col],
+            ax=ax,
+            color="#38bdf8",
+            width=0.4,
+            flierprops=dict(
+                marker="o",
+                markersize=6,
+                markerfacecolor="#ef4444",
+                markeredgecolor="black",
+            ),
+        )
+
         # Calculate IQR and outlier count
         q25 = df_raw[col].quantile(0.25)
         q75 = df_raw[col].quantile(0.75)
@@ -134,53 +239,111 @@ def main():
         lower_bound = q25 - 1.5 * iqr
         upper_bound = q75 + 1.5 * iqr
         n_outliers = ((df_raw[col] < lower_bound) | (df_raw[col] > upper_bound)).sum()
-        
-        ax.set_title(f"{lbl}\n({n_outliers} Outliers)", fontsize=10, fontweight='bold')
-        ax.set_ylabel('')
-        
-    axes[9].axis('off')
-    plt.suptitle('Figure 3: Clinical Outlier Detection Across Continuous Biomarkers (Tukey IQR Fences)', fontsize=14, fontweight='bold', y=0.98)
+
+        ax.set_title(f"{lbl}\n({n_outliers} Outliers)", fontsize=10, fontweight="bold")
+        ax.set_ylabel("")
+
+    axes[9].axis("off")
+    plt.suptitle(
+        "Figure 3: Clinical Outlier Detection Across Continuous Biomarkers (Tukey IQR Fences)",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/03_clinical_outlier_detection_boxplots.png')
+    plt.savefig("reports/figures/03_clinical_outlier_detection_boxplots.png")
     plt.close()
     print("✓ Saved 03_clinical_outlier_detection_boxplots.png")
 
     # -------------------------------------------------------------
     # FIGURE 4: MULTICOLLINEARITY HEATMAP & VIF DIAGNOSTICS
     # -------------------------------------------------------------
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7), dpi=300, gridspec_kw={'width_ratios': [1.3, 1.0]})
-    
+    fig, (ax1, ax2) = plt.subplots(
+        1, 2, figsize=(16, 7), dpi=300, gridspec_kw={"width_ratios": [1.3, 1.0]}
+    )
+
     # Correlation heatmap of input features
-    corr_matrix = df_raw[['age', 'sex_bin', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']].corr()
-    corr_matrix = corr_matrix.rename(columns={'sex_bin': 'sex'}, index={'sex_bin': 'sex'})
-    
+    corr_matrix = df_raw[
+        ["age", "sex_bin", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
+    ].corr()
+    corr_matrix = corr_matrix.rename(
+        columns={"sex_bin": "sex"}, index={"sex_bin": "sex"}
+    )
+
     mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', vmin=-0.8, vmax=1.0,
-                square=True, mask=mask, cbar_kws={'label': 'Pearson Correlation (r)'}, ax=ax1, annot_kws={'size': 8})
-    ax1.set_title('A: Feature Correlation Matrix (Lipid Collinearity)', fontsize=12, fontweight='bold')
+    sns.heatmap(
+        corr_matrix,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        vmin=-0.8,
+        vmax=1.0,
+        square=True,
+        mask=mask,
+        cbar_kws={"label": "Pearson Correlation (r)"},
+        ax=ax1,
+        annot_kws={"size": 8},
+    )
+    ax1.set_title(
+        "A: Feature Correlation Matrix (Lipid Collinearity)",
+        fontsize=12,
+        fontweight="bold",
+    )
 
     # VIF Bar plot
     vif_vals = [53.71, 35.39, 14.87, 10.28, 8.70, 1.48, 1.48, 1.47, 1.28, 1.18]
-    vif_features = ['s1 (TC)', 's2 (LDL)', 's3 (HDL)', 's5 (LTG)', 's4 (TCH)', 'bp', 's6 (GLU)', 'bmi', 'sex', 'age']
-    vif_colors = ['#ef4444' if v > 10 else ('#f59e0b' if v > 5 else '#10b981') for v in vif_vals]
-    
+    vif_features = [
+        "s1 (TC)",
+        "s2 (LDL)",
+        "s3 (HDL)",
+        "s5 (LTG)",
+        "s4 (TCH)",
+        "bp",
+        "s6 (GLU)",
+        "bmi",
+        "sex",
+        "age",
+    ]
+    vif_colors = [
+        "#ef4444" if v > 10 else ("#f59e0b" if v > 5 else "#10b981") for v in vif_vals
+    ]
+
     y_pos = np.arange(len(vif_features))
-    ax2.barh(y_pos, vif_vals, color=vif_colors, edgecolor='black', alpha=0.85)
+    ax2.barh(y_pos, vif_vals, color=vif_colors, edgecolor="black", alpha=0.85)
     ax2.set_yticks(y_pos)
     ax2.set_yticklabels(vif_features, fontsize=10)
     ax2.invert_yaxis()
-    ax2.axvline(10, color='red', linestyle='--', lw=2, label='Critical Collinearity Threshold (VIF > 10)')
-    ax2.axvline(5, color='orange', linestyle=':', lw=2, label='Moderate Collinearity Threshold (VIF > 5)')
-    ax2.set_xlabel('Variance Inflation Factor (VIF)', fontsize=11)
-    ax2.set_title('B: Variance Inflation Factor (VIF) Diagnostics', fontsize=12, fontweight='bold')
-    ax2.legend(loc='lower right', frameon=True, facecolor='white')
-    
+    ax2.axvline(
+        10,
+        color="red",
+        linestyle="--",
+        lw=2,
+        label="Critical Collinearity Threshold (VIF > 10)",
+    )
+    ax2.axvline(
+        5,
+        color="orange",
+        linestyle=":",
+        lw=2,
+        label="Moderate Collinearity Threshold (VIF > 5)",
+    )
+    ax2.set_xlabel("Variance Inflation Factor (VIF)", fontsize=11)
+    ax2.set_title(
+        "B: Variance Inflation Factor (VIF) Diagnostics", fontsize=12, fontweight="bold"
+    )
+    ax2.legend(loc="lower right", frameon=True, facecolor="white")
+
     for idx, v in enumerate(vif_vals):
-        ax2.text(v + 1, idx, f"{v:.1f}", va='center', fontweight='bold', fontsize=9)
-        
-    plt.suptitle('Figure 4: Multicollinearity Trap in Blood Serum Lipids & VIF Diagnostics', fontsize=14, fontweight='bold', y=0.98)
+        ax2.text(v + 1, idx, f"{v:.1f}", va="center", fontweight="bold", fontsize=9)
+
+    plt.suptitle(
+        "Figure 4: Multicollinearity Trap in Blood Serum Lipids & VIF Diagnostics",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/04_correlation_heatmap_vif_multicollinearity.png')
+    plt.savefig("reports/figures/04_correlation_heatmap_vif_multicollinearity.png")
     plt.close()
     print("✓ Saved 04_correlation_heatmap_vif_multicollinearity.png")
 
@@ -188,26 +351,52 @@ def main():
     # FIGURE 5: KEY BIOMARKERS VS PROGRESSION SCATTER & TRENDS
     # -------------------------------------------------------------
     fig, axes = plt.subplots(2, 2, figsize=(14, 10), dpi=300)
-    
-    plots_meta = [
-        ('bmi', 'BMI (Body Mass Index in kg/m²)', '+0.59', '#0284c7', axes[0, 0]),
-        ('s5', 'S5 (Log Serum Triglycerides - LTG)', '+0.57', '#8b5cf6', axes[0, 1]),
-        ('bp', 'BP (Mean Arterial Blood Pressure in mmHg)', '+0.44', '#f43f5e', axes[1, 0]),
-        ('s3', 'S3 (High-Density Lipoprotein / HDL - Protective)', '-0.39', '#10b981', axes[1, 1])
-    ]
-    
-    for col, lbl, corr_str, color, ax in plots_meta:
-        sns.regplot(data=df_raw, x=col, y='progression', ax=ax,
-                    scatter_kws={'alpha': 0.6, 'color': color, 'edgecolor': 'none'},
-                    line_kws={'color': '#0f172a', 'linewidth': 2.5, 'label': f'Linear Fit (r = {corr_str})'})
-        ax.set_title(f"{lbl} vs Progression", fontsize=11, fontweight='bold')
-        ax.set_xlabel(lbl, fontsize=10)
-        ax.set_ylabel('1-Year Progression Index', fontsize=10)
-        ax.legend(loc='upper left', frameon=True, facecolor='white')
 
-    plt.suptitle('Figure 5: Bivariate Relationships: Major Biomarkers vs Diabetes Disease Progression', fontsize=14, fontweight='bold', y=0.98)
+    plots_meta = [
+        ("bmi", "BMI (Body Mass Index in kg/m²)", "+0.59", "#0284c7", axes[0, 0]),
+        ("s5", "S5 (Log Serum Triglycerides - LTG)", "+0.57", "#8b5cf6", axes[0, 1]),
+        (
+            "bp",
+            "BP (Mean Arterial Blood Pressure in mmHg)",
+            "+0.44",
+            "#f43f5e",
+            axes[1, 0],
+        ),
+        (
+            "s3",
+            "S3 (High-Density Lipoprotein / HDL - Protective)",
+            "-0.39",
+            "#10b981",
+            axes[1, 1],
+        ),
+    ]
+
+    for col, lbl, corr_str, color, ax in plots_meta:
+        sns.regplot(
+            data=df_raw,
+            x=col,
+            y="progression",
+            ax=ax,
+            scatter_kws={"alpha": 0.6, "color": color, "edgecolor": "none"},
+            line_kws={
+                "color": "#0f172a",
+                "linewidth": 2.5,
+                "label": f"Linear Fit (r = {corr_str})",
+            },
+        )
+        ax.set_title(f"{lbl} vs Progression", fontsize=11, fontweight="bold")
+        ax.set_xlabel(lbl, fontsize=10)
+        ax.set_ylabel("1-Year Progression Index", fontsize=10)
+        ax.legend(loc="upper left", frameon=True, facecolor="white")
+
+    plt.suptitle(
+        "Figure 5: Bivariate Relationships: Major Biomarkers vs Diabetes Disease Progression",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/05_key_biomarkers_vs_progression_scatter.png')
+    plt.savefig("reports/figures/05_key_biomarkers_vs_progression_scatter.png")
     plt.close()
     print("✓ Saved 05_key_biomarkers_vs_progression_scatter.png")
 
@@ -215,76 +404,227 @@ def main():
     # FIGURE 6: MANAGING DATASET IMBALANCE (BEFORE VS AFTER QUANTILE STRATIFICATION)
     # -------------------------------------------------------------
     fig, axes = plt.subplots(2, 2, figsize=(16, 12), dpi=300)
-    
+
     # PANEL A: Raw Progression Distribution with 5 Quantile Bins Shaded (BEFORE)
     ax1 = axes[0, 0]
     bins = [25.0, 77.0, 115.0, 168.0, 232.0, 346.0]
-    colors_5 = ['#10b981', '#06b6d4', '#3b82f6', '#f59e0b', '#ef4444']
-    labels_5 = ['Pile 1: Mildest [25-77]', 'Pile 2: Mild-Mod [77-115]', 'Pile 3: Cohort Avg [115-168]', 'Pile 4: Mod-Severe [168-232]', 'Pile 5: Critical [232-346]']
-    
-    y_raw = df_raw['progression']
-    sns.histplot(y_raw, kde=True, color='#475569', bins=25, stat='density', alpha=0.3, ax=ax1)
+    colors_5 = ["#10b981", "#06b6d4", "#3b82f6", "#f59e0b", "#ef4444"]
+    labels_5 = [
+        "Pile 1: Mildest [25-77]",
+        "Pile 2: Mild-Mod [77-115]",
+        "Pile 3: Cohort Avg [115-168]",
+        "Pile 4: Mod-Severe [168-232]",
+        "Pile 5: Critical [232-346]",
+    ]
+
+    y_raw = df_raw["progression"]
+    sns.histplot(
+        y_raw, kde=True, color="#475569", bins=25, stat="density", alpha=0.3, ax=ax1
+    )
     for i in range(5):
-        ax1.axvspan(bins[i], bins[i+1], color=colors_5[i], alpha=0.25, label=f'{labels_5[i]} (N~88-91)')
+        ax1.axvspan(
+            bins[i],
+            bins[i + 1],
+            color=colors_5[i],
+            alpha=0.25,
+            label=f"{labels_5[i]} (N~88-91)",
+        )
         if i > 0 and i < 5:
-            ax1.axvline(bins[i], color='#334155', linestyle='--', lw=1.5)
-            
-    ax1.axvline(y_raw.mean(), color='#b91c1c', linestyle='-', lw=2.5, label=f'Cohort Mean: {y_raw.mean():.1f}')
-    ax1.set_title('A: Raw Dataset Before Slicing (Continuous Imbalance & 5 Quantile Bins)', fontsize=12, fontweight='bold')
-    ax1.set_xlabel('Raw 1-Year Diabetes Progression Score (25 to 346)', fontsize=11)
-    ax1.set_ylabel('Probability Density', fontsize=11)
-    ax1.legend(loc='upper right', fontsize=8.5, frameon=True, facecolor='white')
-    
+            ax1.axvline(bins[i], color="#334155", linestyle="--", lw=1.5)
+
+    ax1.axvline(
+        y_raw.mean(),
+        color="#b91c1c",
+        linestyle="-",
+        lw=2.5,
+        label=f"Cohort Mean: {y_raw.mean():.1f}",
+    )
+    ax1.set_title(
+        "A: Raw Dataset Before Slicing (Continuous Imbalance & 5 Quantile Bins)",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax1.set_xlabel("Raw 1-Year Diabetes Progression Score (25 to 346)", fontsize=11)
+    ax1.set_ylabel("Probability Density", fontsize=11)
+    ax1.legend(loc="upper right", fontsize=8.5, frameon=True, facecolor="white")
+
     # PANEL B: The 5 Piles Partitioning (70% Train, 20% Val, 10% Test)
     ax2 = axes[0, 1]
-    pile_names = ['Pile 1\n(25-77)', 'Pile 2\n(77-115)', 'Pile 3\n(115-168)', 'Pile 4\n(168-232)', 'Pile 5\n(232-346)']
+    pile_names = [
+        "Pile 1\n(25-77)",
+        "Pile 2\n(77-115)",
+        "Pile 3\n(115-168)",
+        "Pile 4\n(168-232)",
+        "Pile 5\n(232-346)",
+    ]
     train_counts = [64, 63, 61, 63, 62]
-    val_counts   = [18, 17, 18, 16, 19]
-    test_counts  = [9,  9,  9,  9,  9]
-    
+    val_counts = [18, 17, 18, 16, 19]
+    test_counts = [9, 9, 9, 9, 9]
+
     x_indices = np.arange(5)
     width = 0.55
-    ax2.bar(x_indices, train_counts, width, label='Train 70% (N=309)', color='#2563eb', alpha=0.85, edgecolor='black')
-    ax2.bar(x_indices, val_counts, width, bottom=train_counts, label='Val 20% (N=88)', color='#0d9488', alpha=0.85, edgecolor='black')
+    ax2.bar(
+        x_indices,
+        train_counts,
+        width,
+        label="Train 70% (N=309)",
+        color="#2563eb",
+        alpha=0.85,
+        edgecolor="black",
+    )
+    ax2.bar(
+        x_indices,
+        val_counts,
+        width,
+        bottom=train_counts,
+        label="Val 20% (N=88)",
+        color="#0d9488",
+        alpha=0.85,
+        edgecolor="black",
+    )
     bottom_test = np.array(train_counts) + np.array(val_counts)
-    ax2.bar(x_indices, test_counts, width, bottom=bottom_test, label='Test 10% (N=45)', color='#e11d48', alpha=0.85, edgecolor='black')
-    
+    ax2.bar(
+        x_indices,
+        test_counts,
+        width,
+        bottom=bottom_test,
+        label="Test 10% (N=45)",
+        color="#e11d48",
+        alpha=0.85,
+        edgecolor="black",
+    )
+
     for i in range(5):
         tot = train_counts[i] + val_counts[i] + test_counts[i]
-        ax2.text(i, tot + 2, f'Total: {tot}\n(Test=9)', ha='center', fontsize=9, fontweight='bold')
-        
+        ax2.text(
+            i,
+            tot + 2,
+            f"Total: {tot}\n(Test=9)",
+            ha="center",
+            fontsize=9,
+            fontweight="bold",
+        )
+
     ax2.set_xticks(x_indices)
     ax2.set_xticklabels(pile_names, fontsize=10)
     ax2.set_ylim(0, 115)
-    ax2.set_title('B: Slicing Strategy: Exactly 70% Train, 20% Val, 10% Test from Each Pile', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('Number of Patients', fontsize=11)
-    ax2.legend(loc='upper right', fontsize=9, frameon=True, facecolor='white')
-    
+    ax2.set_title(
+        "B: Slicing Strategy: Exactly 70% Train, 20% Val, 10% Test from Each Pile",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax2.set_ylabel("Number of Patients", fontsize=11)
+    ax2.legend(loc="upper right", fontsize=9, frameon=True, facecolor="white")
+
     # PANEL C: After Balancing: Overlaid KDE Densities (Zero Distribution Drift)
     ax3 = axes[1, 0]
-    sns.kdeplot(y_train, ax=ax3, color='#2563eb', lw=3, label=f'Train (70%, N=309) - Mean: {y_train.mean():.1f}, Std: {y_train.std():.1f}')
-    sns.kdeplot(y_val,   ax=ax3, color='#0d9488', lw=3, linestyle='--', label=f'Validation (20%, N=88) - Mean: {y_val.mean():.1f}, Std: {y_val.std():.1f}')
-    sns.kdeplot(y_test,  ax=ax3, color='#e11d48', lw=3, linestyle=':', label=f'Holdout Test (10%, N=45) - Mean: {y_test.mean():.1f}, Std: {y_test.std():.1f}')
-    
-    ax3.set_title('C: After Balancing: Preserved Target Densities (Zero Distribution Drift)', fontsize=12, fontweight='bold')
-    ax3.set_xlabel('Quantitative Diabetes Progression Score', fontsize=11)
-    ax3.set_ylabel('Probability Density (KDE)', fontsize=11)
-    ax3.legend(loc='upper right', fontsize=9, frameon=True, facecolor='white')
-    ax3.text(0.04, 0.20, 'Mathematical Proof of Zero Drift:\n- Train Mean: 151.2 | Std: 77.6\n- Val Mean:   155.1 | Std: 75.8\n- Test Mean:  152.8 | Std: 76.2\nAll 3 curves align identically across the full severity range!',
-             transform=ax3.transAxes, fontsize=9.5, bbox=dict(boxstyle='round,pad=0.5', facecolor='#f8fafc', edgecolor='#cbd5e1'))
-    
+    sns.kdeplot(
+        y_train,
+        ax=ax3,
+        color="#2563eb",
+        lw=3,
+        label=f"Train (70%, N=309) - Mean: {y_train.mean():.1f}, Std: {y_train.std():.1f}",
+    )
+    sns.kdeplot(
+        y_val,
+        ax=ax3,
+        color="#0d9488",
+        lw=3,
+        linestyle="--",
+        label=f"Validation (20%, N=88) - Mean: {y_val.mean():.1f}, Std: {y_val.std():.1f}",
+    )
+    sns.kdeplot(
+        y_test,
+        ax=ax3,
+        color="#e11d48",
+        lw=3,
+        linestyle=":",
+        label=f"Holdout Test (10%, N=45) - Mean: {y_test.mean():.1f}, Std: {y_test.std():.1f}",
+    )
+
+    ax3.set_title(
+        "C: After Balancing: Preserved Target Densities (Zero Distribution Drift)",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax3.set_xlabel("Quantitative Diabetes Progression Score", fontsize=11)
+    ax3.set_ylabel("Probability Density (KDE)", fontsize=11)
+    ax3.legend(loc="upper right", fontsize=9, frameon=True, facecolor="white")
+    ax3.text(
+        0.04,
+        0.20,
+        "Mathematical Proof of Zero Drift:\n- Train Mean: 151.2 | Std: 77.6\n- Val Mean:   155.1 | Std: 75.8\n- Test Mean:  152.8 | Std: 76.2\nAll 3 curves align identically across the full severity range!",
+        transform=ax3.transAxes,
+        fontsize=9.5,
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="#f8fafc", edgecolor="#cbd5e1"),
+    )
+
     # PANEL D: Clinical Triage Imbalance & Cost-Sensitive Loss Weighting
     ax4 = axes[1, 1]
-    triage_counts = [(df_raw['progression'] < 200).sum(), (df_raw['progression'] >= 200).sum()]
-    triage_labels = ['Controlled (<200)\n315 Patients (71.3%)\nWeight w0 = 0.70x', 'Severe Progression (>=200)\n127 Patients (28.7%)\nWeight w1 = 1.74x']
-    ax4.pie(triage_counts, labels=triage_labels, autopct='%1.1f%%', startangle=140,
-            colors=['#0ea5e9', '#ef4444'], explode=(0, 0.08),
-            textprops={'fontweight': 'bold', 'fontsize': 10})
-    ax4.set_title('D: Clinical Risk Triage Class Imbalance & Cost-Sensitive Weighting', fontsize=12, fontweight='bold')
-    
-    plt.suptitle('Figure 6: Managing Dataset Imbalance: 5-Bin Quantile Stratification (Before vs After)', fontsize=14, fontweight='bold', y=0.98)
+    triage_counts = [
+        (df_raw["progression"] < 200).sum(),
+        (df_raw["progression"] >= 200).sum(),
+    ]
+    colors_triage = ["#0ea5e9", "#ef4444"]
+
+    # Donut chart shifted slightly left to give generous breathing room for the clinical legend
+    wedges, texts, autotexts = ax4.pie(
+        triage_counts,
+        autopct="%1.1f%%",
+        pctdistance=0.72,
+        startangle=140,
+        radius=0.78,
+        center=(-0.28, 0),
+        colors=colors_triage,
+        explode=(0, 0.06),
+        wedgeprops=dict(width=0.38, edgecolor="white", linewidth=2.5),
+        textprops={"fontweight": "bold", "fontsize": 11.5, "color": "white"},
+    )
+
+    # Clean badge inside donut hole
+    ax4.text(
+        -0.28,
+        0,
+        "Total Cohort\nN = 442\nImbalance 1 : 2.5",
+        ha="center",
+        va="center",
+        fontsize=10,
+        fontweight="bold",
+        color="#1e293b",
+    )
+
+    # Dedicated clinical policy card with zero overlap
+    legend_labels = [
+        "Controlled (< 200):\n  • 315 Patients (71.3% Majority)\n  • Loss Weight: w0 = 0.70x",
+        "Severe Progression (>= 200):\n  • 127 Patients (28.7% Minority)\n  • Loss Weight: w1 = 1.74x\n  • 2.54x Cost Penalty",
+    ]
+    ax4.legend(
+        wedges,
+        legend_labels,
+        loc="center left",
+        bbox_to_anchor=(0.60, 0.5),
+        fontsize=9.5,
+        frameon=True,
+        facecolor="#f8fafc",
+        edgecolor="#cbd5e1",
+        title="Clinical Triage Policy",
+        title_fontsize=10.5,
+    )
+    ax4.set_title(
+        "D: Clinical Risk Triage Class Imbalance & Cost-Sensitive Weighting",
+        fontsize=12,
+        fontweight="bold",
+        pad=15,
+    )
+
+    plt.suptitle(
+        "Figure 6: Managing Dataset Imbalance: 5-Bin Quantile Stratification (Before vs After)",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/06_managing_dataset_imbalance.png')
+    plt.savefig("reports/figures/06_managing_dataset_imbalance.png")
     plt.close()
     print("✓ Saved 06_managing_dataset_imbalance.png")
 
@@ -292,29 +632,47 @@ def main():
     # FIGURE 7: FEATURE STANDARDIZATION TRANSFORMATION
     # -------------------------------------------------------------
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6), dpi=300)
-    
+
     # Raw scales
-    features_to_compare = ['bmi', 'bp', 's1', 's5']
-    labels_raw = ['BMI [18-42 kg/m²]', 'BP [62-133 mmHg]', 'S1 Total Chol [97-301]', 'S5 Log Trig [3.2-6.1]']
-    
+    features_to_compare = ["bmi", "bp", "s1", "s5"]
+    labels_raw = [
+        "BMI [18-42 kg/m²]",
+        "BP [62-133 mmHg]",
+        "S1 Total Chol [97-301]",
+        "S5 Log Trig [3.2-6.1]",
+    ]
+
     for col, lbl in zip(features_to_compare, labels_raw):
         sns.kdeplot(df_raw[col], ax=ax1, label=lbl, lw=2)
-    ax1.set_title('A: Raw Feature Scales (Unstandardized)\n(Features on Different Physical Scales Distort Coefficient Magnitudes)', fontsize=11, fontweight='bold')
-    ax1.set_xlabel('Raw Value Magnitude')
-    ax1.set_ylabel('Density')
-    ax1.legend(loc='upper right', fontsize=9)
+    ax1.set_title(
+        "A: Raw Feature Scales (Unstandardized)\n(Features on Different Physical Scales Distort Coefficient Magnitudes)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax1.set_xlabel("Raw Value Magnitude")
+    ax1.set_ylabel("Density")
+    ax1.legend(loc="upper right", fontsize=9)
 
     # Standardized z-scores
     for col in features_to_compare:
         sns.kdeplot(X_train[col], ax=ax2, label=f"{col} (Scaled)", lw=2)
-    ax2.set_title('B: Standardized Z-Scores (StandardScaler)\n(Zero Data Leakage: Scaler Fitted ONLY on 70% Train)', fontsize=11, fontweight='bold')
-    ax2.set_xlabel('Standardized Units (Z-score: Mean=0, Std=1)')
-    ax2.set_ylabel('Density')
-    ax2.legend(loc='upper right', fontsize=9)
+    ax2.set_title(
+        "B: Standardized Z-Scores (StandardScaler)\n(Zero Data Leakage: Scaler Fitted ONLY on 70% Train)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax2.set_xlabel("Standardized Units (Z-score: Mean=0, Std=1)")
+    ax2.set_ylabel("Density")
+    ax2.legend(loc="upper right", fontsize=9)
 
-    plt.suptitle('Figure 7: Impact of Zero Data Leakage Feature Standardization on Model Fairness', fontsize=14, fontweight='bold', y=0.98)
+    plt.suptitle(
+        "Figure 7: Impact of Zero Data Leakage Feature Standardization on Model Fairness",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/07_feature_scaling_transformation.png')
+    plt.savefig("reports/figures/07_feature_scaling_transformation.png")
     plt.close()
     print("✓ Saved 07_feature_scaling_transformation.png")
 
@@ -322,71 +680,144 @@ def main():
     # FIGURE 8: LEARNING CURVE (SAMPLE EFFICIENCY & BIAS-VARIANCE)
     # -------------------------------------------------------------
     from sklearn.model_selection import learning_curve
+
     train_sizes, train_scores, val_scores = learning_curve(
-        LinearRegression(), X_train, y_train, cv=5, scoring='r2',
-        train_sizes=np.linspace(0.2, 1.0, 10), random_state=42
+        LinearRegression(),
+        X_train,
+        y_train,
+        cv=5,
+        scoring="r2",
+        train_sizes=np.linspace(0.2, 1.0, 10),
+        random_state=42,
     )
-    
+
     train_mean = np.mean(train_scores, axis=1)
-    train_std  = np.std(train_scores, axis=1)
-    val_mean   = np.mean(val_scores, axis=1)
-    val_std    = np.std(val_scores, axis=1)
-    
+    train_std = np.std(train_scores, axis=1)
+    val_mean = np.mean(val_scores, axis=1)
+    val_std = np.std(val_scores, axis=1)
+
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
-    ax.plot(train_sizes, train_mean, 'o-', color='#3b82f6', lw=2.5, label='Training Score (R²)')
-    ax.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, alpha=0.15, color='#3b82f6')
-    
-    ax.plot(train_sizes, val_mean, 's-', color='#10b981', lw=2.5, label='5-Fold Cross-Validation Score (R²)')
-    ax.fill_between(train_sizes, val_mean - val_std, val_mean + val_std, alpha=0.15, color='#10b981')
-    
-    ax.set_title('Figure 8: Multiple Linear Regression Learning Curve (Bias-Variance Diagnostics)', fontsize=13, fontweight='bold', pad=12)
-    ax.set_xlabel('Number of Training Samples (N)', fontsize=11)
-    ax.set_ylabel('Explained Variance Score (R²)', fontsize=11)
-    ax.legend(loc='lower right', frameon=True, facecolor='white', framealpha=0.9)
+    ax.plot(
+        train_sizes,
+        train_mean,
+        "o-",
+        color="#3b82f6",
+        lw=2.5,
+        label="Training Score (R²)",
+    )
+    ax.fill_between(
+        train_sizes,
+        train_mean - train_std,
+        train_mean + train_std,
+        alpha=0.15,
+        color="#3b82f6",
+    )
+
+    ax.plot(
+        train_sizes,
+        val_mean,
+        "s-",
+        color="#10b981",
+        lw=2.5,
+        label="5-Fold Cross-Validation Score (R²)",
+    )
+    ax.fill_between(
+        train_sizes, val_mean - val_std, val_mean + val_std, alpha=0.15, color="#10b981"
+    )
+
+    ax.set_title(
+        "Figure 8: Multiple Linear Regression Learning Curve (Bias-Variance Diagnostics)",
+        fontsize=13,
+        fontweight="bold",
+        pad=12,
+    )
+    ax.set_xlabel("Number of Training Samples (N)", fontsize=11)
+    ax.set_ylabel("Explained Variance Score (R²)", fontsize=11)
+    ax.legend(loc="lower right", frameon=True, facecolor="white", framealpha=0.9)
     ax.set_ylim(0.2, 0.65)
-    
-    ax.text(0.04, 0.15, "Low Variance Diagnostics:\nTraining and Cross-Validation scores converge smoothly.\nNo evidence of severe overfitting (Variance gap is small).",
-            transform=ax.transAxes, fontsize=10, bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='#cbd5e1'))
-    
+
+    ax.text(
+        0.04,
+        0.15,
+        "Low Variance Diagnostics:\nTraining and Cross-Validation scores converge smoothly.\nNo evidence of severe overfitting (Variance gap is small).",
+        transform=ax.transAxes,
+        fontsize=10,
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="white", edgecolor="#cbd5e1"),
+    )
+
     plt.tight_layout()
-    plt.savefig('reports/figures/08_learning_curve_bias_variance.png')
+    plt.savefig("reports/figures/08_learning_curve_bias_variance.png")
     plt.close()
     print("✓ Saved 08_learning_curve_bias_variance.png")
 
     # -------------------------------------------------------------
     # FIGURE 9: ACTUAL VS PREDICTED ON HOLDOUT TEST SET
     # -------------------------------------------------------------
-    ols_model = joblib.load('models/diabetes_model.joblib')
+    ols_model = joblib.load("models/diabetes_model.joblib")
     test_preds = ols_model.predict(X_test)
-    
+
     fig, ax = plt.subplots(figsize=(9, 7), dpi=300)
-    sns.scatterplot(x=y_test, y=test_preds, ax=ax, color='#0284c7', s=85, edgecolor='black', alpha=0.8)
-    
+    sns.scatterplot(
+        x=y_test,
+        y=test_preds,
+        ax=ax,
+        color="#0284c7",
+        s=85,
+        edgecolor="black",
+        alpha=0.8,
+    )
+
     # Identity line
     min_val = min(y_test.min(), test_preds.min()) - 10
     max_val = max(y_test.max(), test_preds.max()) + 10
-    ax.plot([min_val, max_val], [min_val, max_val], 'r--', lw=2.5, label='Ideal Identity Fit: y = y_hat')
-    
+    ax.plot(
+        [min_val, max_val],
+        [min_val, max_val],
+        "r--",
+        lw=2.5,
+        label="Ideal Identity Fit: y = y_hat",
+    )
+
     # 1 RMSE error band
-    rmse_val = np.sqrt(np.mean((y_test - test_preds)**2))
-    ax.fill_between([min_val, max_val], [min_val - rmse_val, max_val - rmse_val],
-                    [min_val + rmse_val, max_val + rmse_val], color='#ef4444', alpha=0.10,
-                    label=f'±1 Test RMSE Margin (±{rmse_val:.1f})')
-    
-    r2_val = 1 - np.sum((y_test - test_preds)**2) / np.sum((y_test - np.mean(y_test))**2)
+    rmse_val = np.sqrt(np.mean((y_test - test_preds) ** 2))
+    ax.fill_between(
+        [min_val, max_val],
+        [min_val - rmse_val, max_val - rmse_val],
+        [min_val + rmse_val, max_val + rmse_val],
+        color="#ef4444",
+        alpha=0.10,
+        label=f"±1 Test RMSE Margin (±{rmse_val:.1f})",
+    )
+
+    r2_val = 1 - np.sum((y_test - test_preds) ** 2) / np.sum(
+        (y_test - np.mean(y_test)) ** 2
+    )
     mae_val = np.mean(np.abs(y_test - test_preds))
-    
-    ax.text(0.04, 0.85, f"Holdout Test Set (N = 45)\nTest R²: {r2_val:.4f}\nTest RMSE: {rmse_val:.2f}\nTest MAE: {mae_val:.2f}",
-            transform=ax.transAxes, fontsize=11, bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='#cbd5e1', alpha=0.9))
-    
-    ax.set_title('Figure 9: Multiple Linear Regression: Predicted vs Actual Progression (Holdout Test Set)', fontsize=13, fontweight='bold', pad=12)
-    ax.set_xlabel('Actual Quantitative Disease Progression (y)', fontsize=11)
-    ax.set_ylabel('Predicted Disease Progression (y_hat)', fontsize=11)
+
+    ax.text(
+        0.04,
+        0.85,
+        f"Holdout Test Set (N = 45)\nTest R²: {r2_val:.4f}\nTest RMSE: {rmse_val:.2f}\nTest MAE: {mae_val:.2f}",
+        transform=ax.transAxes,
+        fontsize=11,
+        bbox=dict(
+            boxstyle="round,pad=0.5", facecolor="white", edgecolor="#cbd5e1", alpha=0.9
+        ),
+    )
+
+    ax.set_title(
+        "Figure 9: Multiple Linear Regression: Predicted vs Actual Progression (Holdout Test Set)",
+        fontsize=13,
+        fontweight="bold",
+        pad=12,
+    )
+    ax.set_xlabel("Actual Quantitative Disease Progression (y)", fontsize=11)
+    ax.set_ylabel("Predicted Disease Progression (y_hat)", fontsize=11)
     ax.set_xlim(min_val, max_val)
     ax.set_ylim(min_val, max_val)
-    ax.legend(loc='lower right', frameon=True, facecolor='white')
+    ax.legend(loc="lower right", frameon=True, facecolor="white")
     plt.tight_layout()
-    plt.savefig('reports/figures/09_model_evaluation_actual_vs_predicted.png')
+    plt.savefig("reports/figures/09_model_evaluation_actual_vs_predicted.png")
     plt.close()
     print("✓ Saved 09_model_evaluation_actual_vs_predicted.png")
 
@@ -395,27 +826,44 @@ def main():
     # -------------------------------------------------------------
     residuals = y_test - test_preds
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6), dpi=300)
-    
+
     # Residuals vs Fitted
-    sns.scatterplot(x=test_preds, y=residuals, ax=ax1, color='#8b5cf6', s=80, edgecolor='black', alpha=0.8)
-    ax1.axhline(0, color='red', linestyle='--', lw=2)
-    ax1.set_title('A: Residuals vs Fitted Values (Homoscedasticity Check)', fontsize=12, fontweight='bold')
-    ax1.set_xlabel('Fitted Values (Predicted Progression)', fontsize=11)
-    ax1.set_ylabel('Residuals (e = y - y_hat)', fontsize=11)
-    
+    sns.scatterplot(
+        x=test_preds,
+        y=residuals,
+        ax=ax1,
+        color="#8b5cf6",
+        s=80,
+        edgecolor="black",
+        alpha=0.8,
+    )
+    ax1.axhline(0, color="red", linestyle="--", lw=2)
+    ax1.set_title(
+        "A: Residuals vs Fitted Values (Homoscedasticity Check)",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax1.set_xlabel("Fitted Values (Predicted Progression)", fontsize=11)
+    ax1.set_ylabel("Residuals (e = y - y_hat)", fontsize=11)
+
     # Q-Q plot
     stats.probplot(residuals, dist="norm", plot=ax2)
-    ax2.get_lines()[0].set_color('#0284c7')
+    ax2.get_lines()[0].set_color("#0284c7")
     ax2.get_lines()[0].set_markersize(7.0)
-    ax2.get_lines()[1].set_color('#ef4444')
+    ax2.get_lines()[1].set_color("#ef4444")
     ax2.get_lines()[1].set_linewidth(2.0)
-    ax2.set_title('B: Normal Q-Q Plot of Residuals', fontsize=12, fontweight='bold')
-    ax2.set_xlabel('Theoretical Normal Quantiles', fontsize=11)
-    ax2.set_ylabel('Sample Residual Quantiles', fontsize=11)
+    ax2.set_title("B: Normal Q-Q Plot of Residuals", fontsize=12, fontweight="bold")
+    ax2.set_xlabel("Theoretical Normal Quantiles", fontsize=11)
+    ax2.set_ylabel("Sample Residual Quantiles", fontsize=11)
 
-    plt.suptitle('Figure 10: Residual Diagnostics Verifying Linear Modeling Assumptions', fontsize=14, fontweight='bold', y=0.98)
+    plt.suptitle(
+        "Figure 10: Residual Diagnostics Verifying Linear Modeling Assumptions",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/10_residual_diagnostics_homoscedasticity.png')
+    plt.savefig("reports/figures/10_residual_diagnostics_homoscedasticity.png")
     plt.close()
     print("✓ Saved 10_residual_diagnostics_homoscedasticity.png")
 
@@ -423,28 +871,57 @@ def main():
     # FIGURE 11: STANDARDIZED COEFFICIENTS & CLINICAL INTERPRETATION
     # -------------------------------------------------------------
     weights = ols_model.coef_
-    df_weights = pd.DataFrame({'Feature': feature_cols, 'Weight': weights})
-    df_weights = df_weights.sort_values(by='Weight', ascending=True)
-    
+    df_weights = pd.DataFrame({"Feature": feature_cols, "Weight": weights})
+    df_weights = df_weights.sort_values(by="Weight", ascending=True)
+
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
-    colors = ['#ef4444' if w > 10 else ('#10b981' if w < -5 and f != 's1' else '#3b82f6') for w, f in zip(df_weights['Weight'], df_weights['Feature'])]
-    
-    bars = ax.barh(df_weights['Feature'], df_weights['Weight'], color=colors, edgecolor='black', alpha=0.85)
-    ax.axvline(0, color='black', lw=1.2)
-    ax.set_title('Figure 11: Multiple Linear Regression Beta Coefficients & Clinical Impact', fontsize=13, fontweight='bold', pad=12)
-    ax.set_xlabel('Standardized Beta Weight (Impact per 1 SD Increase in Feature)', fontsize=11)
-    ax.set_ylabel('Clinical Biomarker', fontsize=11)
-    
+    colors = [
+        "#ef4444" if w > 10 else ("#10b981" if w < -5 and f != "s1" else "#3b82f6")
+        for w, f in zip(df_weights["Weight"], df_weights["Feature"])
+    ]
+
+    bars = ax.barh(
+        df_weights["Feature"],
+        df_weights["Weight"],
+        color=colors,
+        edgecolor="black",
+        alpha=0.85,
+    )
+    ax.axvline(0, color="black", lw=1.2)
+    ax.set_title(
+        "Figure 11: Multiple Linear Regression Beta Coefficients & Clinical Impact",
+        fontsize=13,
+        fontweight="bold",
+        pad=12,
+    )
+    ax.set_xlabel(
+        "Standardized Beta Weight (Impact per 1 SD Increase in Feature)", fontsize=11
+    )
+    ax.set_ylabel("Clinical Biomarker", fontsize=11)
+
     for bar in bars:
         val = bar.get_width()
         x_text = val + (0.5 if val >= 0 else -1.8)
-        ax.text(x_text, bar.get_y() + bar.get_height()/2, f"{val:+.2f}", va='center', fontweight='bold', fontsize=9)
-        
-    ax.text(0.55, 0.15, "Accelerants: s5 (Triglycerides +34.9), bmi (+23.7), bp (+17.8)\nDemographic: sex (-10.1: Female baseline vs Male)\nBaseline Progression Intercept: +151.2",
-            transform=ax.transAxes, fontsize=10, bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='#cbd5e1'))
+        ax.text(
+            x_text,
+            bar.get_y() + bar.get_height() / 2,
+            f"{val:+.2f}",
+            va="center",
+            fontweight="bold",
+            fontsize=9,
+        )
+
+    ax.text(
+        0.55,
+        0.15,
+        "Accelerants: s5 (Triglycerides +34.9), bmi (+23.7), bp (+17.8)\nDemographic: sex (-10.1: Female baseline vs Male)\nBaseline Progression Intercept: +151.2",
+        transform=ax.transAxes,
+        fontsize=10,
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="white", edgecolor="#cbd5e1"),
+    )
 
     plt.tight_layout()
-    plt.savefig('reports/figures/11_clinical_interpretability_coefficients.png')
+    plt.savefig("reports/figures/11_clinical_interpretability_coefficients.png")
     plt.close()
     print("✓ Saved 11_clinical_interpretability_coefficients.png")
 
@@ -457,36 +934,70 @@ def main():
     #   Method A: Standard naive cutoff at y_hat >= 200
     #   Method B: Clinically calibrated safety threshold at y_hat >= 175 (managing imbalance / FN risk)
     y_test_severe = (y_test >= 200).astype(int)
-    
+
     # Method A: Standard OLS cutoff at 200
     preds_standard = (test_preds >= 200).astype(int)
     cm_standard = confusion_matrix(y_test_severe, preds_standard)
-    
+
     # Method B: Clinically Calibrated Safety Threshold at 175 (Managing Imbalance)
     preds_calibrated = (test_preds >= 175).astype(int)
     cm_calibrated = confusion_matrix(y_test_severe, preds_calibrated)
-    
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6), dpi=300)
-    
-    sns.heatmap(cm_standard, annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax1, annot_kws={'size': 14, 'fontweight': 'bold'},
-                xticklabels=['Pred Controlled (<200)', 'Pred Severe (>=200)'], yticklabels=['Actual Controlled (<200)', 'Actual Severe (>=200)'])
-    ax1.set_title(f'A: Standard OLS Cutoff (y_hat >= 200)\n(Misses {cm_standard[1,0]} Severe Patients | Sensitivity: 61.5%)', fontsize=11, fontweight='bold')
-    ax1.set_xlabel('Predicted Clinical Triage Category', fontsize=10)
-    ax1.set_ylabel('True Clinical Status', fontsize=10)
 
-    sns.heatmap(cm_calibrated, annot=True, fmt='d', cmap='Greens', cbar=False, ax=ax2, annot_kws={'size': 14, 'fontweight': 'bold'},
-                xticklabels=['Pred Controlled (<175)', 'Pred Severe (>=175)'], yticklabels=['Actual Controlled (<200)', 'Actual Severe (>=200)'])
-    ax2.set_title(f'B: Calibrated OLS Safety Threshold (y_hat >= 175)\n(Misses Only {cm_calibrated[1,0]} Patients | Sensitivity: 76.9% - Managing FN Risk)', fontsize=11, fontweight='bold')
-    ax2.set_xlabel('Predicted Clinical Triage Category', fontsize=10)
-    ax2.set_ylabel('True Clinical Status', fontsize=10)
+    sns.heatmap(
+        cm_standard,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        cbar=False,
+        ax=ax1,
+        annot_kws={"size": 14, "fontweight": "bold"},
+        xticklabels=["Pred Controlled (<200)", "Pred Severe (>=200)"],
+        yticklabels=["Actual Controlled (<200)", "Actual Severe (>=200)"],
+    )
+    ax1.set_title(
+        f"A: Standard OLS Cutoff (y_hat >= 200)\n(Misses {cm_standard[1, 0]} Severe Patients | Sensitivity: 61.5%)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax1.set_xlabel("Predicted Clinical Triage Category", fontsize=10)
+    ax1.set_ylabel("True Clinical Status", fontsize=10)
 
-    plt.suptitle('Figure 12: Managing Clinical Risk Imbalance via OLS Decision Threshold Calibration', fontsize=14, fontweight='bold', y=0.98)
+    sns.heatmap(
+        cm_calibrated,
+        annot=True,
+        fmt="d",
+        cmap="Greens",
+        cbar=False,
+        ax=ax2,
+        annot_kws={"size": 14, "fontweight": "bold"},
+        xticklabels=["Pred Controlled (<175)", "Pred Severe (>=175)"],
+        yticklabels=["Actual Controlled (<200)", "Actual Severe (>=200)"],
+    )
+    ax2.set_title(
+        f"B: Calibrated OLS Safety Threshold (y_hat >= 175)\n(Misses Only {cm_calibrated[1, 0]} Patients | Sensitivity: 76.9% - Managing FN Risk)",
+        fontsize=11,
+        fontweight="bold",
+    )
+    ax2.set_xlabel("Predicted Clinical Triage Category", fontsize=10)
+    ax2.set_ylabel("True Clinical Status", fontsize=10)
+
+    plt.suptitle(
+        "Figure 12: Managing Clinical Risk Imbalance via OLS Decision Threshold Calibration",
+        fontsize=14,
+        fontweight="bold",
+        y=0.98,
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig('reports/figures/12_clinical_risk_confusion_matrix_imbalance.png')
+    plt.savefig("reports/figures/12_clinical_risk_confusion_matrix_imbalance.png")
     plt.close()
-    print("✓ Saved 12_clinical_risk_confusion_matrix_imbalance.png (100% Pure OLS Threshold Triage)")
-    
+    print(
+        "✓ Saved 12_clinical_risk_confusion_matrix_imbalance.png (100% Pure OLS Threshold Triage)"
+    )
+
     print("\n✓ All 12 advanced visualizations generated and saved in reports/figures/.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

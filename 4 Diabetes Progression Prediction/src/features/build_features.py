@@ -1,9 +1,9 @@
 import os
-import joblib
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+
+import joblib  # type: ignore[import-untyped]
+import pandas as pd  # type: ignore[import-untyped]
+from sklearn.model_selection import train_test_split  # type: ignore[import-untyped]
+from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
 
 
 def process_input_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -58,7 +58,7 @@ def main():
     progression_quantiles = pd.qcut(y, q=5, labels=False)
 
     # First split: 70% Train (309) vs 30% Temp (133)
-    X_train, X_temp, y_train, y_temp, q_train, q_temp = train_test_split(
+    X_train, X_temp, y_train, y_temp, _, q_temp = train_test_split(
         X,
         y,
         progression_quantiles,
