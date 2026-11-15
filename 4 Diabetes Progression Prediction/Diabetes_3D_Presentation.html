@@ -1599,10 +1599,9 @@
             "sp": "Speaker 1",
             "t": "The Complete ML Pipeline Architecture",
             "plain": [
-                "<b>The Sterile Assembly Line:</b> Like a sterile medicine factory (Raw Herbs &rarr; Purification &rarr; Airlock &rarr; Bottling), if unsterilized room air or bacteria leaks into the vial at any point, the batch is contaminated. In ML, this contamination is <i>Data Leakage</i>\u2014if the model peeks at future test patients during scaling, it cheats and will fail on real hospital patients.",
                 "<b>1. Strict Zero-Leakage Airlocks:</b> Built as an 11-stage modular pipeline. Test patients (10% holdout) are strictly locked in a digital vault and never touch feature scaling, model training, or diagnostic tuning until final evaluation.",
                 "<b>2. Authentic Data Ingestion (N=442):</b> 442 authentic diabetic patients evaluated across 10 physiological vitals and serum biomarkers (4,420 total data points) with <i>zero missing values</i> (NaN=0), requiring zero synthetic imputation.",
-                "<b>3. Dual-Track Feature Handling:</b> Biological sex is decoded into clean binary {0.0=Female, 1.0=Male} adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1\u2013S6) are standardized via Z-score so the math treats them fairly.",
+                "<b>3. Dual-Track Feature Handling:</b> Biological sex is decoded into clean binary {0.0=Female, 1.0=Male} adding an exact physiological offset, while continuous vitals and blood lipids (BMI, BP, S1&ndash;S6) are standardized via Z-score so the math treats them fairly.",
                 "<b>4. Imbalance Management & Partitioning:</b> Severe patients (<i>y</i> &gt; 200) are rare. We sliced all 442 patients into 5 equal severity quantiles and split FIRST into 70% Train, 20% Val, and 10% Test to guarantee zero distribution drift (~152).",
                 "<b>5. Zero-Leakage Scaling & Transparent OLS:</b> Scaler is fitted strictly on the isolated 309 Train set; Val & Test are transformed using those frozen stats. Model is solved analytically via Normal Equation &beta;* = (<b>X</b><sup>T</sup><b>X</b>)<sup>-1</sup><b>X</b><sup>T</sup><b>y</b> in &lt;1 ms with 100% explainability."
             ],
