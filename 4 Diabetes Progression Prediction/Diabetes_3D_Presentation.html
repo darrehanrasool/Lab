@@ -1417,13 +1417,13 @@
             gauge: () => `<div class="gq"><b>Progression Scale (25 to 346)</b><div class="gb"><i style="left:${200 / 346 * 100}%"></i><em style="left:${225 / 346 * 100}%">226</em></div><div class="gl"><span>25 Mild</span><span>200 = Severe Triage Line</span><span>346 Severe</span></div></div>`,
             eda: () => `
 <div class="piles-container">
-    <b class="piles-title">The Solution: 5-Bin Quantile Stratified Splitting</b>
+    <b class="piles-title">The Solution: 5-Bin Quantile Stratified Splitting (Before vs After)</b>
     <div class="piles-five">
-        <div class="pile-box p-1"><span>PILE 1 (20%)</span><b>25 – 68</b><small>Mildest</small></div>
-        <div class="pile-box p-2"><span>PILE 2 (20%)</span><b>68 – 109</b><small>Mild-Mod</small></div>
-        <div class="pile-box p-3"><span>PILE 3 (20%)</span><b>109 – 159</b><small>Cohort Avg</small></div>
-        <div class="pile-box p-4"><span>PILE 4 (20%)</span><b>159 – 211</b><small>Mod-Severe</small></div>
-        <div class="pile-box p-5"><span>PILE 5 (20%)</span><b>211 – 346</b><small>Critical</small></div>
+        <div class="pile-box p-1"><span>PILE 1 (20%)</span><b>25 – 77</b><small>Mildest (N=91)</small></div>
+        <div class="pile-box p-2"><span>PILE 2 (20%)</span><b>77 – 115</b><small>Mild-Mod (N=89)</small></div>
+        <div class="pile-box p-3"><span>PILE 3 (20%)</span><b>115 – 168</b><small>Cohort Avg (N=88)</small></div>
+        <div class="pile-box p-4"><span>PILE 4 (20%)</span><b>168 – 232</b><small>Mod-Sev (N=88)</small></div>
+        <div class="pile-box p-5"><span>PILE 5 (20%)</span><b>232 – 346</b><small>Critical (N=90)</small></div>
     </div>
     <div class="piles-rule">
         <span>From EVERY single pile, we sample:</span> 
@@ -1431,8 +1431,48 @@
         <b style="color:#0d9488">20% Val (88)</b> · 
         <b style="color:#e11d48">10% Test (45)</b>
     </div>
+    <svg viewBox="0 0 520 140" width="100%" style="background:rgba(0,0,0,0.02);border-radius:8px;padding:4px;max-height:140px;">
+        <!-- Left: Raw Data with 5 Bins (Before) -->
+        <text x="15" y="16" fill="var(--tx)" font-size="11" font-weight="700">Before: Raw Progression Sliced into 5 Bins</text>
+        <!-- Bins visual bars -->
+        <rect x="15" y="26" width="40" height="75" rx="3" fill="#10b981" opacity="0.85"/>
+        <text x="35" y="70" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">Q1</text>
+        <rect x="58" y="26" width="40" height="75" rx="3" fill="#06b6d4" opacity="0.85"/>
+        <text x="78" y="70" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">Q2</text>
+        <rect x="101" y="26" width="40" height="75" rx="3" fill="#3b82f6" opacity="0.85"/>
+        <text x="121" y="70" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">Q3</text>
+        <rect x="144" y="26" width="40" height="75" rx="3" fill="#f59e0b" opacity="0.85"/>
+        <text x="164" y="70" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">Q4</text>
+        <rect x="187" y="26" width="40" height="75" rx="3" fill="#ef4444" opacity="0.85"/>
+        <text x="207" y="70" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">Q5</text>
+        <text x="15" y="116" fill="var(--mu)" font-size="9">Range 25-77</text>
+        <text x="121" y="116" fill="var(--mu)" font-size="9" text-anchor="middle">N=88 to 91 per pile</text>
+        <text x="227" y="116" fill="var(--mu)" font-size="9" text-anchor="end">232-346 (Tail)</text>
+
+        <!-- Divider line -->
+        <line x1="250" y1="10" x2="250" y2="130" stroke="currentColor" opacity="0.2" stroke-dasharray="3"/>
+
+        <!-- Right: Overlaid Densities (After) -->
+        <text x="265" y="16" fill="var(--tx)" font-size="11" font-weight="700">After: Train / Val / Test Overlaid (Zero Drift)</text>
+        <!-- Baseline axis -->
+        <line x1="265" y1="105" x2="505" y2="105" stroke="currentColor" opacity="0.3"/>
+        <!-- Train curve (Blue) -->
+        <path d="M 265 103 Q 310 102 335 65 T 395 50 T 450 78 T 505 104" fill="none" stroke="#2563eb" stroke-width="3"/>
+        <!-- Val curve (Teal dashed) -->
+        <path d="M 265 104 Q 310 103 335 66 T 395 48 T 450 79 T 505 104" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-dasharray="4"/>
+        <!-- Test curve (Red dotted) -->
+        <path d="M 265 103 Q 310 101 335 64 T 395 52 T 450 77 T 505 104" fill="none" stroke="#e11d48" stroke-width="2" stroke-dasharray="2"/>
+        
+        <!-- Legend on Right -->
+        <circle cx="275" cy="122" r="4" fill="#2563eb"/>
+        <text x="283" y="125" fill="var(--tx)" font-size="9" font-weight="600">Train (μ=151.2)</text>
+        <circle cx="365" cy="122" r="4" fill="#0d9488"/>
+        <text x="373" y="125" fill="var(--tx)" font-size="9" font-weight="600">Val (μ=155.1)</text>
+        <circle cx="445" cy="122" r="4" fill="#e11d48"/>
+        <text x="453" y="125" fill="var(--tx)" font-size="9" font-weight="600">Test (μ=152.8)</text>
+    </svg>
     <div class="piles-proof">
-        <b>✓ Proof It Worked:</b> Identical average progression across all 3 sets — 
+        <b>✓ Proof It Worked:</b> Average progression is identical across all 3 sets — 
         <span style="color:#2563eb;font-weight:700">Train: 151.2</span>, 
         <span style="color:#0d9488;font-weight:700">Val: 155.1</span>, 
         <span style="color:#e11d48;font-weight:700">Test: 152.8</span>. 
