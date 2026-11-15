@@ -254,3 +254,5 @@ models/*.joblib
 
 # Reports
 reports/figures/*.png
+*.zip
+
