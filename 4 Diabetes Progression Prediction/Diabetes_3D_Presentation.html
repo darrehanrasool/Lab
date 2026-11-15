@@ -1049,6 +1049,416 @@
             text-align: center;
         }
 
+
+        /* === FULLSCREEN NO-SCROLL PRESENTATION STYLING === */
+        #stage {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .sl {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.4rem;
+            opacity: 0;
+            transform: translateY(12px) scale(.99);
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+            box-sizing: border-box;
+        }
+
+        .cd {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 20px;
+            box-shadow: 0 20px 45px -12px var(--sh);
+            backdrop-filter: blur(20px);
+            padding: 1.1rem 1.6rem;
+            max-width: 1360px;
+            width: 96%;
+            height: calc(100vh - 120px);
+            max-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: transform .2s ease;
+        }
+
+        .cd-header {
+            flex-shrink: 0;
+            margin-bottom: 0.45rem;
+        }
+
+        .tg {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--c, #3b82f6);
+            margin-bottom: .15rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin: 0;
+            background: linear-gradient(135deg, var(--tx) 65%, color-mix(in srgb, var(--tx) 35%, var(--c)));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 2-Column Grid that strictly fits the card */
+        .gr {
+            display: grid;
+            grid-template-columns: 1.12fr 1fr;
+            gap: 1.25rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            align-items: stretch;
+        }
+
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 0.4rem;
+            scrollbar-width: thin;
+        }
+
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            overflow-y: auto;
+            justify-content: center;
+            gap: 0.35rem;
+            scrollbar-width: thin;
+        }
+
+        /* Clean, Direct Bullet Points */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: .42rem;
+        }
+
+        li {
+            position: relative;
+            padding-left: 1.35rem;
+            font-size: .86rem;
+            line-height: 1.38;
+            color: var(--tx);
+        }
+
+        li::before {
+            content: "";
+            position: absolute;
+            left: .3rem;
+            top: .52rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--c, #3b82f6);
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--c, #3b82f6) 30%, transparent);
+        }
+
+        li b {
+            color: var(--tx);
+            font-weight: 700;
+        }
+
+        /* Scientific Research Figure Card */
+        .fig-card {
+            background: var(--fm);
+            border: 1.5px solid var(--bd);
+            border-radius: 12px;
+            padding: 0.4rem 0.5rem;
+            margin: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .fig-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.05rem 0.15rem;
+            flex-shrink: 0;
+        }
+
+        .fig-badge {
+            font-size: 0.64rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--c, #2563eb);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+
+        .fig-zoom-btn {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--tx);
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--bd);
+            border-radius: 5px;
+            padding: 2px 7px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .fig-zoom-btn:hover {
+            background: var(--c, #2563eb);
+            color: #fff;
+            border-color: var(--c, #2563eb);
+        }
+
+        .fig-img-wrap {
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            cursor: zoom-in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .fig-img {
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            transition: transform 0.25s ease;
+        }
+
+        .fig-meta {
+            padding: 0.1rem 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .fig-meta b {
+            font-size: 0.76rem;
+            color: var(--tx);
+            display: block;
+            margin-bottom: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fig-meta p {
+            font-size: 0.68rem;
+            color: var(--mu);
+            line-height: 1.25;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Compact Math Formulas */
+        .fm-box {
+            background: var(--fm);
+            border: 1px solid var(--bd);
+            border-left: 3px solid var(--c, #3b82f6);
+            padding: .35rem .65rem;
+            border-radius: 8px;
+            margin: .15rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: .15rem;
+            flex-shrink: 0;
+        }
+
+        .fm-header {
+            font-size: .65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--c, #3b82f6);
+        }
+
+        .fm-math-html {
+            font-size: .90rem;
+            line-height: 1.25;
+            padding: 0;
+        }
+
+        .fm-desc {
+            font-size: .70rem;
+            color: var(--mu);
+            line-height: 1.25;
+        }
+
+        /* Compact Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .76rem;
+            margin: .2rem 0;
+            flex-shrink: 0;
+        }
+
+        th, td {
+            padding: .3rem .5rem;
+            border-bottom: 1px solid var(--bd);
+        }
+
+        th {
+            font-size: .68rem;
+        }
+
+        /* Compact Split Layout */
+        .split-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1;
+            min-height: 0;
+            justify-content: space-between;
+        }
+
+        .split-bar {
+            height: 24px;
+            font-size: 0.68rem;
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .split-bar-seg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .split-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+        }
+
+        .split-card {
+            padding: 0.45rem 0.55rem;
+            border-radius: 8px;
+            border: 1px solid var(--bd);
+            background: var(--fm);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .split-card .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .split-card .card-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+        }
+
+        .split-card .card-count {
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.06);
+        }
+
+        .split-card h4 {
+            font-size: 0.82rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .split-card p {
+            font-size: 0.70rem;
+            line-height: 1.25;
+            color: var(--mu);
+            margin: 0;
+        }
+
+        .split-guarantee-badge {
+            background: color-mix(in srgb, #10b981 12%, var(--fm));
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.72rem;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        /* Pipeline Grid for Stage 3 */
+        .pp {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .35rem;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .nd {
+            background: var(--fm);
+            border: 1px solid var(--bd);
+            padding: .4rem .55rem;
+            border-radius: 8px;
+            font-size: .74rem;
+            border-top: 2.5px solid var(--c);
+        }
+
+        .nd b {
+            display: block;
+            margin-bottom: .1rem;
+            font-size: .78rem;
+        }
+
+        .nd span {
+            font-size: .68rem;
+            color: var(--mu);
+        }
+
+        /* Hide the old say box and example boxes */
+        .sy, .eu, .vz {
+            display: none !important;
+        }
+
 </style>
 </head>
 
@@ -1749,8 +2159,8 @@
 
         $("steps").innerHTML = D.stages.map((s, i) => `<span class="st" style="--c:${C[i]}">${i + 1}. ${s}</span>`).join("");
 
-        $("stage").innerHTML = S.map(s => {
-            let l = `<ul>${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>`;
+                $("stage").innerHTML = S.map(s => {
+            let l = `<div class="left-col"><ul>${s.plain.map(p => `<li>${p}</li>`).join("")}</ul></div>`;
 
             // Format Scientific Figure Card
             let figHtml = "";
@@ -1772,14 +2182,13 @@
                 `;
             }
 
-            // Format Mathematical Equations with structured HTML tags, KaTeX fallback, and clear term breakdown
+            // Format Mathematical Equations with structured HTML tags
             let r = "";
             if (s.math && s.math.length > 0) {
-                r = s.math.map(m => `
+                r = s.math.slice(0, 2).map(m => `
                     <div class="fm-box">
                         <span class="fm-header">${m.h}</span>
                         ${m.html ? `<div class="fm-math-html">${m.html}</div>` : `<div class="fm-math">${m.m}</div>`}
-                        ${m.info ? `<div class="fm-term-info">${m.info}</div>` : ""}
                         <span class="fm-desc">${m.d}</span>
                     </div>
                 `).join("");
@@ -1789,88 +2198,71 @@
                 r += `<table><tr>${s.table[0].map(h => `<th>${h}</th>`).join("")}</tr>${s.table.slice(1).map(w => `<tr>${w.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
             }
 
-            // Beautiful, High-Contrast, Perfectly Legible Dataset Split Component with EASY ENGLISH
+            // Beautiful, High-Contrast Dataset Split Component
             if (s.k == "split") {
                 r = `
                 <div class="split-layout">
-                    <div class="split-intro-box">
-                        <span class="split-intro-title">Dataset Partitioning Strategy (Total N = 442 Patients)</span>
-                        <div class="split-bullets-row">
-                            <div class="split-bullet-item">
-                                <b>Why 3 Sets?</b> Prevents overfitting and guarantees an honest test on completely unseen patients.
-                            </div>
-                            <div class="split-bullet-item">
-                                <b>Quantile Stratified:</b> Divided across 5 progression bins so all 3 sets share the exact same severity ratio.
-                            </div>
-                            <div class="split-bullet-item">
-                                <b>Zero Data Leakage:</b> Scaling parameters (&mu;, &sigma;) are fitted strictly on the Training Set alone.
-                            </div>
+                    <div class="split-bar">
+                        <div class="split-bar-seg seg-train" style="flex: 70; background:#2563eb;">
+                            <span>📚 TRAINING: 70% (309 Patients)</span>
+                        </div>
+                        <div class="split-bar-seg seg-val" style="flex: 20; background:#0d9488;">
+                            <span>🔍 VAL: 20% (88)</span>
+                        </div>
+                        <div class="split-bar-seg seg-test" style="flex: 18; background:#e11d48;">
+                            <span>🔒 TEST: 10% (45)</span>
                         </div>
                     </div>
 
-                    <div class="split-container">
-                        <div class="split-bar">
-                            <div class="split-bar-seg seg-train" style="flex: 70;">
-                                <span>📚 TRAINING: 70% (309 Patients)</span>
+                    <div class="split-cards">
+                        <div class="split-card c-train">
+                            <div class="card-head">
+                                <span class="card-tag" style="color:#2563eb">TRAIN (70%)</span>
+                                <span class="card-count">309</span>
                             </div>
-                            <div class="split-bar-seg seg-val" style="flex: 20;">
-                                <span>🔍 VAL: 20% (88)</span>
-                            </div>
-                            <div class="split-bar-seg seg-test" style="flex: 18; min-width: 140px;">
-                                <span>🔒 TEST: 10% (45)</span>
-                            </div>
+                            <h4>The Model's Textbook</h4>
+                            <p>Learns all 11 parameter weights (&beta;<sub>0</sub> to &beta;<sub>10</sub>) exclusively here. 5-Fold CV: R² = 0.4587 ± 0.0538.</p>
                         </div>
+                        <div class="split-card c-val">
+                            <div class="card-head">
+                                <span class="card-tag" style="color:#0d9488">VAL (20%)</span>
+                                <span class="card-count">88</span>
+                            </div>
+                            <h4>The Practice Mock Exam</h4>
+                            <p>Used to verify convergence, check that errors are normal, and confirm zero overfitting.</p>
+                        </div>
+                        <div class="split-card c-test" style="border:1.5px solid #e11d48">
+                            <div class="card-head">
+                                <span class="card-tag" style="color:#e11d48">🔒 TEST (10%)</span>
+                                <span class="card-count" style="color:#e11d48">45</span>
+                            </div>
+                            <h4 style="color:#e11d48">The Board Exam</h4>
+                            <p>Strictly locked in a vault! Never seen during training. Evaluated strictly once (Test R² = 0.4882).</p>
+                        </div>
+                    </div>
 
-                        <div class="split-cards">
-                            <div class="split-card c-train">
-                                <div class="card-head">
-                                    <span class="card-tag">TRAINING SET (70%)</span>
-                                    <span class="card-count">309 Patients</span>
-                                </div>
-                                <h4>The Model's Textbook</h4>
-                                <p>The model learns all 11 parameter weights (&beta;<sub>0</sub> to &beta;<sub>10</sub>) exclusively here. 5-Fold Cross-Validation runs inside this set (R² = 0.4587 ± 0.0538) to confirm stability.</p>
-                            </div>
-                            <div class="split-card c-val">
-                                <div class="card-head">
-                                    <span class="card-tag">VALIDATION SET (20%)</span>
-                                    <span class="card-count">88 Patients</span>
-                                </div>
-                                <h4>The Practice Mock Exam</h4>
-                                <p>Used by data scientists to verify convergence, check that the model is not memorizing, and confirm error residuals follow a normal bell curve.</p>
-                            </div>
-                            <div class="split-card c-test">
-                                <div class="card-head">
-                                    <span class="card-tag">🔒 HOLDOUT TEST SET (10%)</span>
-                                    <span class="card-count" style="color: #e11d48;">45 Patients</span>
-                                </div>
-                                <h4 style="color: #e11d48;">The Final Board Exam</h4>
-                                <p><strong>STRICTLY LOCKED IN A VAULT!</strong> Never seen, touched, or scaled during training. Evaluated strictly once at the end to prove real-world accuracy (Test R² = 0.4882).</p>
-                            </div>
-                        </div>
-
-                        <div class="split-guarantee-badge">
-                            <b>✓ Stratification Verification:</b> Average disease progression is identical across splits (Train: 151.21, Val: 155.05, Test: 152.78). Zero distribution drift guaranteed!
-                        </div>
+                    <div class="split-guarantee-badge">
+                        <b>✓ Zero Distribution Drift:</b> Progression is identical across sets (Train: 151.2, Val: 155.1, Test: 152.8).
                     </div>
                 </div>`;
             }
 
-            let rightContent = (figHtml || "") + (r || "");
-            let body = s.k == "pipe" ? `${l}<div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div>` :
-                s.k == "title" ? `<ul class="big">${s.plain.map(p => `<li>${p}</li>`).join("")}</ul>` :
-                    s.k == "split" ? `<div class="gr"><div>${l}</div><div>${figHtml}${r}</div></div>` :
-                        rightContent ? `<div class="gr"><div>${l}</div><div>${rightContent}</div></div>` : l;
+            let rightCol = `<div class="right-col">${figHtml}${r}</div>`;
+
+            let body = s.k == "pipe" ? `<div class="gr">${l}<div class="right-col"><div class="pp">${D.pipe.map((p, i) => `<div class="nd" style="--i:${i};--c:${C[i]}"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div></div></div>` :
+                s.k == "title" ? `<div class="title-wrap" style="display:flex;flex-direction:column;justify-content:center;height:100%;"><ul class="big" style="gap:0.8rem;">${s.plain.map(p => `<li style="font-size:1.1rem;line-height:1.5;">${p}</li>`).join("")}</ul></div>` :
+                    s.k == "split" ? `<div class="gr">${l}<div class="right-col">${figHtml}${r}</div></div>` :
+                        `<div class="gr">${l}${rightCol}</div>`;
 
             return `<div class="sl ${s.k == "title" ? "ttl" : ""}" style="--c:${s.c}">
                 <div class="cd">
-                    <span class="tg">${s.sp} · Stage ${s.st + 1}: ${D.stages[s.st]}</span>
-                    <h2>${s.t}</h2>
+                    <div class="cd-header">
+                        <span class="tg">${s.sp} · Stage ${s.st + 1}: ${D.stages[s.st]}</span>
+                        <h2>${s.t}</h2>
+                    </div>
                     ${body}
-                    ${s.vz ? `<div class="vz">${VZ[s.vz]()}</div>` : ""}
-                    ${s.ex ? `<div class="eu"><div class="ex"><b>Example</b>${s.ex}</div><div class="us"><b>Used for</b>${s.use}</div></div>` : ""}
-                    <div class="sy"><b>Say it simply to Professor:</b> ${s.say}</div>
                 </div>
-            </div>`
+            </div>`;
         }).join("");
 
         const sl = [...document.querySelectorAll(".sl")], sp = [...document.querySelectorAll(".st")];
