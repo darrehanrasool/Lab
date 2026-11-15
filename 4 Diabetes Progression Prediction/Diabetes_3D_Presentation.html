@@ -1654,11 +1654,10 @@
             "sp": "Speaker 1",
             "t": "Step 2: Handling Different Input Feature Types",
             "plain": [
-                "<b>Diverse Feature Scales:</b> Clinical data mixes physical vitals (BMI, BP), binary demographics (Sex), and blood serum lipids (S1&ndash;S6) on completely different scales.",
-                "<b>Binary Dummy Sex {0, 1}:</b> Decoded from raw floats into {0.0=Female, 1.0=Male}. In OLS, &beta;<sub>sex</sub> &times; 1.0 adds an exact linear male offset with zero false numeric scaling.",
-                "<b>Log-Transformed Lipids (S5):</b> Natural log compresses extreme triglyceride spikes into a symmetric Gaussian bell curve, perfectly linearizing the math.",
-                "<b>Clinical Outlier Auditing (Tukey IQR):</b> Extreme biomarker values (red dots beyond 1.5 &times; IQR) were audited against medical limits&mdash;verified as genuine severe patients, not typos, and retained.",
-                "<b>Multicollinearity & VIF:</b> Total Cholesterol and LDL share heavy overlap (<i>r</i> = +0.897, VIF = 53.71); OLS handles this natively while preserving accurate global predictions."
+                "<b>1. Binary Dummy Sex {0, 1}:</b> Converted raw 1.0 & 2.0 into {0.0=Female, 1.0=Male}. This stops the math from assuming males are 'twice' females, adding an exact linear baseline offset (&beta;<sub>sex</sub> &times; 1.0).",
+                "<b>2. Log-Compressed Lipids (S5):</b> Human blood fats have extreme spikes. Taking the natural log ln(triglycerides) compresses the skewed tail into a symmetric bell curve, fitting linear regression perfectly.",
+                "<b>3. Clinical Outlier Auditing (Figure 3):</b> Red dots outside Tukey 1.5&times;IQR fences (BMI 42.2, BP 133, S1 301) are <i>real human emergencies</i>, not data entry typos. Deleting them would blind the model to critical patients, so 100% were retained.",
+                "<b>4. Multicollinearity & VIF Explained:</b> Total Cholesterol (S1) and LDL (S2) overlap heavily (<i>r</i> = +0.897, VIF = 53.71). Like two witnesses telling the same story, OLS matrix inversion handles this natively without dropping features or biasing predictions."
             ],
             "math": [
                 {
@@ -1676,10 +1675,10 @@
                     "d": "Total cholesterol and LDL are highly collinear; handled gracefully by OLS closed-form solver."
                 }
             ],
-            "say": "Proper feature engineering respects data types: binary dummy coding for sex and logarithmic compression for serum fats.",
+            "say": "We decode sex to 0/1 to avoid false numeric scaling, compress triglyceride spikes with natural log, retain all audited medical emergencies from Figure 3, and manage high VIF with OLS matrix inversion.",
             "c": "#8b5cf6",
             "n": 5,
-            "ex": "Sex was 1.0 and 2.0. Converted to 0 and 1. If beta is -10.1, it means males have an expected baseline progression 10.1 units lower than females.",
+            "ex": "Outliers = Real high-risk patients (BMI 42, BP 133). VIF = Shared signal between Total Cholesterol & LDL. Both preserved for honest clinical predictions.",
             "use": "Guarantees valid linear mathematics without imposing false ordinal scales on demographics.",
             "vz": "sc",
             "fig": "fig3",

@@ -479,6 +479,10 @@ def main():
     <p>
         <strong>3. Blood Serum Biomarkers (s1 through s6):</strong> Features s1 to s6 represent complex biochemical interactions. Notably, <code>s5</code> is the natural logarithm of serum triglycerides (ln(mg/dL)), which compresses the highly skewed physical triglyceride distribution into a symmetric bell curve, directly enhancing linear model compatibility.
     </p>
+    <p>
+        <strong>4. Clinical Outlier Auditing (Tukey 1.5 &times; IQR Fences &amp; Figure 3):</strong> 
+        In Figure 3, statistical outliers (red dots) beyond the Tukey 1.5 &times; IQR bounds were identified across continuous vitals and lipids (e.g., BMI = 42.2 kg/m&sup2;, Blood Pressure = 133 mmHg, Total Cholesterol = 301 mg/dL). Rather than blindly discarding these points, we conducted an authentic physiological audit. In healthcare, extreme values represent real patients experiencing severe metabolic crises&mdash;not typographical or sensor errors. Deleting them would introduce clinical selection bias, blinding the model to the exact high-risk cohort that needs urgent 12-month intervention. Consequently, 100% of the authentic cohort was retained.
+    </p>
 
     <!-- Section 4 -->
     <h2>4. Exploratory Data Analysis & Multicollinearity Management</h2>

@@ -91,6 +91,15 @@ One of the most important aspects of practical machine learning is handling dive
 - `s1` to `s4` and `s6` are physical lipid and glucose concentrations ($\text{mg/dL}$).
 - Notice `s5` (serum triglycerides): Clinicians specifically record `s5` as the **natural logarithm of serum triglycerides**. Why? Because serum triglycerides follow a log-normal distribution in human populations with extreme right-skewness. Taking the logarithm stabilizes variance and linearizes the relationship with microvascular damage!
 
+### 4. Clinical Outlier Auditing via Tukey IQR Fences (Figure 3)
+- In **Figure 3**, boxplots identify statistical outliers (red dots) falling outside the standard Tukey fences:
+  $$\text{Upper Fence} = Q_3 + 1.5 \times \text{IQR}, \quad \text{Lower Fence} = Q_1 - 1.5 \times \text{IQR}$$
+- **The Clinical Decision — Never Delete Real Patients:**
+  - In computer science or IoT sensor data, outliers are often transmission glitches (e.g., $9999^\circ\text{C}$).
+  - In clinical medicine, a patient with $\text{BMI} = 42.2\text{ kg/m}^2$, $\text{BP} = 133\text{ mmHg}$, or $\text{Total Cholesterol} = 301\text{ mg/dL}$ is **not a typo**—they are a living human being experiencing a severe metabolic emergency!
+  - We audited every red dot against established physiological survival limits. All values are authentic and clinically viable.
+  - If we had deleted them, the model would only learn to predict mild, healthy patients, rendering it blind to the high-risk diabetic emergencies that need Dr. Ayesha's immediate intervention. Therefore, **100% of the authentic data was retained**.
+
 ---
 
 ## 4. Step 3: Managing Dataset Imbalance (Continuous & Categorical)

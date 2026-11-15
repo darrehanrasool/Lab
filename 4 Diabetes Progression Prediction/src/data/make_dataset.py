@@ -1,12 +1,13 @@
 import os
-import pandas as pd
-from sklearn.datasets import load_diabetes
+
+from sklearn.datasets import load_diabetes  # type: ignore[import-untyped]
+
 
 def main():
     print("==========================================================")
     print("STEP 1: INGESTION OF UNTOUCHED RAW CLINICAL DIABETES DATA")
     print("==========================================================")
-    
+
     # Load unscaled authentic physical and biochemical measurements:
     #   age: Patient age in years (19 to 79)
     #   sex: Demographic biological sex: 1.0 (Female), 2.0 (Male)
@@ -21,24 +22,35 @@ def main():
     #   progression: Quantitative diabetes disease progression 1 year post baseline (25.0 to 346.0)
     data = load_diabetes(scaled=False, as_frame=True)
     df = data.frame.copy()
-    
+
     # Rename target column to 'progression' for clear clinical interpretation
-    df = df.rename(columns={'target': 'progression'})
-    
+    df = df.rename(columns={"target": "progression"})
+
     # Strict schema and physiological range validation
     assert df.shape == (442, 11), f"Unexpected shape {df.shape}; expected (442, 11)"
     assert not df.isnull().any().any(), "Dataset contains missing values!"
-    assert (df['progression'] >= 25).all() and (df['progression'] <= 346).all(), "Progression values out of bounds"
-    assert (df['bmi'] >= 15.0).all() and (df['bmi'] <= 50.0).all(), "BMI outside physiological human bounds"
-    assert (df['bp'] >= 50.0).all() and (df['bp'] <= 160.0).all(), "Blood pressure outside physiological bounds"
-    
-    os.makedirs('data/raw', exist_ok=True)
-    raw_path = 'data/raw/diabetes.csv'
+    assert (df["progression"] >= 25).all() and (df["progression"] <= 346).all(), (
+        "Progression values out of bounds"
+    )
+    assert (df["bmi"] >= 15.0).all() and (df["bmi"] <= 50.0).all(), (
+        "BMI outside physiological human bounds"
+    )
+    assert (df["bp"] >= 50.0).all() and (df["bp"] <= 160.0).all(), (
+        "Blood pressure outside physiological bounds"
+    )
+
+    os.makedirs("data/raw", exist_ok=True)
+    raw_path = "data/raw/diabetes.csv"
     df.to_csv(raw_path, index=False)
-    
-    print(f"✓ Success: Ingested {df.shape[0]} patients and {df.shape[1]} clinical variables.")
-    print(f"✓ Target 'progression' summary: Min={df['progression'].min()}, Max={df['progression'].max()}, Mean={df['progression'].mean():.2f}, Median={df['progression'].median():.2f}")
+
+    print(
+        f"✓ Success: Ingested {df.shape[0]} patients and {df.shape[1]} clinical variables."
+    )
+    print(
+        f"✓ Target 'progression' summary: Min={df['progression'].min()}, Max={df['progression'].max()}, Mean={df['progression'].mean():.2f}, Median={df['progression'].median():.2f}"
+    )
     print(f"✓ Saved raw dataset to: {raw_path}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
