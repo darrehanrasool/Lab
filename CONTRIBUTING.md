@@ -5,7 +5,7 @@ Thank you for your interest in contributing to this repository. This repository 
 ---
 
 ## 1. Code of Conduct
-All contributors are expected to uphold a professional, inclusive, and academically honest environment. Please adhere to respectful communication and collaborative peer-review standards.
+All contributors are expected to uphold a professional, inclusive, and academically honest environment. Please adhere to respectful communication and collaborative peer-review standards. For detailed guidelines and enforcement policies, please review the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
