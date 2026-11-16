@@ -10,74 +10,81 @@
 
 This repository houses the complete, production-grade implementation of all **10 Machine Learning laboratory practicals** mandated by the CAI504C curriculum. Every practical has been engineered from the ground up according to strict software engineering standards, reproducible data science methodologies, and academic rigor.
 
+All 10 projects follow the exact **unified standard established in Project 4 (Diabetes Progression Prediction)**:
+1. **1 Advanced Interactive HTML Presentation** per project (`<Project>_Presentation_Advanced.html`): 13 structured slides, 11-stage interactive progress stepper, Dark/Light visual theme switcher, image modal lightbox with pan/zoom controls, responsive 16:9 widescreen canvas, and standalone embedded base64 figures.
+2. **1 Publication-Grade Master Academic Report (PDF)** per project (`<Project>_Complete_Master_Report.pdf`): 12 comprehensive academic chapters covering theoretical foundations, dataset telemetry, exploratory data analysis, mathematical formulations, end-to-end architecture, hyperparameter justification, empirical performance tables, in-depth diagnostic interpretations for all 8 figures, comparative model analyses, production deployment blueprints, viva examination defense Q&A, and academic references.
+3. **1 Autonomous Report Generator Script** per project (`generate_master_report_pdf.py`): Self-contained Python compilation script embedding base64 diagnostic plots and compiling publication-ready PDF reports via headless Google Chrome.
+4. **Clean Schema Enforcement:** Zero clutter, redundant markdown summaries, or `note/` folders across the entire laboratory suite.
+
 ### Key Highlights:
 - **10 Complete Practical Solutions:** Covers classical classification, ensemble learning, physiological regression, text mining & NLP, deep computer vision, recommendation systems, and financial time series.
 - **100% Local Offline Datasets:** All raw data files are stored locally in each project's `data/raw/` directory. Zero external internet calls or runtime downloads are required.
 - **Standardized 3-Way Splitting:** Every project strictly enforces a 3-way partition: **Training (70%)**, **Validation (15%)**, and **Held-Out Test (15%)** in `data/processed/` with zero data leakage.
 - **80 Publication-Grade Diagnostic Visualizations:** Exactly 8 high-resolution (300 DPI) diagnostic charts per project in `reports/figures/` (80 figures total), including ROC curves, Precision-Recall curves, learning curves, residual analyses, and confusion matrix heatmaps.
 - **10 Interactive Dark-Mode Web Dashboards:** Modern Flask web applications with real-time inference and cyberpunk-inspired glassmorphic UIs on ports `5001` through `5010`.
-- **Comprehensive Master Viva Manual:** A dedicated root manual [`lab.md`](file:///Users/darrehanrasool/Desktop/Lab/lab.md) explaining the theoretical formulations, mathematical derivations, graph interpretations, code walkthroughs, and examiner defense answers for every practical.
+- **Comprehensive Master Viva Manual:** A dedicated root manual [`lab.md`](file:///Users/darrehanrasool/Desktop/Lab/lab.md) explaining theoretical formulations, mathematical derivations, graph interpretations, code walkthroughs, and examiner defense answers for every practical.
 
 ---
 
 ## 🔬 Syllabus Practical Matrix & Project Index
 
-| # | Project Name | Algorithm & Technique | Task Type | Key Test Metric | Web App Port | Viva Prep Guide |
-|---|---|---|---|---|---|---|
-| **01** | [Iris Species Classification](file:///Users/darrehanrasool/Desktop/Lab/1%20Iris%20Species%20Clasification) | Multiclass Logistic Regression (Softmax) | Multi-class Classification | Accuracy: **100.0%**, AUC: **1.00** | [`:5001`](http://localhost:5001) | [Iris Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/1%20Iris%20Species%20Clasification/note/1_Iris_Viva_Guide.md) |
-| **02** | [Titanic Survival Prediction](file:///Users/darrehanrasool/Desktop/Lab/2%20Titanic%20Survival%20Prediction) | Random Forest Classifier (Bagging) | Binary Classification | Accuracy: **82.09%**, AUC: **0.865** | [`:5002`](http://localhost:5002) | [Titanic Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/2%20Titanic%20Survival%20Prediction/note/2_Titanic_Viva_Guide.md) |
-| **03** | [Boston Housing Price Prediction](file:///Users/darrehanrasool/Desktop/Lab/3%20Boston%20Housing%20Price%20Prediction) | Random Forest Regressor (MSE splits) | Continuous Regression | $R^2$: **0.8876**, RMSE: **$3.08k** | [`:5003`](http://localhost:5003) | [Boston Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/3%20Boston%20Housing%20Price%20Prediction/note/3_Boston_Housing_Viva_Guide.md) |
-| **04** | [Diabetes Progression Prediction](file:///Users/darrehanrasool/Desktop/Lab/4%20Diabetes%20Progression%20Prediction) | Random Forest Regressor + Ridge Analysis | Physiological Regression | $R^2$: **0.4871**, RMSE: **53.96** | [`:5004`](http://localhost:5004) | [Diabetes Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/4%20Diabetes%20Progression%20Prediction/note/4_Diabetes_Viva_Guide.md) |
-| **05** | [Spam Email Detection](file:///Users/darrehanrasool/Desktop/Lab/5%20Spam%20Email%20Detection) | Multinomial Naive Bayes + TF-IDF | NLP Binary Text Classification | Accuracy: **98.21%**, AUC: **0.986** | [`:5005`](http://localhost:5005) | [Spam Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/5%20Spam%20Email%20Detection/note/5_Spam_Detection_Viva_Guide.md) |
-| **06** | [MNIST Digit Classification](file:///Users/darrehanrasool/Desktop/Lab/6%20MNIST%20Handwritten%20Digit%20Classification) | Multi-Layer Perceptron (784-128-64-10) | Computer Vision Pattern Rec. | Accuracy: **93.91%**, AUC: **0.994** | [`:5006`](http://localhost:5006) | [MNIST Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/6%20MNIST%20Handwritten%20Digit%20Classification/note/6_MNIST_Viva_Guide.md) |
-| **07** | [Movie Recommendation System](file:///Users/darrehanrasool/Desktop/Lab/7%20Movie%20Recommendation%20System) | TruncatedSVD Collaborative Filtering | Latent Factor Matrix Factorization | Explained Var: **61.4%**, Cosine Sim | [`:5007`](http://localhost:5007) | [Movie Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/7%20Movie%20Recommendation%20System/note/7_Movie_Recommendation_Viva_Guide.md) |
-| **08** | [Fashion MNIST Classification](file:///Users/darrehanrasool/Desktop/Lab/8%20Fashion%20MNIST%20Classification) | Multi-Layer Perceptron (784-128-64-10) | Computer Vision Apparel Rec. | Accuracy: **85.82%**, AUC: **0.984** | [`:5008`](http://localhost:5008) | [Fashion Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/8%20Fashion%20MNIST%20Classification/note/8_Fashion_MNIST_Viva_Guide.md) |
-| **09** | [Sentiment Analysis of Text](file:///Users/darrehanrasool/Desktop/Lab/9%20Sentiment%20Analysis%20of%20Text) | Logistic Regression + Sublinear TF-IDF | NLP Binary Sentiment Analysis | Accuracy: **86.89%**, AUC: **0.943** | [`:5009`](http://localhost:5009) | [Sentiment Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/9%20Sentiment%20Analysis%20of%20Text/note/9_Sentiment_Analysis_Viva_Guide.md) |
-| **10** | [Stock Prices Prediction](file:///Users/darrehanrasool/Desktop/Lab/10%20Stock%20Prices%20Prediction) | Random Forest + Technical Indicators | Financial Time Series Regression | $R^2$: **0.9245**, MAPE: **1.19%** | [`:5010`](http://localhost:5010) | [Stock Viva Guide](file:///Users/darrehanrasool/Desktop/Lab/10%20Stock%20Prices%20Prediction/note/10_Stock_Prices_Viva_Guide.md) |
+| # | Project Name | Algorithm & Technique | Task Type | Key Test Metric | Web App Port | Interactive Presentation | Master Academic Report (PDF) |
+|---|---|---|---|---|---|---|---|
+| **01** | [Iris Species Classification](file:///Users/darrehanrasool/Desktop/Lab/1%20Iris%20Species%20Clasification) | Multiclass Logistic Regression (Softmax) | Multi-class Classification | Accuracy: **100.0%**, AUC: **1.00** | [`:5001`](http://localhost:5001) | [Iris Presentation](file:///Users/darrehanrasool/Desktop/Lab/1%20Iris%20Species%20Clasification/Iris_Presentation_Advanced.html) | [Iris Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/1%20Iris%20Species%20Clasification/Iris_Species_Classification_Complete_Master_Report.pdf) |
+| **02** | [Titanic Survival Prediction](file:///Users/darrehanrasool/Desktop/Lab/2%20Titanic%20Survival%20Prediction) | Random Forest Classifier (100 Trees, Depth 5) | Binary Classification | Accuracy: **82.09%**, AUC: **0.865** | [`:5002`](http://localhost:5002) | [Titanic Presentation](file:///Users/darrehanrasool/Desktop/Lab/2%20Titanic%20Survival%20Prediction/Titanic_Presentation_Advanced.html) | [Titanic Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/2%20Titanic%20Survival%20Prediction/Titanic_Survival_Prediction_Complete_Master_Report.pdf) |
+| **03** | [Boston Housing Price Prediction](file:///Users/darrehanrasool/Desktop/Lab/3%20Boston%20Housing%20Price%20Prediction) | Random Forest Regressor (100 Trees, Depth 6) | Continuous Regression | $R^2$: **0.8876**, RMSE: **$3.08k** | [`:5003`](http://localhost:5003) | [Boston Housing Presentation](file:///Users/darrehanrasool/Desktop/Lab/3%20Boston%20Housing%20Price%20Prediction/Boston_Housing_Presentation_Advanced.html) | [Boston Housing Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/3%20Boston%20Housing%20Price%20Prediction/Boston_Housing_Complete_Master_Report.pdf) |
+| **04** | [Diabetes Progression Prediction](file:///Users/darrehanrasool/Desktop/Lab/4%20Diabetes%20Progression%20Prediction) | Random Forest Regressor + Ridge Analysis | Physiological Regression | $R^2$: **0.4871**, RMSE: **53.96** | [`:5004`](http://localhost:5004) | [Diabetes Presentation](file:///Users/darrehanrasool/Desktop/Lab/4%20Diabetes%20Progression%20Prediction/Diabetes_Presentation_Advanced.html) | [Diabetes Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/4%20Diabetes%20Progression%20Prediction/Diabetes_Progression_Prediction_Complete_Master_Report.pdf) |
+| **05** | [Spam Email Detection](file:///Users/darrehanrasool/Desktop/Lab/5%20Spam%20Email%20Detection) | Multinomial Naive Bayes + TF-IDF ($\alpha=0.1$) | NLP Binary Text Classification | Accuracy: **98.21%**, AUC: **0.986** | [`:5005`](http://localhost:5005) | [Spam Email Presentation](file:///Users/darrehanrasool/Desktop/Lab/5%20Spam%20Email%20Detection/Spam_Email_Presentation_Advanced.html) | [Spam Email Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/5%20Spam%20Email%20Detection/Spam_Email_Detection_Complete_Master_Report.pdf) |
+| **06** | [MNIST Digit Classification](file:///Users/darrehanrasool/Desktop/Lab/6%20MNIST%20Handwritten%20Digit%20Classification) | Multi-Layer Perceptron (784-128-64-10, ReLU) | Computer Vision Pattern Rec. | Accuracy: **93.91%**, AUC: **0.994** | [`:5006`](http://localhost:5006) | [MNIST Presentation](file:///Users/darrehanrasool/Desktop/Lab/6%20MNIST%20Handwritten%20Digit%20Classification/MNIST_Presentation_Advanced.html) | [MNIST Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/6%20MNIST%20Handwritten%20Digit%20Classification/MNIST_Digit_Classification_Complete_Master_Report.pdf) |
+| **07** | [Movie Recommendation System](file:///Users/darrehanrasool/Desktop/Lab/7%20Movie%20Recommendation%20System) | TruncatedSVD Collaborative Filtering ($k=20$) | Latent Factor Matrix Factorization | Explained Var: **61.4%**, Cosine Sim | [`:5007`](http://localhost:5007) | [Movie Recommendation Presentation](file:///Users/darrehanrasool/Desktop/Lab/7%20Movie%20Recommendation%20System/Movie_Recommendation_Presentation_Advanced.html) | [Movie Recommendation Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/7%20Movie%20Recommendation%20System/Movie_Recommendation_Complete_Master_Report.pdf) |
+| **08** | [Fashion MNIST Classification](file:///Users/darrehanrasool/Desktop/Lab/8%20Fashion%20MNIST%20Classification) | Multi-Layer Perceptron (784-128-64-10, ReLU) | Computer Vision Apparel Rec. | Accuracy: **85.82%**, AUC: **0.984** | [`:5008`](http://localhost:5008) | [Fashion MNIST Presentation](file:///Users/darrehanrasool/Desktop/Lab/8%20Fashion%20MNIST%20Classification/Fashion_MNIST_Presentation_Advanced.html) | [Fashion MNIST Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/8%20Fashion%20MNIST%20Classification/Fashion_MNIST_Classification_Complete_Master_Report.pdf) |
+| **09** | [Sentiment Analysis of Text](file:///Users/darrehanrasool/Desktop/Lab/9%20Sentiment%20Analysis%20of%20Text) | Logistic Regression + Sublinear TF-IDF ($C=1.0$) | NLP Binary Sentiment Analysis | Accuracy: **86.89%**, AUC: **0.943** | [`:5009`](http://localhost:5009) | [Sentiment Analysis Presentation](file:///Users/darrehanrasool/Desktop/Lab/9%20Sentiment%20Analysis%20of%20Text/Sentiment_Analysis_Presentation_Advanced.html) | [Sentiment Analysis Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/9%20Sentiment%20Analysis%20of%20Text/Sentiment_Analysis_Complete_Master_Report.pdf) |
+| **10** | [Stock Prices Prediction](file:///Users/darrehanrasool/Desktop/Lab/10%20Stock%20Prices%20Prediction) | Random Forest + 17 Technical Indicators | Financial Time Series Regression | $R^2$: **0.9245**, MAPE: **1.19%** | [`:5010`](http://localhost:5010) | [Stock Prices Presentation](file:///Users/darrehanrasool/Desktop/Lab/10%20Stock%20Prices%20Prediction/Stock_Prices_Presentation_Advanced.html) | [Stock Prices Master Report (PDF)](file:///Users/darrehanrasool/Desktop/Lab/10%20Stock%20Prices%20Prediction/Stock_Prices_Prediction_Complete_Master_Report.pdf) |
 
 ---
 
 ## 🏛 Standardized Architecture & File Structure
 
-Every single practical adheres to the exact same folder layout:
+Every single practical adheres to the exact same clean, modular layout standard established in Project 4:
 ```
 <Project_Name>/
 ├── .gitignore               <- Ignore cache and virtual environment artifacts
 ├── CITATION.cff             <- Machine-readable academic citation
 ├── CONTRIBUTING.md          <- Code contribution guidelines
 ├── LICENSE                  <- MIT Open-Source License
-├── README.md                <- Project-specific documentation and results
+├── README.md                <- Project-specific documentation, math derivations, and execution guide
 ├── SECURITY.md              <- Security and vulnerability policy
-├── accuracy.txt             <- Quantitative test metrics and cross-validation scores
+├── accuracy.txt             <- Quantitative test metrics, cross-validation scores, and benchmark summary
 ├── guide.txt                <- Command-line execution cheatsheet
 ├── requirements.txt         <- Pinned Python dependencies
+├── <Project>_Presentation_Advanced.html      <- 13-Slide interactive stepper presentation (Base64 figures, Dark/Light mode)
+├── <Project>_Complete_Master_Report.pdf      <- 12-Section publication-grade comprehensive master report (PDF)
+├── generate_master_report_pdf.py            <- Python script to compile master HTML and headless Chrome PDF
 ├── data/
 │   ├── raw/                 <- Immutable local raw dataset (CSV)
 │   └── processed/           <- Clean 3-way split datasets:
 │       ├── X_train.csv      <- Training feature matrix (70%)
 │       ├── X_val.csv        <- Validation feature matrix (15%)
-│       ├── X_test.csv       <- Test feature matrix (15%)
-│       ├── y_train.csv      <- Training ground truth labels
-│       ├── y_val.csv        <- Validation ground truth labels
-│       ├── y_test.csv       <- Test ground truth labels
-│       └── scaler.joblib    <- Scaler fitted exclusively on X_train
+│       ├── X_test.csv       <- Held-out test feature matrix (15%)
+│       ├── y_train.csv      <- Training ground truth labels / targets
+│       ├── y_val.csv        <- Validation ground truth labels / targets
+│       ├── y_test.csv       <- Test ground truth labels / targets
+│       └── scaler.joblib    <- Scaler fitted exclusively on X_train (zero data leakage)
 ├── models/
-│   └── <model>.joblib       <- Trained model weights and pipeline artifact
-├── note/
-│   └── <ID>_Viva_Guide.md   <- Viva examination reference manual
+│   └── <model>.joblib       <- Trained model weights, vectorizers, and pipeline artifacts
 ├── reports/
-│   └── figures/             <- 8 publication-grade diagnostic plots (300 DPI)
+│   └── figures/             <- 8 publication-grade diagnostic plots (300 DPI, PNG)
 ├── src/
-│   ├── data/make_dataset.py       <- Data ingestion and local validation
+│   ├── data/make_dataset.py       <- Data ingestion, validation, and schema inspection
 │   ├── features/build_features.py <- Preprocessing, feature engineering, and 3-way splitting
 │   ├── models/train_model.py      <- Model training, cross-validation, and metrics export
 │   ├── models/predict_model.py    <- Standalone programmatic inference module
 │   └── visualization/visualize.py <- Generation of all 8 diagnostic figures
 └── web/
-    ├── app.py               <- Flask web application backend
-    ├── templates/index.html <- Semantic HTML5 UI with live input controls
+    ├── app.py               <- Flask web application backend (REST API & UI server)
+    ├── templates/index.html <- Semantic HTML5 UI with real-time controls
     └── static/
-        ├── css/style.css    <- Dark-mode cyberpunk CSS styling
+        ├── css/style.css    <- Dark-mode cyberpunk glassmorphic CSS styling
         └── js/script.js     <- Dynamic asynchronous JavaScript API client
 ```
 
@@ -85,7 +92,7 @@ Every single practical adheres to the exact same folder layout:
 
 ## 📊 Complete Viva Voce Preparation Manual ([`lab.md`](file:///Users/darrehanrasool/Desktop/Lab/lab.md))
 
-For the end-of-semester practical examination, refer to the master document [`lab.md`](file:///Users/darrehanrasool/Desktop/Lab/lab.md). It details:
+For the comprehensive, syllabus-wide end-of-semester practical viva voce defense, refer to [`lab.md`](file:///Users/darrehanrasool/Desktop/Lab/lab.md). It details:
 1. **Mathematical Derivations:** Softmax cross-entropy, Random Forest Gini impurity and variance reduction, MSE minimization, Ridge regression conditioning, Naive Bayes Laplace smoothing, Neural Network backpropagation with Adam optimization, SVD low-rank matrix decomposition, sublinear TF-IDF scaling, and technical indicators (SMA, EMA, RSI).
 2. **Why 3-Way Train/Val/Test Splits:** The statistical imperative preventing hyperparameter leakage and preserving unbiased test evaluation.
 3. **Graph Explanations:** Deep interpretations for every single plot (ROC curves, PR curves, residual homoscedasticity, learning curves, scree plots, t-SNE projections).
@@ -119,10 +126,19 @@ python src/models/train_model.py
 # Step 4: Generate all 8 diagnostic figures
 python src/visualization/visualize.py
 
-# Step 5: Launch the interactive web dashboard
+# Step 5: (Optional) Recompile the publication master report PDF
+python generate_master_report_pdf.py
+
+# Step 6: Launch the interactive web dashboard
 python web/app.py
 ```
 Open your browser and navigate to `http://localhost:5005`.
+
+### Opening Interactive Presentations
+Simply open `<Project_Name>/<Project>_Presentation_Advanced.html` in any web browser. You can navigate slides using:
+- Keyboard Arrow Keys: `Right` / `Space` (Next), `Left` (Previous)
+- Navigation Buttons & Top Stepper Dots
+- Click on any diagnostic figure thumbnail to open the high-resolution lightbox modal with pan and zoom.
 
 ---
 

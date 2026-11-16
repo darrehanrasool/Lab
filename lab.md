@@ -54,8 +54,9 @@ To enforce strict software engineering and reproducible data science practices a
 │       └── scaler.joblib    <- Serialized feature transformer (fitted ONLY on X_train)
 ├── models/
 │   └── <model_name>.joblib  <- Production model artifact serializing weights and hyperparameters
-├── note/
-│   └── <ID>_Viva_Guide.md   <- Specialized standalone viva preparation notes
+├── <Project>_Presentation_Advanced.html  <- Interactive 13-slide stepper presentation (Dark/Light mode, Lightbox)
+├── <Project>_Complete_Master_Report.pdf  <- 12-section publication-quality master academic report (PDF)
+├── generate_master_report_pdf.py        <- Script compiling master HTML and Headless Chrome PDF report
 ├── reports/
 │   └── figures/             <- 8 publication-grade diagnostic plots (300 DPI, PNG)
 ├── src/
