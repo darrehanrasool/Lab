@@ -4,8 +4,14 @@ import json
 import subprocess
 import shutil
 
-PROJ_DIR = "1 Iris Species Clasification"
+PROJ_DIR = os.path.dirname(os.path.abspath(__file__))
 FIG_DIR = os.path.join(PROJ_DIR, "reports/figures")
+
+def find_template(fname):
+    for candidate in [fname, os.path.join(PROJ_DIR, fname), os.path.join(PROJ_DIR, "..", fname)]:
+        if os.path.exists(candidate):
+            return candidate
+    raise FileNotFoundError(f"Cannot find {fname}")
 
 def get_base64_img(rel_path):
     with open(rel_path, "rb") as f:
@@ -408,10 +414,10 @@ slides = [
 
 # 3. Assemble Presentation HTML
 print("Reading presentation template head and tail...")
-with open("presentation_template_head.html", "r") as f:
+with open(find_template("presentation_template_head.html"), "r") as f:
     head_html = f.read()
 
-with open("presentation_template_tail.js", "r") as f:
+with open(find_template("presentation_template_tail.js"), "r") as f:
     tail_js = f.read()
 
 # Replace title in head
@@ -432,7 +438,7 @@ print(f"✓ Saved Advanced Presentation to: {pres_path} ({len(full_presentation_
 
 # 4. Generate Master Report HTML and PDF
 print("Compiling Master Report PDF for Iris Classification...")
-with open("report_template_style.css", "r") as f:
+with open(find_template("report_template_style.css"), "r") as f:
     report_css = f.read()
 
 report_html = f"""<!DOCTYPE html>

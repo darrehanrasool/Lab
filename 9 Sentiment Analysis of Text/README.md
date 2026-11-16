@@ -1,135 +1,6 @@
 # Sentiment Analysis of Text
 
-A complete end-to-end Natural Language Processing (NLP) machine learning system that determines the subjective sentiment (Positive vs Negative) of movie reviews, tweets, and product feedback using Logistic Regression with Sublinear TF-IDF n-gram feature extraction, featuring complete evaluation diagnostics and a web dashboard for interactive text analysis.
-
----
-
-## 🎯 Problem Statement & Objective
-
-**Syllabus Mapping (Experiment 9):**
-- **Objective:** Determine the sentiment (positive, negative, neutral) of a piece of text, such as a tweet or a product review.
-- **Dataset:** 6,000 highly polarized natural language reviews from the canonical IMDB Sentiment benchmark.
-- **Classification Type:** Binary Sentiment Classification (0 = Negative Sentiment, 1 = Positive Sentiment).
-
----
-
-## 🔬 Mathematical Formulation & ML Theory
-
-### 1. Document Representation via Sublinear TF-IDF
-Given a document $d \in D$, raw term frequency exhibits diminishing returns (a word appearing 20 times is not 20 times as important as a word appearing once). We apply sublinear term scaling:
-$$\text{TF}(t, d) = \begin{cases} 1 + \log(\text{count}(t, d)) & \text{if } \text{count}(t, d) > 0 \\ 0 & \text{otherwise} \end{cases}$$
-$$\text{IDF}(t, D) = \log\left(\frac{1 + |D|}{1 + \text{DF}(t)}\right) + 1$$
-$$\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \text{IDF}(t, D)$$
-Feature vectors are normalized using the Euclidean $L_2$ norm: $\|x\|_2 = 1$.
-
-### 2. Logistic Regression Classification
-Logistic Regression models the posterior probability of the positive class via the standard Sigmoid function:
-$$P(y = 1 \mid x) = \sigma(w^T x + b) = \frac{1}{1 + e^{-(w^T x + b)}}$$
-The log-odds (logit) is a linear combination of input n-gram weights:
-$$\log\left(\frac{P(y = 1 \mid x)}{1 - P(y = 1 \mid x)}\right) = w^T x + b = \sum_{j=1}^p w_j x_j + b$$
-- A positive weight $w_j > 0$ indicates token $j$ increases positive sentiment odds (e.g., *superb, excellent, wonderful*).
-- A negative weight $w_j < 0$ indicates token $j$ increases negative sentiment odds (e.g., *waste, terrible, awful, worst*).
-
-### 3. Loss Function & L2 Regularization
-The model parameters are optimized by minimizing the Binary Cross-Entropy loss with $L_2$ weight regularization:
-$$\mathcal{L}(w, b) = -\frac{1}{N} \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right] + \frac{1}{2C} \|w\|_2^2$$
-where $C=1.0$ controls the inverse regularization strength, preventing individual sentiment keywords from dominating predictions.
-
----
-
-## 📁 Dataset Details
-
-- **Total Reviews:** 6,000 balanced reviews (3,028 negative, 2,972 positive).
-- **Local Storage:** `data/raw/sentiment.csv` (100% saved locally on disk, no network reliance at inference).
-- **Splits:**
-  - Training Set (70%): 4,200 reviews (2,080 positive, 2,120 negative)
-  - Validation Set (15%): 900 reviews (446 positive, 454 negative)
-  - Test Set (15%): 900 reviews (446 positive, 454 negative)
-  - Stratified sampling guarantees equal representation across splits.
-
----
-
-## ⚡ Quick Start
-
-1. Navigate to the project directory:
-   ```bash
-   cd "9 Sentiment Analysis of Text"
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run the end-to-end pipeline:
-   ```bash
-   python src/data/make_dataset.py
-   python src/features/build_features.py
-   python src/models/train_model.py
-   python src/visualization/visualize.py
-   ```
-5. Test a review in CLI:
-   ```bash
-   python src/models/predict_model.py
-   ```
-6. Launch web interface:
-   ```bash
-   python web/app.py
-   ```
-   Open `http://127.0.0.1:5008` in your browser.
-
----
-
-## 📊 Results Summary
-
-| Metric | Validation Set | Test Set | Cross-Validation (5-Fold Mean) |
-|---|---|---|---|
-| **Accuracy** | 87.00% | **86.89%** | **85.21%** (+/- 0.0083) |
-| **Precision** | 85.6% | **85.50%** | — |
-| **Recall** | 88.3% | **88.57%** | — |
-| **F1-Score** | 87.16% | **87.00%** | — |
-| **ROC-AUC** | 94.1% | **94.26%** | — |
-
----
-
-## 📈 Evaluation Graphs
-
-All diagnostic plots are saved in `reports/figures/`:
-
-### 1. Sentiment Class Distribution
-Bar chart confirming balanced distribution (~50% Positive vs ~50% Negative) across the benchmark dataset.
-![Sentiment Distribution](reports/figures/sentiment_distribution.png)
-
-### 2. Review Word Count Distribution
-Histogram and KDE comparing review word counts across sentiment labels. Both positive and negative reviews exhibit comparable length distributions peaking around 120–180 words.
-![Review Length Distribution](reports/figures/review_length_distribution.png)
-
-### 3. Confusion Matrix
-Annotated heatmap of actual vs predicted sentiment on the held-out test set (387 TN, 67 FP, 51 FN, 395 TP).
-![Confusion Matrix](reports/figures/confusion_matrix.png)
-
-### 4. ROC Curve
-Receiver Operating Characteristic curve achieving an **AUC of 0.9426**, verifying high discrimination power across probability decision thresholds.
-![ROC Curve](reports/figures/roc_curve.png)
-
-### 5. Precision-Recall Curve
-PR Curve with an Average Precision (AP) of 0.9405 demonstrating high precision across a wide recall spectrum.
-![Precision Recall Curve](reports/figures/precision_recall_curve.png)
-
-### 6. Learning Curve
-Accuracy curve plotted against training sample size confirming steady convergence without significant overfitting.
-![Learning Curve](reports/figures/learning_curve.png)
-
-### 7. Cross-Validation Scores
-Bar chart of 5-fold cross-validation showing consistent performance across different patient splits.
-![Cross Validation](reports/figures/cross_validation.png)
-
-### 8. Top Sentiment Words
-Dual horizontal bar plots showing the top 12 positive words (*excellent, great, loved, wonderful, superb*) versus top 12 negative words (*worst, waste, awful, terrible, boring, poor*), proving the model learns authentic semantic polarities.
-![Top Sentiment Words](reports/figures/top_sentiment_words.png)
+A complete, production-grade Natural Language Processing (NLP) machine learning system that determines the subjective sentiment (Positive vs Negative) of movie reviews, tweets, and consumer feedback using **Logistic Regression ($C=1.0$) with Sublinear TF-IDF Vectorization** (4,000 unigram and bigram features), featuring comprehensive evaluation diagnostics and an interactive cyberpunk web dashboard for real-time text analysis.
 
 ---
 
@@ -138,61 +9,114 @@ Dual horizontal bar plots showing the top 12 positive words (*excellent, great, 
 ```
 9 Sentiment Analysis of Text/
 ├── .gitignore
-├── LICENSE
-├── README.md
-├── CONTRIBUTING.md
-├── SECURITY.md
 ├── CITATION.cff
-├── accuracy.txt
-├── guide.txt
-├── requirements.txt
-├── note/
-│   └── 9_Sentiment_Analysis_Viva_Guide.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md                                <- Project documentation, structure & evaluation
+├── SECURITY.md
+├── accuracy.txt                             <- Quantitative test metrics & cross-validation scores
+├── guide.txt                                <- Command-line execution guide
+├── requirements.txt                         <- Pinned Python dependencies
+├── Sentiment_Analysis_Presentation_Advanced.html  <- Interactive 13-slide stepper presentation
+├── Sentiment_Analysis_Complete_Master_Report.pdf  <- 12-chapter publication-grade master report (PDF)
+├── generate_master_report_pdf.py            <- Script compiling master HTML and headless Chrome PDF
 ├── data/
-│   ├── raw/
-│   │   └── sentiment.csv
-│   └── processed/
-│       ├── X_train.csv
-│       ├── X_val.csv
-│       ├── X_test.csv
-│       ├── y_train.csv
-│       ├── y_val.csv
-│       ├── y_test.csv
-│       ├── X_train_tfidf.joblib
-│       ├── X_val_tfidf.joblib
-│       ├── X_test_tfidf.joblib
-│       └── vectorizer.joblib
+│   ├── raw/                                 <- Immutable raw dataset (sentiment.csv, 6,000 reviews)
+│   └── processed/                           <- Clean 3-way split: X/y train (70%), val (15%), test (15%), TF-IDF
 ├── models/
-│   ├── sentiment_model.joblib
-│   └── vectorizer.joblib
+│   ├── sentiment_model.joblib               <- Serialized Logistic Regression pipeline
+│   └── vectorizer.joblib                    <- Fitted Sublinear TF-IDF Vectorizer
 ├── reports/
-│   └── figures/
-│       ├── sentiment_distribution.png
-│       ├── review_length_distribution.png
-│       ├── confusion_matrix.png
-│       ├── roc_curve.png
-│       ├── precision_recall_curve.png
-│       ├── learning_curve.png
-│       ├── cross_validation.png
-│       └── top_sentiment_words.png
+│   └── figures/                             <- Publication-grade diagnostic plots (Uniform 1200x900)
 ├── src/
-│   ├── __init__.py
-│   ├── data/
-│   │   └── make_dataset.py
-│   ├── features/
-│   │   └── build_features.py
-│   ├── models/
-│   │   ├── train_model.py
-│   │   └── predict_model.py
-│   └── visualization/
-│       └── visualize.py
+│   ├── data/make_dataset.py
+│   ├── features/build_features.py
+│   ├── models/train_model.py
+│   ├── models/predict_model.py
+│   └── visualization/visualize.py
 └── web/
-    ├── app.py
-    ├── templates/
-    │   └── index.html
+    ├── app.py                               <- Flask HTTP API & UI server (Port 5009)
+    ├── templates/index.html
     └── static/
-        ├── css/
-        │   └── style.css
-        └── js/
-            └── script.js
+        ├── css/style.css
+        └── js/script.js
 ```
+
+---
+
+## 📊 Results & Accuracy Table (from `accuracy.txt`)
+
+| Dataset Partition / Metric | Metric Value | Analytical & Machine Learning Interpretation |
+|---|---|---|
+| **Holdout Test Accuracy (N=900)** | **86.89%** (0.8689) | Generalization benchmark on unseen test movie reviews |
+| **Test F1-Score (Positive)** | **0.8700** | Harmonic mean of precision and recall on positive sentiment |
+| **Test Precision (Positive)** | **0.8550** | Correctness of positive sentiment predictions |
+| **Test Recall (Positive)** | **0.8857** | Sensitivity retrieving true positive sentiment reviews |
+| **Negative Class Precision** | **0.8836** | Correctness of negative sentiment predictions |
+| **Negative Class Recall** | **0.8524** | Sensitivity retrieving negative sentiment reviews |
+| **Negative Class F1-Score** | **0.8677** | Balanced performance on negative class |
+| **Area Under the ROC Curve (AUC)** | **0.9426** | Superior ranking ability across decision probability thresholds |
+| **Validation Set Accuracy (N=900)** | **87.00%** (0.8700) | Independent validation parameter verification (F1: 0.8716) |
+| **5-Fold Cross-Validation Accuracy** | **85.21%** ($\pm 0.0083$) | Fold scores: `[0.857, 0.860, 0.839, 0.845, 0.860]` |
+
+---
+
+## 📈 Evaluation Graphs
+
+All diagnostic figures are rendered at a uniform, high-resolution **1200 × 900** canvas for seamless visual alignment:
+
+### 1. Sentiment Polarity Class Distribution
+Bar chart confirming balanced distribution (~50% Positive vs ~50% Negative) across the benchmark dataset.
+![Sentiment Distribution](reports/figures/sentiment_distribution.png)
+
+### 2. Review Word Count Distribution by Sentiment
+Comparative histogram and KDE establishing similar review length distributions peaking around 120–180 words.
+![Review Length Distribution](reports/figures/review_length_distribution.png)
+
+### 3. Confusion Matrix
+Confusion matrix on the 900-sample holdout test set demonstrating high diagonal accuracy (387 true negatives, 395 true positives).
+![Confusion Matrix](reports/figures/confusion_matrix.png)
+
+### 4. Receiver Operating Characteristic (ROC Curve)
+ROC trajectory demonstrating an Area Under the Curve (AUC) of 0.9426, confirming robust discriminative capability.
+![ROC Curve](reports/figures/roc_curve.png)
+
+### 5. Precision-Recall Curve
+Precision-Recall trajectory (Average Precision = 0.94) illustrating consistent precision retention across recall levels.
+![Precision Recall Curve](reports/figures/precision_recall_curve.png)
+
+### 6. Learning Curve (Bias-Variance Diagnostics)
+Cross-validation and training accuracy convergence demonstrating stable convex optimization without overfitting.
+![Learning Curve](reports/figures/learning_curve.png)
+
+### 7. 5-Fold Cross-Validation Accuracy Benchmark
+Cross-validation fold distribution confirming consistent generalization stability ($\pm 0.0083$).
+![Cross Validation](reports/figures/cross_validation.png)
+
+### 8. Top Informative Sentiment Words (Model Coefficients)
+Ranked horizontal bar charts displaying the most influential negative and positive n-grams based on logistic regression log-odds weights.
+![Top Sentiment Words](reports/figures/top_sentiment_words.png)
+
+---
+
+## ⚡ Quick Start
+
+```bash
+cd "9 Sentiment Analysis of Text"
+
+# 1. Run raw dataset extraction & validation
+python src/data/make_dataset.py
+
+# 2. Extract sublinear TF-IDF features and split 3 ways
+python src/features/build_features.py
+
+# 3. Train Logistic Regression model
+python src/models/train_model.py
+
+# 4. Generate all uniform 1200x900 diagnostic figures
+python src/visualization/visualize.py
+
+# 5. Launch web application
+python web/app.py
+```
+Open your browser and navigate to `http://localhost:5009`.

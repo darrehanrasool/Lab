@@ -4,8 +4,15 @@ import json
 import subprocess
 import shutil
 
-PROJ_DIR = "2 Titanic Survival Prediction"
+PROJ_DIR = os.path.dirname(os.path.abspath(__file__))
 FIG_DIR = os.path.join(PROJ_DIR, "reports/figures")
+
+
+def find_template(fname):
+    for candidate in [fname, os.path.join(PROJ_DIR, fname), os.path.join(PROJ_DIR, "..", fname)]:
+        if os.path.exists(candidate):
+            return candidate
+    raise FileNotFoundError(f"Cannot find {fname}")
 
 def get_base64_img(rel_path):
     with open(rel_path, "rb") as f:
@@ -404,10 +411,10 @@ slides = [
 ]
 
 print("Assembling Presentation HTML for Titanic...")
-with open("presentation_template_head.html", "r") as f:
+with open(find_template("presentation_template_head.html"), "r") as f:
     head_html = f.read()
 
-with open("presentation_template_tail.js", "r") as f:
+with open(find_template("presentation_template_tail.js"), "r") as f:
     tail_js = f.read()
 
 head_html = head_html.replace(
@@ -426,7 +433,7 @@ with open(pres_path, "w", encoding="utf-8") as f:
 print(f"✓ Saved Advanced Presentation to: {pres_path} ({len(full_presentation_html)} bytes)")
 
 print("Compiling Master Report PDF for Titanic Survival Prediction...")
-with open("report_template_style.css", "r") as f:
+with open(find_template("report_template_style.css"), "r") as f:
     report_css = f.read()
 
 report_html = f"""<!DOCTYPE html>
@@ -814,5 +821,4 @@ if os.path.exists(note_dir):
     print(f"✓ Removed deprecated note directory: {note_dir}")
 
 # Save generate_master_report_pdf.py in project folder
-shutil.copy("build_project_2.py", os.path.join(PROJ_DIR, "generate_master_report_pdf.py"))
 print("Project 2 assets generation complete!")

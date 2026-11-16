@@ -12,18 +12,18 @@ Each of the ten practicals has been developed to adhere to the gold-standard **C
 
 ### 1.1 Master Project Directory Index & Port Allocation
 
-| # | Project Name | Primary ML Algorithm | Task Type | Test Score | Local Dataset Path | Web Port |
+| # | Project Name | Primary ML Algorithm | Task Type | Key Test Metric (Ground Truth) | Local Dataset Path | Web Port |
 |---|---|---|---|---|---|---|
-| **01** | **Iris Species Classification** | Multiclass Logistic Regression (Softmax) | Multi-class Classification | Accuracy: **100.0%** | `1.../data/raw/iris.csv` | `http://localhost:5001` |
-| **02** | **Titanic Survival Prediction** | Random Forest Classifier | Binary Classification | Accuracy: **82.09%**, AUC: **0.865** | `2.../data/raw/titanic.csv` | `http://localhost:5002` |
-| **03** | **Boston Housing Price Prediction** | Random Forest Regressor | Continuous Regression | $R^2$: **0.8876**, RMSE: **$3.08k** | `3.../data/raw/boston.csv` | `http://localhost:5003` |
-| **04** | **Diabetes Progression Prediction** | Random Forest Regressor | Physiological Regression | $R^2$: **0.4871**, RMSE: **53.96** | `4.../data/raw/diabetes.csv` | `http://localhost:5004` |
-| **05** | **Spam Email Detection** | Multinomial Naive Bayes + TF-IDF | NLP Binary Classification | Accuracy: **98.21%**, AUC: **0.986** | `5.../data/raw/spam.csv` | `http://localhost:5005` |
-| **06** | **MNIST Digit Classification** | Multi-Layer Perceptron (MLP: 784-128-64-10) | Computer Vision Multi-class | Accuracy: **93.91%**, AUC: **0.994** | `6.../data/raw/mnist.csv` | `http://localhost:5006` |
-| **07** | **Movie Recommendation System** | TruncatedSVD Collaborative Filtering | Latent Factor Matrix Factorization | Explained Var: **61.4%**, Cosine Sim | `7.../data/raw/ratings.csv` | `http://localhost:5007` |
-| **08** | **Fashion MNIST Classification** | Multi-Layer Perceptron (MLP: 784-128-64-10) | Computer Vision Apparel | Accuracy: **85.82%**, AUC: **0.984** | `8.../data/raw/fashion_mnist.csv`| `http://localhost:5008` |
-| **09** | **Sentiment Analysis of Text** | Logistic Regression + Sublinear TF-IDF | NLP Binary Sentiment | Accuracy: **86.89%**, AUC: **0.943** | `9.../data/raw/sentiment.csv` | `http://localhost:5009` |
-| **10** | **Stock Prices Prediction** | Random Forest + Technical Indicators (OHLCV)| Financial Time Series | $R^2$: **0.9245**, MAPE: **1.19%** | `10.../data/raw/stock_prices.csv`| `http://localhost:5010` |
+| **01** | **Iris Species Classification** | Multiclass Logistic Regression (Softmax) | Multi-class Classification | Test Accuracy: **93.33%**, Macro F1: **0.9333** | `1.../data/raw/iris.csv` | `http://localhost:5001` |
+| **02** | **Titanic Survival Prediction** | Random Forest Classifier (`n_estimators=100`) | Binary Classification | Test Accuracy: **77.61%**, F1 (Survived): **0.68** | `2.../data/raw/titanic.csv` | `http://localhost:5002` |
+| **03** | **Boston Housing Price Prediction** | Multiple Linear Regression (OLS) & Linear SVR | Continuous Regression | Test $R^2$: **0.7140**, RMSE: **$5,421.71**, MAE: **$3,390.46** | `3.../data/raw/boston.csv` | `http://localhost:5003` |
+| **04** | **Diabetes Progression Prediction** | Multiple Linear Regression (OLS) | Physiological Continuous Regression | Holdout Test $R^2$: **0.4882**, RMSE: **55.17**, MAE: **44.92** | `4.../data/raw/diabetes.csv` | `http://localhost:5004` |
+| **05** | **Spam Email Detection** | Multinomial Naive Bayes (Laplace $\alpha=0.1$) + TF-IDF | NLP Binary Classification | Test Accuracy: **97.85%**, Spam F1: **0.9155**, AUC: **0.9834** | `5.../data/raw/spam.csv` | `http://localhost:5005` |
+| **06** | **MNIST Digit Classification** | Multi-Layer Perceptron (MLP: 784-128-64-10) | Computer Vision Multi-class | Test Accuracy: **93.91%**, Macro F1: **0.9390** | `6.../data/raw/mnist.csv` | `http://localhost:5006` |
+| **07** | **Movie Recommendation System** | TruncatedSVD Collaborative Filtering ($k=20$) | Latent Factor Matrix Factorization | Explained Var: **31.15%**, Test RMSE: **2.8146** | `7.../data/raw/ratings.csv` | `http://localhost:5007` |
+| **08** | **Fashion MNIST Classification** | Multi-Layer Perceptron (MLP: 784-128-64-10) | Computer Vision Apparel | Test Accuracy: **85.82%**, Macro F1: **0.8590** | `8.../data/raw/fashion_mnist.csv`| `http://localhost:5008` |
+| **09** | **Sentiment Analysis of Text** | Logistic Regression + Sublinear TF-IDF | NLP Binary Sentiment | Test Accuracy: **86.89%**, F1: **0.8700**, AUC: **0.9426** | `9.../data/raw/sentiment.csv` | `http://localhost:5009` |
+| **10** | **Stock Prices Prediction** | Random Forest Regressor + 17 Technical Indicators | Financial Time Series | Test $R^2$: **0.9245**, RMSE: **$2.10**, MAPE: **1.19%** | `10.../data/raw/stock_prices.csv`| `http://localhost:5010` |
 
 ---
 
@@ -228,91 +228,110 @@ Titanic features complex non-linear interactions (e.g., the "women and children 
 - **Task:** Continuous Socioeconomic Real Estate Regression.
 - **Problem Statement:** Predict the median home value (`MEDV` in thousands of dollars) in Boston metropolitan census tracts based on 13 environmental, geographic, structural, and demographic variables.
 
-#### 1. Mathematical Formulation: Random Forest Regressor & MSE Reduction
-For continuous target regression, decision trees partition the 13-dimensional feature space into orthogonal hyper-rectangles $R_1, R_2, \dots, R_M$.
-1. **Terminal Node Prediction:**
-   $$\hat{c}_m = \text{mean}(y_i \mid x_i \in R_m) = \frac{1}{|R_m|} \sum_{i \in R_m} y_i$$
-2. **Splitting Objective (Variance Minimization):**
-   $$\min_{j, \theta} \left[ \sum_{i \in R_L(j, \theta)} (y_i - \bar{y}_L)^2 + \sum_{i \in R_R(j, \theta)} (y_i - \bar{y}_R)^2 \right]$$
-3. **Regression Metrics:**
-   - **Mean Squared Error (MSE):**
-     $$\text{MSE} = \frac{1}{N} \sum_{i=1}^N (y_i - \hat{y}_i)^2$$
-   - **Root Mean Squared Error (RMSE):** In natural target units (\$1000s):
-     $$\text{RMSE} = \sqrt{\text{MSE}}$$
-   - **Coefficient of Determination ($R^2$):** Proportion of variance explained:
-     $$R^2 = 1 - \frac{\sum_{i=1}^N (y_i - \hat{y}_i)^2}{\sum_{i=1}^N (y_i - \bar{y})^2} = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}}$$
+#### 1. Mathematical Formulation: Multiple Linear Regression (OLS) & Linear SVR
+1. **Multiple Linear Regression (OLS via Normal Equation):**
+   $$\hat{y} = \beta_0 + \sum_{j=1}^{13} \beta_j x_j = X \hat{\beta}$$
+   Closed-form minimization of the Mean Squared Error:
+   $$\hat{\beta}_{\text{OLS}} = (X^T X)^{-1} X^T y$$
+2. **Linear Support Vector Regression (Linear SVR with $\epsilon$-Insensitive Loss):**
+   $$\min_{w, b, \xi, \xi^*} \frac{1}{2} \|w\|^2 + C \sum_{i=1}^N (\xi_i + \xi_i^*)$$
+   subject to:
+   $$\begin{cases} y_i - (w^T x_i + b) \le \epsilon + \xi_i \\ (w^T x_i + b) - y_i \le \epsilon + \xi_i^* \\ \xi_i, \xi_i^* \ge 0 \end{cases}$$
+   Only points falling strictly outside the $\epsilon$-tube ($\epsilon=0.2$) contribute to the support vector loss.
+3. **Regression Metrics (from `accuracy.txt`):**
+   - **Multiple Linear Regression (OLS - All 13 Features):**
+     - Test $R^2$: **0.7140** (71.40% Variance Explained)
+     - Test MSE: **29.3949**
+     - Test RMSE: **$5,421.71**
+     - Test MAE: **$3,390.46**
+     - Validation $R^2$: **0.7079** | Validation MSE: **17.5397**
+     - 5-Fold Cross-Validation Mean $R^2$: **0.6880** ($\pm 0.1860$)
+   - **Linear Support Vector Regression (Linear SVR, C=1.0, eps=0.2):**
+     - Test $R^2$: **0.6634** | Test MSE: **34.6027**
+   - **Simple Linear Regression Baseline ($RM \to MEDV$):**
+     - Test $R^2$: **0.4288** | Test MSE: **58.7166**
 
-#### 2. Why Random Forest Regressor?
-The Boston housing dataset contains strong non-linear relationships and collinear clusters (e.g., nitrogen oxide concentration `NOX` and distance to employment centers `DIS`). Linear regression suffers from high residual variance ($R^2 \approx 0.70$) and violates homoscedasticity. Random Forest captures non-linear threshold effects (e.g. rooms `RM` $> 6.5$ drastically increases price) without requiring polynomial feature expansions, yielding $R^2 = 0.8876$.
-
-#### 3. Dataset Splitting & Preprocessing
+#### 2. Dataset Splitting & Preprocessing
 - **Raw File:** `3 Boston Housing Price Prediction/data/raw/boston.csv` (506 tracts).
 - **Splits:** 70% Train (354), 15% Val (76), 15% Test (76).
-- **Feature Scaling:** `RobustScaler` is used because features such as `CRIM` (per capita crime rate) and `B` have extreme outliers. RobustScaler scales via interquartile ranges: $x' = \frac{x - Q_2}{Q_3 - Q_1}$.
+- **Feature Scaling:** `StandardScaler` fitted exclusively on training set to prevent data leakage.
 
-#### 4. Diagnostic Visualizations Walkthrough
-- `actual_vs_predicted.png`: Scatter plot comparing ground truth vs predictions; points cluster tightly along the $45^\circ$ line, achieving test $R^2 = 0.8876$ and $\text{RMSE} = \$3.08\text{k}$.
-- `residual_distribution.png`: Histogram and KDE curve of residuals $(y - \hat{y})$; shows zero-centered, bell-shaped distribution verifying unbiased regression.
-- `feature_importances.png`: Demonstrates that `LSTAT` (% lower status of population) and `RM` (average rooms per dwelling) account for $>70\%$ of the predictive power.
-- `learning_curve.png`: Shows convergence of training and validation scores with minimal gap, confirming that depth constraints prevented overfitting.
+#### 3. Diagnostic Visualizations Walkthrough
+- `actual_vs_predicted.png`: Scatter plot comparing ground truth vs predictions; points cluster along the diagonal, confirming strong linear alignment ($R^2 = 0.7140$).
+- `residual_plot.png`: Scatter plot of residuals against predicted values; demonstrates zero-centered scatter verifying homoscedasticity.
+- `feature_distributions.png`: Shows underlying distributions of the 13 predictors, highlighting skewness in crime rate (`CRIM`) and zoning (`ZN`).
+- `heatmap.png`: Reveals strong positive correlation between rooms (`RM`) and price ($r = +0.70$) and negative correlation with lower-status population (`LSTAT`, $r = -0.74$).
 
-#### 5. Code Walkthrough
-- `src/features/build_features.py`: Handles tabular cleansing, removes synthetic artifacts, fits `RobustScaler`, and writes partitioned CSVs.
-- `src/models/train_model.py`: Fits `RandomForestRegressor(n_estimators=100, max_depth=8, random_state=42)` and dumps performance metrics to `accuracy.txt`.
-- `web/app.py`: Serves on port `5003`. Interactive real estate appraisal interface with sliders for rooms, tax rates, crime rate, and pupil-teacher ratio.
+#### 4. Code Walkthrough
+- `src/features/build_features.py`: Standardizes features, enforces 3-way partition (70/15/15), and exports processed CSVs.
+- `src/models/train_model.py`: Fits `LinearRegression()` and `SVR(kernel='linear', C=1.0, epsilon=0.2)`, records metrics in `accuracy.txt`, and saves `models/boston_model.joblib`.
+- `web/app.py`: Serves on port `5003`. Interactive real estate appraisal interface.
 
-#### 6. Examiner Viva Questions & Answers
-- **Q: Can a Random Forest Regressor extrapolate outside the range of training target values?**
-  *A:* No. A decision tree regressor predicts the average target value of training samples residing in the corresponding leaf node. Consequently, a Random Forest can never predict a value higher than the maximum target or lower than the minimum target observed in the training data.
-- **Q: What is the difference between $R^2$ and Adjusted $R^2$?**
-  *A:* $R^2$ monotonically increases whenever new features are added, even if they are pure noise. Adjusted $R^2$ penalizes model complexity:
-  $$R^2_{\text{adj}} = 1 - \left[ \frac{(1 - R^2)(N - 1)}{N - p - 1} \right]$$
-  It only increases if a newly added feature improves the model beyond what would be expected by chance.
+#### 5. Examiner Viva Questions & Answers
+- **Q: Why does Multiple Linear Regression achieve $R^2 = 0.7140$ while Simple Linear Regression achieves only $0.4288$?**
+  *A:* Rooms alone (`RM`) only account for interior living volume ($R^2 = 0.4288$). Multiple Linear Regression incorporates 12 additional socio-environmental predictors (`LSTAT`, `PTRATIO`, `NOX`, `TAX`, etc.), capturing broader urban economics and explaining an additional $28.52\%$ of the price variance.
+- **Q: What is the benefit of comparing OLS with Linear SVR?**
+  *A:* OLS minimizes squared error and is sensitive to extreme home value outliers. Linear SVR with an $\epsilon$-insensitive tube ignores errors smaller than $\epsilon$ and uses linear slack penalties ($L_1$), offering enhanced robustness against localized valuation anomalies.
 
 ---
 
 ### PROJECT 4: DIABETES PROGRESSION PREDICTION
-- **Task:** Physiological Regression under Multicollinearity.
+- **Task:** Physiological Regression under Multicollinearity and Clinical Imbalance Management.
 - **Problem Statement:** Predict quantitative disease progression one year after baseline in 442 diabetes patients using 10 physiological and biochemical variables: Age, Sex, BMI, Blood Pressure (BP), and six blood serum biomarkers ($S_1$ to $S_6$).
 
-#### 1. Mathematical Formulation: Ridge Regularization vs. Random Forest
-In physiological datasets, biomarkers often exhibit severe multicollinearity (e.g., total cholesterol $S_1$, low-density lipoproteins $S_2$, and high-density lipoproteins $S_3$).
-1. **The Multicollinearity Problem in OLS:**
+#### 1. Mathematical Formulation: Multiple Linear Regression (OLS)
+1. **Multiple Linear Regression (OLS Normal Equation):**
+   $$\hat{y} = \beta_0 + \sum_{j=1}^{10} \beta_j z_j$$
+   where $z_j = \frac{x_j - \mu_j}{\sigma_j}$ represents the standardized z-score of biomarker $j$.
    $$\hat{\beta}_{\text{OLS}} = (X^T X)^{-1} X^T y$$
-   When features are collinear, $X^T X$ becomes nearly singular ($\det(X^T X) \to 0$). The eigenvalues $\lambda_{\min} \to 0$, causing the variance of estimated coefficients to explode:
-   $$\text{Var}(\hat{\beta}_j) = \sigma^2 \left[ (X^T X)^{-1} \right]_{jj} = \frac{\sigma^2}{(1 - R_j^2) \sum (x_{ij} - \bar{x}_j)^2}$$
-2. **L2 Ridge Regression Regularization:**
-   Adds an L2 penalty to condition the matrix:
-   $$\hat{\beta}_{\text{Ridge}} = (X^T X + \lambda I)^{-1} X^T y$$
-   Adding $\lambda > 0$ guarantees that all eigenvalues $\lambda_i + \lambda > 0$, bounding coefficient variance at the cost of a small, controlled amount of bias.
-3. **Random Forest Regression for Tabular Biomarkers:**
-   A tuned `RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=6)` prevents overfitting on this noisy physiological cohort, capturing non-linear metabolic thresholds (e.g. BMI interacting non-linearly with serum glucose $S_6$).
+   The closed-form analytical solution provides 100% transparent interpretability (zero black-box opacity).
+2. **Managing Dataset Imbalance via Cost-Sensitive Logistic Regression:**
+   - For clinical risk triage, cases with disease progression $\ge 200$ (severe disease progression) are identified (28.7% severe cases, class ratio 1:2.5 imbalanced).
+   - Baseline unweighted logistic regression suffers from low sensitivity (high false negatives: 6 missed patients).
+   - Cost-sensitive balanced logistic regression applies inverse class frequency weights:
+     $$w_c = \frac{N}{2 \cdot N_c}$$
+     This increases sensitivity from $53.85\%$ to **$76.92\%$**, cutting False Negatives in half (from 6 to 3), which is clinically vital because missing a deteriorating diabetic patient is far more dangerous than a false alarm.
+3. **Regression Benchmark Performance (from `accuracy.txt`):**
+   - **Holdout Test Set (10%, N=45):** $R^2 = \mathbf{0.4882}$ (48.82% Variance Explained), RMSE = **55.17**, MAE = **44.92**
+   - **Validation Set (20%, N=88):** $R^2 = \mathbf{0.5894}$, RMSE = **50.71**, MAE = **41.69**
+   - **Training Set (70%, N=309):** $R^2 = \mathbf{0.4967}$, RMSE = **54.16**, MAE = **43.70**
+   - **5-Fold Cross-Validation:** Mean $R^2 = \mathbf{0.4587} \pm 0.0538$
+   - **Baseline Intercept ($\beta_0$):** **151.21**
 
-#### 2. Why Random Forest Regressor with Depth Restraints?
-Biological disease progression exhibits non-linear relationships. An unconstrained tree would memorize individual patient records in this small cohort ($N=442$). Constraining `max_depth=5` and `min_samples_split=6` restricts model complexity, producing stable generalization ($R^2 = 0.4871$, RMSE = $53.96$).
+#### 2. Feature Beta Weights & Clinical Significance
+- $S_5$ (LTG / Triglycerides): $\beta = +34.89$ (Strongest metabolic risk accelerator)
+- BMI (Body Mass Index): $\beta = +23.72$ (Visceral adiposity driving insulin resistance)
+- $S_2$ (LDL Cholesterol): $\beta = +18.96$ (Atherogenic lipid burden)
+- BP (Blood Pressure): $\beta = +17.76$ (Vascular shear stress)
+- $S_4$ (TCH / Total Cholesterol Ratio): $\beta = +5.30$
+- $S_6$ (GLU / Fasting Glucose): $\beta = +3.57$
 
 #### 3. Dataset Splitting & Preprocessing
 - **Raw File:** `4 Diabetes Progression Prediction/data/raw/diabetes.csv` (442 patients).
-- **Splits:** 70% Train (309), 15% Val (66), 15% Test (67).
-- **Preprocessing:** Standardized via `StandardScaler` fitted exclusively on training set to preserve biomarker distributions.
+- **Splits:** 70% Train (309), 20% Val (88), 10% Test (45).
+- **Feature Scaling:** `StandardScaler` fitted strictly on training data (mean=0, variance=1).
 
 #### 4. Diagnostic Visualizations Walkthrough
-- `biomarker_correlation_matrix.png`: Confirms extreme correlation between serum lipids $S_1$ and $S_2$ ($r = 0.897$), demonstrating multicollinearity.
-- `actual_vs_predicted.png`: Scatter plot comparing predicted vs actual progression scores, displaying a steady positive diagonal trend.
-- `residual_diagnostics.png`: Shows even vertical scatter of residuals across all progression ranges, demonstrating homoscedasticity.
-- `feature_importances.png`: Identifies Body Mass Index (`BMI`), serum triglyceride level (`S5`), and average blood pressure (`BP`) as the top three disease progression drivers.
+- `feature_importance.png`: Visualizes standardized beta weights, clearly illustrating the dominant predictive power of $S_5$ triglycerides, BMI, and LDL.
+- `actual_vs_predicted.png`: Scatter plot comparing predicted vs actual progression scores, displaying a clear positive diagonal trend.
+- `residual_plot.png`: Scatter plot of residuals against predicted values showing homoscedastic dispersion around zero.
+- `residual_distribution.png`: Near-Gaussian bell-shaped histogram confirming normal error distribution without severe tail bias.
+- `learning_curves.png`: Training and validation error convergence across cohort subsets verifying absence of overfitting.
+- `correlation_heatmap.png`: Highlights severe collinearity between $S_1$ and $S_2$ ($r = +0.897$).
 
 #### 5. Code Walkthrough
-- `src/data/make_dataset.py`: Extracts benchmark diabetes cohort, validates patient indices, and stores raw data.
-- `src/features/build_features.py`: Performs 3-way split, scales physiological features, and exports clean CSVs.
-- `src/models/train_model.py`: Trains depth-regularized Random Forest, records cross-validation metrics, and saves `diabetes_model.joblib`.
+- `src/data/make_dataset.py`: Validates local 442 patient cohort in `data/raw/diabetes.csv`.
+- `src/features/build_features.py`: Standardizes biomarkers via `StandardScaler`, splits into 70% Train, 20% Val, 10% Test without data leakage.
+- `src/models/train_model.py`: Fits Multiple Linear Regression (`LinearRegression()`), runs 5-fold CV, trains balanced logistic regression for clinical triage, and exports metrics to `accuracy.txt`.
 - `web/app.py`: Serves on port `5004`. Clinical dashboard allowing physicians to input patient BMI, blood pressure, and lipid profiles to estimate one-year disease progression.
 
 #### 6. Examiner Viva Questions & Answers
+- **Q: Why is Multiple Linear Regression preferred over black-box models for this clinical task?**
+  *A:* In clinical prognosis, physicians require fully transparent, interpretable weights rather than opaque predictions. Multiple Linear Regression provides explicit beta coefficients ($\beta_j$), allowing clinicians to quantify the exact marginal contribution of each biomarker (e.g. $+34.89$ for $S_5$ and $+23.72$ for BMI) to patient disease progression.
 - **Q: Why is an $R^2$ of ~0.49 considered successful for the Diabetes dataset?**
-  *A:* Human disease progression is influenced by genetic, dietary, environmental, and behavioral variables not captured in these 10 baseline metrics. In biomedical prognosis, an $R^2 \approx 0.50$ indicates strong clinical predictive signal while reflecting real-world biological stochasticity.
-- **Q: How does BMI interact with serum biomarkers in predicting diabetes progression?**
-  *A:* Elevated BMI increases insulin resistance, amplifying the pathological impact of elevated blood triglycerides ($S_5$) and serum glucose ($S_6$). Tree models capture these interaction thresholds naturally without requiring manual interaction terms.
+  *A:* Human disease progression is influenced by unmeasured factors (genetics, nutrition, exercise, medication adherence). In biological prognostic modeling, explaining ~49% of variance with only 10 baseline metrics indicates a strong, clinically actionable physiological signal.
+- **Q: How was dataset imbalance handled in the classification of severe progression?**
+  *A:* By using cost-sensitive learning (`class_weight='balanced'`), the loss function penalized false negatives inversely proportional to class frequencies, increasing clinical recall from $53.85\%$ to $76.92\%$ and reducing missed severe cases from 6 to 3.
 
 ---
 
@@ -620,8 +639,9 @@ Financial price series exhibit non-linear patterns, structural breaks, and regim
 
 | Algorithm Family | Projects Used | Key Strengths | Limitations / Weaknesses |
 |---|---|---|---|
-| **Linear / Logistic Regression** | 1 (Iris), 9 (Sentiment) | Convex loss (global minimum), fast convergence, directly interpretable weights, calibrated class probabilities. | Assumes linear decision boundaries; vulnerable to multicollinearity without regularization. |
-| **Random Forest (Bagging)** | 2 (Titanic), 3 (Boston), 4 (Diabetes), 10 (Stocks) | Captures non-linear feature interactions, handles mixed feature types, invariant to monotonic scaling, robust against outliers. | Computationally intensive at inference time, cannot extrapolate beyond historical target ranges. |
+| **Linear / Logistic Regression (OLS & Softmax)** | 1 (Iris), 3 (Boston OLS), 4 (Diabetes OLS), 9 (Sentiment) | Convex loss (global minimum), closed-form / fast convergence, directly interpretable weights, zero black-box opacity. | Assumes linear relationships; vulnerable to multicollinearity without regularization or dimensionality reduction. |
+| **Support Vector Machines (SVR)** | 3 (Boston Linear SVR) | Robust against outliers via $\epsilon$-insensitive tube, convex quadratic programming optimization. | Sensitive to hyperparameter choices ($C, \epsilon$), requires careful scaling of feature inputs. |
+| **Random Forest (Bagging)** | 2 (Titanic), 10 (Stocks) | Captures non-linear feature interactions, handles mixed feature types, invariant to monotonic scaling, robust against noise. | Computationally intensive at inference time, cannot extrapolate beyond historical target ranges. |
 | **Naive Bayes (Probabilistic)** | 5 (Spam Detection) | Linear time training $\mathcal{O}(N \cdot L)$, handles sparse high-dimensional text data, low memory requirements. | Assumes feature independence; conditional probability values can be poorly calibrated. |
 | **Multi-Layer Perceptron (Neural Net)**| 6 (MNIST), 8 (Fashion MNIST) | Universal function approximator, learns hierarchical feature representations across hidden layers. | Non-convex loss surface (local minima), sensitive to weight initialization, requires careful tuning of learning rate and architecture. |
 | **TruncatedSVD (Matrix Factorization)**| 7 (Movie Recommender) | Compresses sparse interaction matrices into compact latent factors, captures implicit tastes. | Suffers from the Cold Start Problem; standard SVD requires imputing unobserved values. |

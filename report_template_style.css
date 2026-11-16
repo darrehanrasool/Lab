@@ -1,0 +1,342 @@
+@page {
+            size: A4;
+            margin: 16mm 14mm 16mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.55;
+            font-size: 9.5pt;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2, h3, h4 {
+            color: #0f172a;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+        h1 {
+            font-size: 20pt;
+            margin-top: 0;
+            margin-bottom: 6pt;
+            letter-spacing: -0.02em;
+            color: #1e3a8a;
+        }
+        h2 {
+            font-size: 12.5pt;
+            border-bottom: 1.5pt solid #e2e8f0;
+            padding-bottom: 4pt;
+            margin-top: 18pt;
+            margin-bottom: 8pt;
+            color: #1e40af;
+            page-break-after: avoid;
+        }
+        h3 {
+            font-size: 10.5pt;
+            margin-top: 12pt;
+            margin-bottom: 4pt;
+            color: #0369a1;
+            page-break-after: avoid;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 6pt;
+            text-align: justify;
+        }
+        .header-box {
+            background: #f8fafc;
+            border: 1pt solid #cbd5e1;
+            border-left: 5pt solid #2563eb;
+            padding: 10pt 14pt;
+            border-radius: 6pt;
+            margin-bottom: 14pt;
+        }
+        .header-meta {
+            font-size: 8pt;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4pt;
+        }
+        .header-subtitle {
+            font-size: 10pt;
+            color: #334155;
+            margin: 0;
+            font-weight: 500;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6pt;
+            margin-top: 8pt;
+            padding-top: 8pt;
+            border-top: 1pt dashed #cbd5e1;
+            font-size: 8pt;
+        }
+        .meta-item b {
+            display: block;
+            color: #0f172a;
+            font-size: 8.5pt;
+        }
+
+        /* Scientific Callout Boxes */
+        .callout {
+            padding: 8pt 10pt;
+            border-radius: 5pt;
+            margin: 8pt 0;
+            font-size: 9pt;
+            border-left: 3.5pt solid #3b82f6;
+            background: #f0f7ff;
+            page-break-inside: avoid;
+        }
+        .callout-success {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+            color: #065f46;
+        }
+        .callout-warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+            color: #92400e;
+        }
+        .callout-danger {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .callout-title {
+            font-weight: 700;
+            font-size: 8.5pt;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 3pt;
+        }
+
+        /* High-Definition Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8pt 0 12pt 0;
+            font-size: 8pt;
+            page-break-inside: avoid;
+        }
+        th, td {
+            padding: 5pt 7pt;
+            text-align: left;
+            border-bottom: 1pt solid #e2e8f0;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e293b;
+            font-weight: 700;
+            border-top: 1pt solid #cbd5e1;
+            border-bottom: 1.5pt solid #94a3b8;
+        }
+        tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        /* Mathematical Formula Cards */
+        .formula-card {
+            background: #f8fafc;
+            border: 1pt solid #e2e8f0;
+            border-left: 3.5pt solid #2563eb;
+            border-radius: 6pt;
+            padding: 8pt 12pt;
+            margin: 8pt 0;
+            page-break-inside: avoid;
+        }
+        .formula-title {
+            font-size: 8pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #2563eb;
+            margin-bottom: 4pt;
+        }
+        .formula-body {
+            font-size: 11pt;
+            font-family: "Cambria Math", "Latin Modern Math", "Georgia", "Times New Roman", serif;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4pt 6pt;
+            padding: 3pt 0;
+            line-height: 1.5;
+        }
+        .formula-body i {
+            font-style: italic;
+            font-family: "Times New Roman", "Cambria Math", serif;
+        }
+        .formula-body b {
+            font-weight: 700;
+        }
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 3pt;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+        .num {
+            border-bottom: 1.5pt solid currentColor;
+            padding: 0 2pt 1pt 2pt;
+            display: block;
+        }
+        .den {
+            padding: 1pt 2pt 0 2pt;
+            display: block;
+        }
+        .formula-desc {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 4pt;
+            border-top: 1pt dashed #cbd5e1;
+            padding-top: 4pt;
+            line-height: 1.4;
+        }
+        .term-badge {
+            display: inline-block;
+            padding: 1pt 4pt;
+            border-radius: 3pt;
+            font-size: 7pt;
+            font-weight: 700;
+            margin-right: 3pt;
+        }
+        .b-blue { background: #dbeafe; color: #1e40af; }
+        .b-teal { background: #ccfbf1; color: #0f766e; }
+        .b-amber { background: #fef3c7; color: #b45309; }
+        .b-rose { background: #ffe4e6; color: #be123c; }
+
+        /* Publication Figure Embeds */
+        .figure-box {
+            margin: 10pt 0 14pt 0;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        .figure-img {
+            max-width: 98%;
+            height: auto;
+            border: 1pt solid #cbd5e1;
+            border-radius: 5pt;
+            box-shadow: 0 2pt 6pt rgba(0,0,0,0.06);
+        }
+        .figure-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 4pt;
+            text-align: center;
+            line-height: 1.35;
+        }
+        .figure-caption b {
+            color: #1e3a8a;
+        }
+
+        /* Q&A Cards */
+        .qa-card {
+            background: #ffffff;
+            border: 1pt solid #e2e8f0;
+            border-radius: 5pt;
+            padding: 7pt 10pt;
+            margin: 6pt 0;
+            page-break-inside: avoid;
+        }
+        .qa-q {
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 8.5pt;
+            margin-bottom: 3pt;
+        }
+        .qa-a {
+            font-size: 8pt;
+            color: #334155;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Dataset Split Visual Component */
+        .split-bar-pdf {
+            display: flex;
+            height: 22pt;
+            border-radius: 5pt;
+            overflow: hidden;
+            margin: 6pt 0;
+            border: 1pt solid #94a3b8;
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: #ffffff;
+            text-align: center;
+            line-height: 22pt;
+        }
+        .split-cards-pdf {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.15fr;
+            gap: 6pt;
+            margin-top: 6pt;
+        }
+        .split-card-pdf {
+            border: 1pt solid #cbd5e1;
+            border-radius: 5pt;
+            padding: 6pt 8pt;
+            background: #f8fafc;
+            font-size: 7.5pt;
+        }
+        .split-card-pdf.test-card {
+            border: 1.5pt solid #e11d48;
+            background: #fff1f2;
+        }
+        .split-card-pdf h4 {
+            margin: 0 0 2pt 0;
+            font-size: 9pt;
+            color: #0f172a;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+.fig-container {
+    margin: 10pt 0 14pt 0;
+    text-align: center;
+    page-break-inside: avoid;
+}
+.fig-container img {
+    max-width: 98%;
+    height: auto;
+    border: 1pt solid #cbd5e1;
+    border-radius: 5pt;
+    box-shadow: 0 2pt 6pt rgba(0,0,0,0.06);
+}
+.fig-caption {
+    font-size: 8pt;
+    color: #475569;
+    margin-top: 4pt;
+    text-align: center;
+    line-height: 1.35;
+}
+.fig-caption b {
+    color: #1e3a8a;
+}
+.formula-box {
+    background: #f8fafc;
+    border: 1pt solid #e2e8f0;
+    border-left: 3.5pt solid #2563eb;
+    border-radius: 6pt;
+    padding: 8pt 12pt;
+    margin: 8pt 0;
+    page-break-inside: avoid;
+    font-family: "Cambria Math", "Latin Modern Math", "Georgia", "Times New Roman", serif;
+    font-size: 10pt;
+    color: #0f172a;
+}
