@@ -98,6 +98,11 @@ Stability bar chart across 5 test cohorts confirming consistent error metrics ac
 Heatmap illustrating correlations and co-occurrence patterns across canonical film genres (*Action, Comedy, Drama, Sci-Fi*).
 ![Genre Correlation](reports/figures/genre_correlation_heatmap.png)
 
+
+### 9. Interactive Web Dashboard UI
+Latent factor movie recommendation interface deployed on port 5006 delivering personalized top-10 movie recommendations with similarity scores and genre filtering.
+![Movie Recommendation Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

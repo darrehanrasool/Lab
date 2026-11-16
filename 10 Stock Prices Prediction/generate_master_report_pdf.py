@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "actual_vs_predicted_prices.png"),
     "fig6": os.path.join(FIG_DIR, "residual_plot.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation_tscv.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation_tscv.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -384,7 +385,7 @@ slides = [
         "say": "We deployed the financial model into an interactive trading dashboard that forecasts next-day closing prices with live momentum badges.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig5",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Stock Price Prediction Dashboard",
         "figCap": "Web application interface featuring live technical indicator inputs, forecast closing price badge, and visual market trajectory."
     },

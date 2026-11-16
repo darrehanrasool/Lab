@@ -131,8 +131,8 @@ Benchmark comparison showing our model ($R^2 = 0.4882$) approaching the biologic
 ![Biological Ceiling](reports/figures/13_stanford_benchmark_biological_noise_ceiling.png)
 
 ### 14. Interactive Clinical Web Dashboard
-Modern real-time prognostic calculator deployed on port 5004 for clinical early-warning risk scoring.
-![Web UI Dashboard](reports/figures/14_web_ui_dashboard.png)
+Modern real-time prognostic calculator deployed on port 5003 for clinical early-warning risk scoring.
+![Clinical Web UI Dashboard](reports/figures/Prediction.png)
 
 ---
 

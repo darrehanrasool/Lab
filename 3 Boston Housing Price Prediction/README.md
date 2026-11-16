@@ -97,6 +97,11 @@ Cross-validation $R^2$ stability across all 5 training folds confirming reliable
 Standardized beta coefficients quantifying the marginal valuation impact of each socio-environmental variable on home prices.
 ![Feature Importances](reports/figures/feature_importances.png)
 
+
+### 9. Interactive Web Dashboard UI
+Interactive property valuation interface deployed on port 5002 for predicting median Boston home values based on neighborhood and structural indicators.
+![Boston Housing Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

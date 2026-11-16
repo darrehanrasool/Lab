@@ -103,6 +103,11 @@ Accuracy distribution across cross-validation splits confirming stable generaliz
 Visual gallery of test predictions with green headers denoting correct classifications and red denoting errors.
 ![Predictions Gallery](reports/figures/predictions_gallery.png)
 
+
+### 9. Interactive Web Dashboard UI
+Interactive digit recognition portal on port 5005 featuring a responsive HTML5 drawing canvas and real-time MLP digit classification with softmax probability distribution.
+![MNIST Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

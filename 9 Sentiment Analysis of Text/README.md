@@ -97,6 +97,11 @@ Cross-validation fold distribution confirming consistent generalization stabilit
 Ranked horizontal bar charts displaying the most influential negative and positive n-grams based on logistic regression log-odds weights.
 ![Top Sentiment Words](reports/figures/top_sentiment_words.png)
 
+
+### 9. Interactive Web Dashboard UI
+Real-time natural language sentiment analysis dashboard on port 5008 evaluating reviews and text with polarity scores and probability metrics.
+![Sentiment Analysis Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

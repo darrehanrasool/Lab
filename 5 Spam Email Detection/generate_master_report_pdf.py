@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "roc_curve.png"),
     "fig6": os.path.join(FIG_DIR, "precision_recall_curve.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -381,7 +382,7 @@ slides = [
         "say": "We deployed the Naive Bayes model into an interactive Flask dashboard that classifies arbitrary text messages in under 0.6 milliseconds.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig4",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Spam Inspection Dashboard",
         "figCap": "Web application interface featuring live message classification, risk score gauge, and discriminative token analysis."
     },

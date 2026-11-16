@@ -103,6 +103,11 @@ Accuracy distribution across cross-validation splits confirming robust neural ne
 Visual gallery of test predictions with green headers indicating correct apparel classifications and red indicating errors.
 ![Predictions Gallery](reports/figures/predictions_gallery.png)
 
+
+### 9. Interactive Web Dashboard UI
+Neural apparel classification dashboard operating on port 5007 with real-time fashion drawing canvas, apparel category predictions, and softmax confidence rankings.
+![Fashion MNIST Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "actual_vs_predicted_ratings.png"),
     "fig6": os.path.join(FIG_DIR, "rating_error_distribution.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve_svd.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation_rmse.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation_rmse.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -382,7 +383,7 @@ slides = [
         "say": "We deployed the collaborative filtering engine into an interactive Flask dashboard that delivers instant top-10 movie recommendations with match percentages.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig2",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Movie Recommendation Dashboard",
         "figCap": "Web application interface featuring live movie search, dynamic top-10 recommendation tiles, and cosine match percentages."
     },

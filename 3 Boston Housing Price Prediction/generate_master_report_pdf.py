@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "residual_plot.png"),
     "fig6": os.path.join(FIG_DIR, "feature_importances.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -380,7 +381,7 @@ slides = [
         "say": "We deployed the regression model into an interactive appraisal dashboard providing instantaneous property valuation with complete transparency.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig4",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Valuation Web Architecture",
         "figCap": "Web application pipeline showing dynamic input validation, standard score scaling, and closed-form linear inference."
     },

@@ -96,6 +96,11 @@ Convergence analysis showing training accuracy and 5-fold cross-validation accur
 Cross-validation fold distribution confirming consistent generalization stability across training subsets.
 ![Cross Validation](reports/figures/cross_validation.png)
 
+
+### 9. Interactive Web Dashboard UI
+Live interactive Flask web dashboard operating on port 5001 allowing users to enter passenger demographics and evaluate real-time survival predictions.
+![Titanic Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

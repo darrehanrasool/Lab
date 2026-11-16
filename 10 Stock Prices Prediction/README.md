@@ -95,6 +95,11 @@ Evaluation across 5 chronological expanding folds without lookahead bias.
 Ranked feature importances (Mean Decrease in Impurity) identifying moving averages, closing prices, and momentum as dominant predictors.
 ![Feature Importances](reports/figures/feature_importances.png)
 
+
+### 9. Interactive Web Dashboard UI
+Financial quant market predictor deployed on port 5009 displaying next-day price forecasts, percentage shifts, and real-time trading signals (BUY / HOLD / SELL).
+![Stock Price Prediction Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start

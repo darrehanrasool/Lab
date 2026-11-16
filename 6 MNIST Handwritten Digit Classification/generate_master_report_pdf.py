@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "roc_curves_multiclass.png"),
     "fig6": os.path.join(FIG_DIR, "precision_recall_curves.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -385,7 +386,7 @@ slides = [
         "say": "We deployed the MLP into an interactive HTML5 drawing canvas application where users can draw digits and receive real-time neural predictions.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig4",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Handwritten Digit Canvas Dashboard",
         "figCap": "Interactive web application featuring live HTML5 drawing canvas, automatic image centering, and real-time Softmax probability bars."
     },

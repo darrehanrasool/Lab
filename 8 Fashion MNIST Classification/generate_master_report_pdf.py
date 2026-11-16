@@ -26,7 +26,8 @@ fig_files = {
     "fig5": os.path.join(FIG_DIR, "roc_curves_multiclass.png"),
     "fig6": os.path.join(FIG_DIR, "precision_recall_curves.png"),
     "fig7": os.path.join(FIG_DIR, "learning_curve.png"),
-    "fig8": os.path.join(FIG_DIR, "cross_validation.png")
+    "fig8": os.path.join(FIG_DIR, "cross_validation.png"),
+    "fig_web_ui": os.path.join(FIG_DIR, "Prediction.png")
 }
 
 FIG_ASSETS = {}
@@ -386,7 +387,7 @@ slides = [
         "say": "We deployed the apparel classifier into an interactive Flask dashboard that delivers real-time clothing classification with animated confidence bars.",
         "c": "#2563eb",
         "n": 12,
-        "fig": "fig4",
+        "fig": "fig_web_ui",
         "figTitle": "Figure 9: Real-Time Fashion Recognition Dashboard",
         "figCap": "Web application interface featuring live garment selection, prediction confidence badge, and Softmax probability breakdown."
     },

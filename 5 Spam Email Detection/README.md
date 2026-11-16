@@ -98,6 +98,11 @@ Cross-validation F1-score consistency across all 5 training folds confirming rel
 Ranked log-likelihood ratios $\log \frac{P(w \mid \text{Spam})}{P(w \mid \text{Ham})}$ identifying the most discriminative spam keywords (*claim, prize, free, urgent, txt, stop*).
 ![Top Keywords](reports/figures/top_keywords_importance.png)
 
+
+### 9. Interactive Web Dashboard UI
+Real-time spam filtering web application on port 5004 providing instant classification, confidence percentages, and posterior probabilities for user text.
+![Spam Detection Web UI Dashboard](reports/figures/Prediction.png)
+
 ---
 
 ## ⚡ Quick Start
