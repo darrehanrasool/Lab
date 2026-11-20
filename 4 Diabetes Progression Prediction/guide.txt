@@ -1,26 +1,29 @@
-Project 4: Diabetes Progression Prediction
-==========================================
-End-to-End Workflow Guide:
+Project 4: Diabetes Progression Prediction via Multiple Linear Regression
+========================================================================
+Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
+Dataset: Efron et al. (2004) Authentic Clinical Diabetes Cohort (N = 442 Patients)
+End-to-End Execution & Reproduction Guide:
 
-1. Download and extract raw dataset to local disk:
-   python src/data/make_dataset.py
-   (Saves data/raw/diabetes.csv)
+1. Ingest and defensively validate raw clinical dataset:
+   python3 src/data/make_dataset.py
+   (Validates human physiological ranges and saves clean data/raw/diabetes.csv)
 
-2. Build Train (70%), Validation (15%), and Test (15%) feature matrices:
-   python src/features/build_features.py
-   (Generates data/processed/X_train.csv, X_val.csv, X_test.csv, y_train.csv, y_val.csv, y_test.csv, and scaler.joblib)
+2. Preprocess features, quantile-stratify, and standardize with zero data leakage:
+   python3 src/features/build_features.py
+   (Partitions into 70% Train [309], 20% Val [88], 10% Test [45], and fits StandardScaler exclusively on Train)
 
-3. Train Random Forest Regression model and evaluate metrics:
-   python src/models/train_model.py
-   (Saves models/diabetes_model.joblib and generates accuracy.txt)
+3. Train Multiple Linear Regression (OLS) & Balanced Logistic Triage Model:
+   python3 src/models/train_model.py
+   (Computes VIFs, analytical Normal Equation weights, 5-fold CV, cost-sensitive triage, and writes accuracy.txt)
 
-4. Generate full suite of Exploratory Data Analysis & Evaluation Graphs:
-   python src/visualization/visualize.py
-   (Saves 8 figures to reports/figures/)
+4. Generate publication-grade Exploratory Data Analysis & Diagnostic Figures:
+   python3 src/visualization/visualize.py
+   (Renders 14 high-resolution 300 DPI analytical figures to reports/figures/)
 
-5. Run sample CLI prediction:
-   python src/models/predict_model.py
+5. Run real-time single-patient CLI prognosis & linear biomarker decomposition:
+   python3 src/models/predict_model.py
+   (Computes continuous prediction, exact beta*z contributions, and severe triage alert)
 
-6. Launch the interactive web user interface:
-   cd web && python app.py
-   Access in browser at: http://127.0.0.1:5003
+6. Launch the interactive web user interface & REST API:
+   python3 web/app.py
+   (Starts production Flask server at http://127.0.0.1:5003 with zero cold-start latency)

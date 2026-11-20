@@ -30,5 +30,5 @@ weighted avg     0.8605    0.8582    0.8590      2250
 
 
 5-Fold Cross-Validation Accuracy:
-  - Fold Scores: [np.float64(0.8367), np.float64(0.8283), np.float64(0.8167), np.float64(0.7983), np.float64(0.8417)]
+  - Fold Scores: [0.8367, 0.8283, 0.8167, 0.7983, 0.8417]
   - Mean Accuracy: 0.8243 (+/- 0.0155)

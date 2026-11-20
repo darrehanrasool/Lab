@@ -32,7 +32,3 @@ Ham (Legitimate)       0.98      1.00      0.99       483
        macro avg       0.97      0.93      0.95       558
     weighted avg       0.98      0.98      0.98       558
 
-
-5-Fold Cross-Validation (F1-Score on Training Data):
-  - Fold Scores: [np.float64(0.9261), np.float64(0.9463), np.float64(0.8932), np.float64(0.9307), np.float64(0.9458)]
-  - Mean F1:     0.9284 (+/- 0.0194)

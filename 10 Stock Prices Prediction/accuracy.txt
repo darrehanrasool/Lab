@@ -15,5 +15,5 @@ Test Set Evaluation (Held-Out Future Window):
   - Predicted Price Mean:           $116.54
 
 Time Series Cross-Validation (TimeSeriesSplit Expanding Window R²):
-  - Fold Scores: [-0.2348, 0.4818, -0.086, 0.7231, 0.5867]
-  - Mean Temporal R²: 0.2942 (+/- 0.3819)
+  - Fold Scores: [-0.2342, 0.5053, -0.0725, 0.703, 0.5802]
+  - Mean Temporal R²: 0.2964 (+/- 0.3761)
