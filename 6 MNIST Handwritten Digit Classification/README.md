@@ -48,6 +48,177 @@ The entire neural network computer vision pipeline—from raw pixel ingestion, d
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Class Equilibrium Audit
+
+<div align="center">
+  <img src="reports/figures/fig01_class_distribution_equilibrium.png" alt="🔍 Figure 1 Analysis: Class Equilibrium Audit" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Discrete category frequency distribution across digits $0$ through $9$.
+- **Finding**: All 10 digits are evenly represented ($\sim 1,050$ samples per digit in training).
+- **Implication**: Perfect class balance ensures that the loss surface is not biased toward any digit, making standard multiclass accuracy an authoritative metric.
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Visual Morphology of Hand-Drawn Digits
+
+<div align="center">
+  <img src="reports/figures/fig02_digit_sample_grid.png" alt="🔍 Figure 2 Analysis: Visual Morphology of Hand-Drawn Digits" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: $2 \times 5$ sub-grid rendering raw $28 \times 28$ grayscale matrices.
+- **Observations**:
+  - Digits feature stroke thickness variation, tilt, and natural curvature.
+  - Digits are centered within the bounding box, but stroke connectivity varies significantly.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Canonical Spatial Templates
+
+<div align="center">
+  <img src="reports/figures/fig03_canonical_digit_prototypes.png" alt="🔍 Figure 3 Analysis: Canonical Spatial Templates" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Spatial average intensity heatmap across all training images for each digit.
+- **Insights**:
+  - The heatmaps reveal the mathematical "essence" of each digit.
+  - Border pixels are almost universally zero (dark purple), showing that discriminatory information is concentrated in the central $20 \times 20$ region.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Extreme Pixel Sparsity
+
+<div align="center">
+  <img src="reports/figures/fig04_stroke_pixel_intensity_sparsity.png" alt="🔍 Figure 4 Analysis: Extreme Pixel Sparsity" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **High Sparsity**: Approximately **$80.8\%$ of all pixel values are exactly 0** (background).
+- Active pen strokes display a bimodal distribution with a peak near maximum saturation ($255$).
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Manifold Complexity & Non-Linearity
+
+<div align="center">
+  <img src="reports/figures/fig05_pca_2d_manifold_projection.png" alt="🔍 Figure 5 Analysis: Manifold Complexity & Non-Linearity" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Observations**: In linear 2D space, digits $0$ (blue) and $1$ (orange) separate well, but digits $3, 5, 8$ overlap substantially.
+- **Need for Multi-Layer Neural Network**: Simple linear models struggle with complex curved strokes. Multi-layer non-linear transformations are required to project these representations into separable decision boundaries.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Loss Curve Optimization Dynamics
+
+<div align="center">
+  <img src="reports/figures/fig06_mlp_loss_convergence.png" alt="🔍 Figure 6 Analysis: Loss Curve Optimization Dynamics" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Cross-entropy training loss vs epoch iterations.
+- **Observations**:
+  - The loss decreases smoothly from $> 0.8$ down to $\sim 0.02$, showing stable Adam convergence without oscillations.
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Multiclass Error Breakdown
+
+<div align="center">
+  <img src="reports/figures/fig07_10x10_confusion_matrix.png" alt="🔍 Figure 7 Analysis: Multiclass Error Breakdown" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Strong Diagonal Dominance**: High correct classification across all 10 digits ($> 200$ samples correct per digit out of $225$).
+- **Common Confusions**: Slight mutual misclassification between $4$ and $9$ (due to vertical stroke similarities) and $3$ and $5$ (curved bottoms).
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: Balanced Per-Class Performance
+
+<div align="center">
+  <img src="reports/figures/fig08_per_digit_classification_report.png" alt="🔍 Figure 8 Analysis: Balanced Per-Class Performance" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Top Performer**: Digit $1$ achieves **$97.78\%$ Precision and Recall** (simple linear vertical stroke).
+- **Most Challenging**: Digit $8$ has the lowest recall ($88.44\%$) due to loop closure variations.
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: Multiclass ROC-AUC
+
+<div align="center">
+  <img src="reports/figures/fig09_multiclass_roc_auc_curves.png" alt="🔍 Figure 9 Analysis: Multiclass ROC-AUC" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Macro AUC $= 0.9962$**: Near-ideal probability calibration and discrimination across all 10 digit classes.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Ambiguous Handwriting Auditing
+
+<div align="center">
+  <img src="reports/figures/fig10_test_predictions_and_error_gallery.png" alt="🔍 Figure 10 Analysis: Ambiguous Handwriting Auditing" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Inspection**: Inspection reveals that misclassified digits are heavily deformed or objectively ambiguous even to human examiners.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```

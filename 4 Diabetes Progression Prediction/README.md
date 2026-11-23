@@ -48,6 +48,196 @@ The entire clinical data science pipeline—from raw biomarker ingestion, explor
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Target Distribution & Triage Threshold
+
+<div align="center">
+  <img src="reports/figures/fig01_target_progression_distribution.png" alt="🔍 Figure 1 Analysis: Target Distribution & Triage Threshold" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Continuous density distribution (Subplot A) paired with clinical risk tier partitioning (Subplot B).
+- **Findings**:
+  - Continuous target spans from $25$ to $346$ (Mean: $152.1$, Median: $140.5$).
+  - **Severe Triage Imbalance**: Severe disease progression ($y \ge 200$) accounts for exactly **$28.7\%$** ($N = 127$) of patients. This represents an imbalanced class ratio of $\sim 1 : 2.5$, requiring cost-sensitive weighting for triage models.
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Primary Metabolic Accelerants
+
+<div align="center">
+  <img src="reports/figures/fig02_primary_metabolic_accelerants.png" alt="🔍 Figure 2 Analysis: Primary Metabolic Accelerants" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Scatter plots with fitted linear regression lines detailing the two highest-correlated continuous biomarkers.
+- **Findings**:
+  - **BMI ($r = +0.586$)**: Elevated visceral adiposity directly correlates with worsening insulin resistance.
+  - **$s5$ Triglycerides ($r = +0.566$)**: Serum triglyceride concentration is the single strongest blood chemistry driver of diabetic microvascular progression.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Blood Serum Multicollinearity
+
+<div align="center">
+  <img src="reports/figures/fig03_correlation_covariance_matrix.png" alt="🔍 Figure 3 Analysis: Blood Serum Multicollinearity" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Full $11 \times 11$ Pearson correlation matrix across all 10 features and continuous target `progression`.
+- **Severe Collinearity Alert**:
+  - Total Cholesterol (`s1`) and LDL (`s2`) correlate at **$r = +0.897$**.
+  - Total Cholesterol (`s1`) and TCH Ratio (`s4`) correlate at **$r = +0.542$**.
+  - HDL (`s3`) and TCH (`s4`) correlate negatively at **$r = -0.738$**.
+- **Impact on OLS**: High collinearity causes the normal equation to give $s1$ and $s2$ large, opposing signs to cancel out shared variance.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Diagnosing Multicollinearity (VIF)
+
+<div align="center">
+  <img src="reports/figures/fig04_variance_inflation_factor_vif.png" alt="🔍 Figure 4 Analysis: Diagnosing Multicollinearity (VIF)" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Formula**: $\text{VIF}_j = \frac{1}{1 - R_j^2}$.
+- **Findings**:
+  - `s1` (Total Cholesterol) reaches **VIF $= 59.2$** and `s2` (LDL) reaches **VIF $= 39.2$**, far above the severe threshold ($> 10$).
+  - This explains why unregularized OLS sets $\beta_{s1} = -31.89$ and $\beta_{s2} = +18.96$. Regularized linear models (Ridge/Lasso/ElasticNet) help stabilize these weights.
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Feature Range & Standardization Rationale
+
+<div align="center">
+  <img src="reports/figures/fig05_baseline_feature_distributions.png" alt="🔍 Figure 5 Analysis: Feature Range & Standardization Rationale" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Scale Discrepancies**: Features like `s1` (cholesterol) reach $> 300$ mg/dL, whereas `sex` is binary ($1$ or $2$) and `s5` is logarithmic.
+- **Action**: Z-score standardization ($z = \frac{x - \mu}{\sigma}$) centers each feature around zero with unit variance, enabling direct comparison of beta coefficients.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Why OLS Wins on Small Clinical Cohorts
+
+<div align="center">
+  <img src="reports/figures/fig06_ols_vs_decision_tree_benchmark.png" alt="🔍 Figure 6 Analysis: Why OLS Wins on Small Clinical Cohorts" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Head-to-head empirical comparison across Test $R^2$ (Subplot A) and Test RMSE (Subplot B).
+- **Core Findings**:
+  - **OLS dominates**: Test $R^2 = 0.4882$, RMSE $= 55.17$.
+  - **Unpruned Decision Tree collapses**: Test $R^2 = -0.3643$, RMSE $= 90.08$ (worse than predicting the mean!).
+  - **Tuned Decision Tree**: Even after regularizing depth and leaf sizes, Test $R^2 = 0.2538$ (explaining only half the variance of OLS).
+- **Takeaway**: Biological biomarkers have continuous, additive effects that match the smooth parametric assumptions of linear regression.
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Goodness-of-Fit Assessment
+
+<div align="center">
+  <img src="reports/figures/fig07_actual_vs_predicted_progression.png" alt="🔍 Figure 7 Analysis: Goodness-of-Fit Assessment" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Scatter plot of ground truth versus predicted scores plotted against the $45^\circ$ ideal fit line.
+- **Findings**:
+  - The model achieves **$R^2 = 0.4882$**, explaining nearly half of unseen clinical variance.
+  - Test **MAE is $44.92$**, with moderate cases clustered tightly around the central diagonal.
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: Residual Diagnostics & Regression to Mean
+
+<div align="center">
+  <img src="reports/figures/fig08_residual_tail_sparsity_diagnostic.png" alt="🔍 Figure 8 Analysis: Residual Diagnostics & Regression to Mean" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Residual error distribution ($e_i = y_i - \hat{y}_i$) vs predicted values $\hat{y}_i$.
+- **Clinical Observation**: Extreme cases ($y > 250$) show slight underprediction. This reflects **regression to the mean** driven by tail sample sparsity in training data.
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: Cost-Sensitive High-Risk Triage
+
+<div align="center">
+  <img src="reports/figures/fig09_high_risk_triage_confusion_matrix.png" alt="🔍 Figure 9 Analysis: Cost-Sensitive High-Risk Triage" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Confusion matrix heatmap evaluating the balanced triage classifier on unseen holdout patients.
+- **Life-Saving Impact**:
+  - **Clinical Sensitivity (Recall)**: **$76.92\%$** ($10$ out of $13$ deteriorating diabetic patients identified).
+  - Unweighted models achieve only $61.54\%$ recall. Cost-sensitive weighting reduced dangerous False Negatives from $5$ down to $3$.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Clinical Risk Weight Hierarchy
+
+<div align="center">
+  <img src="reports/figures/fig10_standardized_ols_coefficients.png" alt="🔍 Figure 10 Analysis: Clinical Risk Weight Hierarchy" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Horizontal bar chart of standardized OLS regression weights $\beta_j$.
+- **Clinical Hierarchy**:
+  - **$s5$ Triglycerides ($+34.89$)**: Strongest single metabolic accelerant.
+  - **BMI ($+23.72$)**: Second strongest accelerant.
+  - **$s2$ LDL Cholesterol ($+18.96$)**: Atherogenic lipid burden.
+  - **BP ($+17.76$)**: Vascular shear stress.
+  - **Age ($-1.05$)**: Minimal marginal impact in this cohort.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```

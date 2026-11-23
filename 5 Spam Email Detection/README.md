@@ -48,6 +48,189 @@ The entire NLP machine learning pipeline—from raw text ingestion, message char
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Severe Class Imbalance
+
+<div align="center">
+  <img src="reports/figures/fig01_class_imbalance_distribution.png" alt="🔍 Figure 1 Analysis: Severe Class Imbalance" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Frequency bar chart and proportional donut chart depicting class priors.
+- **Quantitative Findings**:
+  - **Ham (Legitimate)**: $N = 4,825$ ($86.6\%$)
+  - **Spam (Malicious)**: $N = 747$ ($13.4\%$)
+- **Implication**: Severe class imbalance requires monitoring **Precision, Recall, and ROC-AUC / PR-AUC** rather than raw classification accuracy alone. A naive majority-class model achieves $86.6\%$ accuracy while catching $0$ spam emails!
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Distinct Structural Length Signals
+
+<div align="center">
+  <img src="reports/figures/fig02_message_length_density.png" alt="🔍 Figure 2 Analysis: Distinct Structural Length Signals" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Dual-density Gaussian KDE comparing character lengths of legitimate versus spam communications.
+- **Striking Empirical Disparity**:
+  - **Ham**: Median length is **$52$ characters**; conversational and concise.
+  - **Spam**: Tightly peaked right against the **$160$ character SMS limit** (Median $= 149$ characters). Spammers maximize the available payload to pack marketing text, phone numbers, and call-to-actions.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Numerical Digit Signatures
+
+<div align="center">
+  <img src="reports/figures/fig03_numeric_digit_frequencies.png" alt="🔍 Figure 3 Analysis: Numerical Digit Signatures" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Word count boxplot alongside average numerical digit frequency.
+- **Findings**:
+  - Spam messages contain an average of **$15.65$ digits per message**, compared to only **$0.30$ digits** in legitimate messages ($> 52\times$ increase!).
+  - Phone numbers, currency values (£, $), and verification codes dominate spam content.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Malicious Token Hierarchy
+
+<div align="center">
+  <img src="reports/figures/fig04_top_spam_predictive_tokens.png" alt="🔍 Figure 4 Analysis: Malicious Token Hierarchy" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Horizontal bar chart of the highest TF-IDF weighted terms in spam communications.
+- **Dominant Keywords**:
+  - `free`, `claim`, `prize`, `won`, `cash`, `urgent`, `service`, `stop`.
+  - These terms align with phishing patterns and deceptive prize claims.
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Conversational Ham Lexicon
+
+<div align="center">
+  <img src="reports/figures/fig05_top_ham_legitimate_tokens.png" alt="🔍 Figure 5 Analysis: Conversational Ham Lexicon" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Dominant Keywords**:
+  - `come`, `good`, `like`, `time`, `know`, `love`, `home`, `going`, `sorry`.
+  - Legitimate communications feature everyday conversational tokens with zero promotional urgency.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Algorithm Tradeoffs
+
+<div align="center">
+  <img src="reports/figures/fig06_algorithm_tradeoff_comparison.png" alt="🔍 Figure 6 Analysis: Algorithm Tradeoffs" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Paired comparison of Overall Test Accuracy and Minority Spam F1-Score.
+- **Key Takeaways**:
+  - **Multinomial Naive Bayes** achieves **$97.85\%$ Accuracy** and an exceptional **$91.55\%$ Spam F1-Score**.
+  - **Logistic Regression** has perfect precision ($100\%$) but sacrifices recall ($74.7\%$), missing subtle spam messages.
+  - **Linear SVM** delivers near-identical performance ($98.03\%$ Acc, $92.31\%$ F1).
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Cross-Validation Consistency
+
+<div align="center">
+  <img src="reports/figures/fig07_cross_validation_robustness.png" alt="🔍 Figure 7 Analysis: Cross-Validation Consistency" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Accuracy per fold with mean and $\pm 1\sigma$ variance bounds.
+- **Finding**: Mean accuracy is **$98.15\% \pm 0.31\%$**, showing negligible fold variance.
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: Error Breakdown & False Positives
+
+<div align="center">
+  <img src="reports/figures/fig08_confusion_matrix_heatmap.png" alt="🔍 Figure 8 Analysis: Error Breakdown & False Positives" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Integer contingency heatmap illustrating classification decisions across 558 test communications.
+- **Breakdown**:
+  - **True Negatives (Legitimate Ham)**: **$481 / 483$** correctly classified ($99.59\%$ specificity).
+  - **False Positives (Critical Error)**: Only **$2$ legitimate emails** misclassified as spam ($0.41\%$ false alarm rate).
+  - **True Positives (Spam Caught)**: **$65 / 75$** ($86.67\%$ recall).
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: ROC-AUC Discrimination
+
+<div align="center">
+  <img src="reports/figures/fig09_roc_auc_trajectory.png" alt="🔍 Figure 9 Analysis: ROC-AUC Discrimination" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Sensitivity vs False Alarm rate across all continuous log-probability thresholds.
+- **Result**: $\text{AUC} = 0.9834$, confirming near-ideal class discrimination across all operating thresholds.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Precision-Recall Curve (PR-AUC)
+
+<div align="center">
+  <img src="reports/figures/fig10_precision_recall_curve.png" alt="🔍 Figure 10 Analysis: Precision-Recall Curve (PR-AUC)" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: PR trajectory measuring positive spam precision retention without false-negative inflation.
+- **Metric Insight**: **Average Precision (AP) $= 0.9412$**, retaining $> 95\%$ precision up to $80\%$ recall.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```

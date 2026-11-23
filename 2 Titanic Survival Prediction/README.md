@@ -47,6 +47,198 @@ The entire machine learning pipeline—from defensive manifest ingestion, explor
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Target Imbalance Audit
+
+<div align="center">
+  <img src="reports/figures/fig01_target_imbalance_distribution.png" alt="🔍 Figure 1 Analysis: Target Imbalance Audit" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Dual-panel graphic detailing raw counts (Subplot A) and prior probability ratios (Subplot B).
+- **Quantitative Finding**:
+  - **Perished ($y = 0$)**: $N = 549$ ($61.62\%$)
+  - **Survived ($y = 1$)**: $N = 342$ ($38.38\%$)
+- **Modeling Implication**: The dataset has a moderate class imbalance (~$1.6 : 1$). Stratified sampling (`stratify=y`) is essential to preserve this ratio across training, validation, and holdout test splits.
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Sociological & Historical Drivers
+
+<div align="center">
+  <img src="reports/figures/fig02_survival_by_sex_and_class.png" alt="🔍 Figure 2 Analysis: Sociological & Historical Drivers" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Side-by-side empirical survival rate comparisons across biological sex and ticket class.
+- **Dramatic Disparities**:
+  - **Gender Effect**: Females survived at **$74.2\%$**, whereas males survived at only **$18.9\%$** ($> 3.9\times$ multiplier). This reflects the strict enforcement of maritime evacuation protocol.
+  - **Economic Stratification**: 1st Class passengers had a **$63.0\%$** survival rate, compared to **$47.3\%$** for 2nd Class and just **$24.2\%$** for 3rd Class. Upper-deck proximity and lifeboat priority created an enormous survival gradient.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Age Demographics & Child Evacuation
+
+<div align="center">
+  <img src="reports/figures/fig03_age_density_child_evacuation.png" alt="🔍 Figure 3 Analysis: Age Demographics & Child Evacuation" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Dual-density Gaussian Kernel Density Estimation (KDE) comparing continuous age curves of survivors versus fatalities.
+- **Pediatric Spikes**: A distinct density spike appears for children aged $0 - 5$ in the survival curve, confirming lifeboat prioritization for infants and young children.
+- **Elderly Mortality**: Passengers aged $> 60$ show elevated mortality rates.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Fare Distribution & Scaling Needs
+
+<div align="center">
+  <img src="reports/figures/fig04_fare_distribution_and_outliers.png" alt="🔍 Figure 4 Analysis: Fare Distribution & Scaling Needs" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Raw boxplots demonstrating extreme outliers (fares reaching £512) alongside log-transformed KDE curves.
+- **Findings**:
+  - Fare is heavily right-skewed: Median fare is £$14.45$, but max is £$512.33$.
+  - Survivors paid markedly higher fares across every class.
+- **Preprocessing Strategy**: Because fare contains extreme outliers, **median imputation** must be used for any missing fare values, and **StandardScaler** must normalize scale before model ingestion.
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Target Association & Multicollinearity
+
+<div align="center">
+  <img src="reports/figures/fig05_correlation_heatmap.png" alt="🔍 Figure 5 Analysis: Target Association & Multicollinearity" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Correlation with Target (`survived`)**:
+  - `sex` has the strongest positive linear association with survival (**$r = +0.543$**).
+  - `pclass` has a strong negative association (**$r = -0.338$**), meaning lower class number (1st class) had higher survival.
+  - `fare` correlates positively (**$r = +0.257$**).
+- **Multicollinearity**: `pclass` and `fare` exhibit moderate negative correlation ($r = -0.549$), but no pairs exceed $|r| > 0.8$, indicating benign inter-feature collinearity.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Cross-Validation Stability
+
+<div align="center">
+  <img src="reports/figures/fig06_cross_validation_stability.png" alt="🔍 Figure 6 Analysis: Cross-Validation Stability" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Accuracy bar plot per cross-validation fold with mean reference and $\pm 1\sigma$ variance envelope.
+- **Quantitative Finding**:
+  - **Mean Cross-Validation Accuracy**: **$81.69\% \pm 3.47\%$**.
+  - All five folds remain within the $[77.6\%, 87.2\%]$ band, demonstrating that the ensemble generalises across diverse passenger subsets.
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Confusion Matrix & Diagnostic Errors
+
+<div align="center">
+  <img src="reports/figures/fig07_confusion_matrix.png" alt="🔍 Figure 7 Analysis: Confusion Matrix & Diagnostic Errors" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Integer contingency heatmap illustrating True Negatives ($71$), False Positives ($12$), False Negatives ($19$), and True Positives ($32$).
+- **Key Diagnostic Metrics**:
+  - **Perished Class Precision**: **$78.9\%$**; **Recall**: **$85.5\%$**.
+  - **Survived Class Precision**: **$72.7\%$**; **Recall**: **$62.7\%$**.
+  - **Clinical / Disaster Context**: The model prioritizes conservative predictions with higher specificity ($85.5\%$), accurately capturing the majority mortality class.
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: Discrimination Capacity & ROC-AUC
+
+<div align="center">
+  <img src="reports/figures/fig08_roc_auc_curve.png" alt="🔍 Figure 8 Analysis: Discrimination Capacity & ROC-AUC" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: ROC curve illustrating Sensitivity versus False Alarm rate across all continuous discrimination thresholds $[0.0, 1.0]$.
+- **Quantitative Finding**:
+  - The model achieves **$\text{AUC} = 0.8351$**, verifying that the ensemble ranks positive survival candidates well above random chance ($0.50$).
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: Precision-Recall Tradeoff
+
+<div align="center">
+  <img src="reports/figures/fig09_precision_recall_curve.png" alt="🔍 Figure 9 Analysis: Precision-Recall Tradeoff" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Precision-Recall trajectory assessing performance on the minority class ($38.4\%$ survived) without distortion from large true negative volumes.
+- **Metric Insight**:
+  - **Average Precision (AP)**: **$0.8143$**, far exceeding the no-skill baseline of $38.1\%$.
+  - The model sustains $> 75\%$ precision up to $60\%$ recall.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Feature Importance Hierarchy
+
+<div align="center">
+  <img src="reports/figures/fig10_random_forest_feature_importance.png" alt="🔍 Figure 10 Analysis: Feature Importance Hierarchy" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Bar chart ranking predictors by total Mean Decrease in Gini Impurity aggregated across all 100 decision trees.
+- **Empirical Hierarchy**:
+  1. **Sex ($34.8\%$)**: Overwhelming primary driver of evacuation survival.
+  2. **Fare ($23.9\%$)**: Continuous economic marker reflecting cabin deck placement.
+  3. **Age ($18.7\%$)**: Modulates pediatric priority.
+  4. **Pclass ($11.5\%$)**: Structural passenger class assignment.
+  5. **SibSp & Parch ($11.1\%$ combined)**: Family unit dynamics.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```

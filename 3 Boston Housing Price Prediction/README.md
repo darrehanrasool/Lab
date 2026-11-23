@@ -48,6 +48,193 @@ The entire econometric regression pipeline—from raw census data ingestion, exp
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Target Price Distribution & Boundary Censoring
+
+<div align="center">
+  <img src="reports/figures/fig01_target_price_distribution.png" alt="🔍 Figure 1 Analysis: Target Price Distribution & Boundary Censoring" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Histogram with Gaussian KDE (Subplot A) and 5-number summary Boxplot (Subplot B).
+- **Key Empirical Observations**:
+  - The distribution is moderately right-skewed with a peak around \$20k - \$22k.
+  - **Right-Censoring Artifact**: Exactly 16 census tracts are artificially pinned at \$50.0k (the study's truncation ceiling). This ceiling creates slight non-linearity at high property prices that standard linear models tend to underpredict.
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Primary Structural & Socioeconomic Drivers
+
+<div align="center">
+  <img src="reports/figures/fig02_primary_structural_drivers.png" alt="🔍 Figure 2 Analysis: Primary Structural & Socioeconomic Drivers" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Scatter plots with fitted linear regression trajectories.
+- **Findings**:
+  - **Room Count (RM)**: Demonstrates a strong positive linear correlation (**$r = +0.695$**). More rooms directly correspond to larger home size and higher valuation.
+  - **Lower Status (% LSTAT)**: Strong negative non-linear inverse relationship (**$r = -0.738$**). As neighborhood poverty rises, home values decline rapidly.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Multicollinearity Diagnosis
+
+<div align="center">
+  <img src="reports/figures/fig03_correlation_matrix_heatmap.png" alt="🔍 Figure 3 Analysis: Multicollinearity Diagnosis" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Full $14 \times 14$ correlation matrix between all 13 features and target `MEDV`.
+- **Key Inter-Feature Collinearities**:
+  - `RAD` (highway accessibility) and `TAX` (property tax rate): **$r = +0.91$** (severe collinearity).
+  - `NOX` (pollution) and `INDUS` (industrial acreage): **$r = +0.76$**.
+  - `DIS` (distance to employment centers) negatively correlates with `NOX` ($-0.77$) and `AGE` ($-0.75$).
+- **Implication**: Severe multicollinearity between RAD and TAX can inflate coefficient variance in unregularized OLS.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Variance Inflation Factors (VIF)
+
+<div align="center">
+  <img src="reports/figures/fig04_variance_inflation_factors_vif.png" alt="🔍 Figure 4 Analysis: Variance Inflation Factors (VIF)" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Formula**: $\text{VIF}_j = \frac{1}{1 - R_j^2}$, measuring how much the variance of $\hat{\beta}_j$ is inflated due to collinearity with remaining features.
+- **Findings**:
+  - `TAX` (VIF $\approx 9.0$) and `RAD` (VIF $\approx 7.5$) cross the warning threshold ($	ext{VIF} > 5$).
+  - Features like `CHAS` (river proximity) and `CRIM` have VIF $< 2$, indicating complete linear independence.
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Scale Disparity & Standardization Need
+
+<div align="center">
+  <img src="reports/figures/fig05_predictor_scale_disparities.png" alt="🔍 Figure 5 Analysis: Scale Disparity & Standardization Need" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Log-scale boxplot comparing the numerical domains of all 13 input predictors.
+- **Observation**: `TAX` values exceed $700$, while `NOX` values remain below $1.0$.
+- **Downstream Impact**: In SVR and gradient solvers, unscaled high-magnitude variables dominate the loss function. Z-score scaling ($z = \frac{x - \mu}{\sigma}$) centers every predictor to mean 0 and variance 1.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Cross-Validation Stability
+
+<div align="center">
+  <img src="reports/figures/fig06_cross_validation_performance.png" alt="🔍 Figure 6 Analysis: Cross-Validation Stability" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Paired fold-by-fold $R^2$ performance bar chart comparing OLS versus Linear SVR.
+- **Observations**:
+  - OLS achieves a **Mean CV $R^2 = 0.6880$**, outperforming Linear SVR (Mean $R^2 = 0.6481$).
+  - Performance remains steady across all 5 folds, verifying generalizability.
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Goodness-of-Fit Assessment
+
+<div align="center">
+  <img src="reports/figures/fig07_actual_vs_predicted_prices.png" alt="🔍 Figure 7 Analysis: Goodness-of-Fit Assessment" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Scatter plot of actual target values ($y$) versus model predictions ($\hat{y}$) mapped against the diagonal identity line $y = \hat{y}$.
+- **Findings**:
+  - Points cluster tightly along the $45^\circ$ trajectory, reflecting **$R^2 = 0.7140$** (explaining $71.4\%$ of unseen price variance).
+  - Average error magnitude (**MAE**) is **\$3,390.46** on tracts with a median valuation of \$22,500.
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: Heteroscedasticity & Residual Randomness
+
+<div align="center">
+  <img src="reports/figures/fig08_residual_homoscedasticity.png" alt="🔍 Figure 8 Analysis: Heteroscedasticity & Residual Randomness" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Scatter plot of residual errors ($e_i = y_i - \hat{y}_i$) plotted against predicted values ($\hat{y}_i$).
+- **Statistical Findings**:
+  - Residuals are uniformly distributed around the zero-error axis without expanding funnel shapes, satisfying the **homoscedasticity** condition of the Gauss-Markov theorem.
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: Normality of Residuals
+
+<div align="center">
+  <img src="reports/figures/fig09_residual_normality_qq_plot.png" alt="🔍 Figure 9 Analysis: Normality of Residuals" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Residual error distribution (Subplot A) alongside a Normal Quantile-Quantile (Q-Q) plot (Subplot B).
+- **Inference**: Residuals follow the theoretical normal line closely, confirming that the linear formulation captures systematic variance without major unmodeled patterns.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Econometric Drivers & Feature Impact
+
+<div align="center">
+  <img src="reports/figures/fig10_standardized_beta_coefficients.png" alt="🔍 Figure 10 Analysis: Econometric Drivers & Feature Impact" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Horizontal diverging bar chart depicting standardized regression coefficients $\beta_j$.
+- **Key Determinants**:
+  - **LSTAT ($-3.74$)**: Strongest negative factor. Higher neighborhood poverty substantially suppresses valuations.
+  - **DIS ($+3.10$)**: Proximity to Boston employment centers boosts value.
+  - **RM ($+2.67$)**: Each standard deviation increase in rooms adds $\sim \$2,670$ to valuation.
+  - **NOX ($-2.06$)**: Atmospheric pollution heavily penalizes prices.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```

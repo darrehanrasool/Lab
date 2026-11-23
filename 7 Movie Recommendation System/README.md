@@ -48,6 +48,167 @@ The entire recommender machine learning pipeline—from sparse matrix ingestion,
 
 ---
 
+
+---
+
+## 📊 Complete Machine Learning Pipeline Visualizations (10 Diagnostic Figures)
+
+Every phase of the pipeline generates publication-grade diagnostic plots ($14 \times 7$ inches, 300 DPI) engineered with uniform dimensions, typography, and cohesive scientific palettes for seamless GitHub presentation and viva defense.
+
+### 🔍 Figure 1 Analysis: Positive Rating Skewness
+
+<div align="center">
+  <img src="reports/figures/fig01_rating_frequency_distribution.png" alt="🔍 Figure 1 Analysis: Positive Rating Skewness" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Discrete bar chart across all half-star rating values from $0.5$ to $5.0$.
+- **Findings**:
+  - The distribution is heavily **positively skewed**: **$4.0$ stars is the most frequent rating** ($26,818$ times), followed by $3.0$ stars.
+  - Users rarely finish or rate movies they dislike, creating an overall mean rating of **$3.50$ stars**.
+
+</details>
+
+---
+
+### 🔍 Figure 2 Analysis: Power-Law User Engagement
+
+<div align="center">
+  <img src="reports/figures/fig02_user_engagement_power_law.png" alt="🔍 Figure 2 Analysis: Power-Law User Engagement" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Power Law Structure**: A small minority of power users account for the majority of ratings (top user submitted $> 2,600$ reviews), while the median user rated $68$ movies.
+
+</details>
+
+---
+
+### 🔍 Figure 3 Analysis: Landmark Catalog Drivers
+
+<div align="center">
+  <img src="reports/figures/fig03_top_rated_landmark_movies.png" alt="🔍 Figure 3 Analysis: Landmark Catalog Drivers" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Top Films**: *Forrest Gump (1994)* ($329$ ratings), *Shawshank Redemption (1994)* ($317$ ratings), and *Pulp Fiction (1994)* ($307$ ratings) serve as universal semantic anchors in latent space.
+
+</details>
+
+---
+
+### 🔍 Figure 4 Analysis: Visualizing Sparse Observations
+
+<div align="center">
+  <img src="reports/figures/fig04_matrix_observation_sparsity.png" alt="🔍 Figure 4 Analysis: Visualizing Sparse Observations" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Visual Architecture**: Boolean observation heatmap where blue indicates a known rating and light gray indicates an unobserved interaction.
+- **Factorization Necessity**: Even among the top 50 active users and top 50 movies, substantial holes exist. TruncatedSVD fills these voids by discovering low-rank latent factors.
+
+</details>
+
+---
+
+### 🔍 Figure 5 Analysis: Genre Composition
+
+<div align="center">
+  <img src="reports/figures/fig05_movie_genre_representation.png" alt="🔍 Figure 5 Analysis: Genre Composition" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Dominant Genres**: Drama ($4,361$ titles) and Comedy ($3,756$ titles) comprise over $50\%$ of the catalog, followed by Thriller and Action.
+
+</details>
+
+---
+
+### 🔍 Figure 6 Analysis: Latent Spectrum Decay
+
+<div align="center">
+  <img src="reports/figures/fig06_svd_variance_explained_scree.png" alt="🔍 Figure 6 Analysis: Latent Spectrum Decay" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Scree Plot**: The top $3$ components capture the dominant broad genres (Action, Drama, Comedy), while higher components capture nuanced stylistic subtleties.
+
+</details>
+
+---
+
+### 🔍 Figure 7 Analysis: Semantic Proximity in Latent Space
+
+<div align="center">
+  <img src="reports/figures/fig07_latent_space_semantic_projection.png" alt="🔍 Figure 7 Analysis: Semantic Proximity in Latent Space" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- **Semantic Clustering**: Animated family movies (*Toy Story*, *Lion King*) cluster closely together in latent coordinate space, completely distinct from sci-fi/action (*The Matrix*).
+
+</details>
+
+---
+
+### 🔍 Figure 8 Analysis: High Fidelity Semantic Cosine Scores
+
+<div align="center">
+  <img src="reports/figures/fig08_pairwise_cosine_similarity_matrix.png" alt="🔍 Figure 8 Analysis: High Fidelity Semantic Cosine Scores" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- *Toy Story* and *The Lion King* share a high similarity score (**$0.864$**), while *Toy Story* and *Pulp Fiction* share low similarity ($0.412$), validating the model's semantic accuracy.
+
+</details>
+
+---
+
+### 🔍 Figure 9 Analysis: Real-Time Recommendation Quality
+
+<div align="center">
+  <img src="reports/figures/fig09_nearest_neighbor_recommendations.png" alt="🔍 Figure 9 Analysis: Real-Time Recommendation Quality" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- Recommendations for *Toy Story* return *Toy Story 2*, *Shrek*, *Monsters Inc.*, and *Finding Nemo*, confirming that the model captures family-friendly animated adventure features.
+
+</details>
+
+---
+
+### 🔍 Figure 10 Analysis: Reconstruction Fidelity
+
+<div align="center">
+  <img src="reports/figures/fig10_rating_reconstruction_error.png" alt="🔍 Figure 10 Analysis: Reconstruction Fidelity" width="100%" />
+</div>
+
+<details open>
+<summary><b>🔍 Statistical Analysis & Viva Defense Insights</b></summary>
+
+- Errors are centered symmetrically around $0.0$, verifying that low-rank SVD captures the central rating tendencies without bias.
+
+</details>
+
+---
+
 ## 💻 Project Structure
 
 ```
