@@ -1,26 +1,25 @@
-Project 7: Movie Recommendation System
-======================================
-End-to-End Pipeline Guide:
+7 Movie Recommendation System
+========================================================================
+Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
+Clean Architecture: Production Jupyter Notebook Pipeline + Flask Web API
 
-1. Download MovieLens dataset and extract locally:
-   python src/data/make_dataset.py
-   (Downloads and saves data/raw/movies.csv and data/raw/ratings.csv)
+End-to-End Execution & Reproduction Guide:
+------------------------------------------
 
-2. Build Train (70%), Validation (15%), and Test (15%) splits & User-Item matrix:
-   python src/features/build_features.py
-   (Saves data/processed/user_item_matrix.joblib, movie_metadata.joblib, and split CSVs)
+1. Run the Full Machine Learning Pipeline (Interactive Jupyter Notebook):
+   jupyter notebook notebooks/Movie_Recommendation_Pipeline.ipynb
+   (Executes end-to-end data ingestion, exploratory data analysis, zero-leakage 
+    scaling, model training, cross-validation, and serializes production models)
 
-3. Train TruncatedSVD Matrix Factorization model and evaluate metrics:
-   python src/models/train_model.py
-   (Saves models/recommender_pipeline.joblib and generates accuracy.txt)
+2. Launch the Interactive Web Dashboard & REST API:
+   python3 web/app.py
+   (Starts the production Flask server with pre-loaded models at http://127.0.0.1:5007)
 
-4. Generate full evaluation and latent space diagnostics:
-   python src/visualization/visualize.py
-   (Saves 8 figures to reports/figures/)
+3. Review the Publication-Grade Master Learning Report:
+   Open Movie_Recommender_Report.pdf
+   (Comprehensive 12-chapter textbook detailing theory, math derivations,
+    and in-depth analysis of all 10 diagnostic figures)
 
-5. Test interactive movie recommendation in CLI:
-   python src/models/predict_model.py
-
-6. Run web application:
-   cd web && python app.py
-   Access in browser: http://127.0.0.1:5006
+4. Present Interactive Advanced Slides:
+   Open Movie_Recommender_Presentation.html in your browser
+   (Interactive 13-slide stepper presentation for viva and defense)

@@ -1,26 +1,25 @@
-Project 9: Sentiment Analysis of Text
-======================================
-End-to-End Pipeline Guide:
+9 Sentiment Analysis of Text
+========================================================================
+Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
+Clean Architecture: Production Jupyter Notebook Pipeline + Flask Web API
 
-1. Download raw IMDB sentiment dataset directly to disk:
-   python src/data/make_dataset.py
-   (Downloads and saves data/raw/sentiment.csv)
+End-to-End Execution & Reproduction Guide:
+------------------------------------------
 
-2. Perform text normalization, train/val/test splitting, and Sublinear TF-IDF extraction:
-   python src/features/build_features.py
-   (Saves data/processed/X_train.csv, X_val.csv, X_test.csv, y_train.csv, y_val.csv, y_test.csv, and vectorizer.joblib)
+1. Run the Full Machine Learning Pipeline (Interactive Jupyter Notebook):
+   jupyter notebook notebooks/Sentiment_Analysis_Pipeline.ipynb
+   (Executes end-to-end data ingestion, exploratory data analysis, zero-leakage 
+    scaling, model training, cross-validation, and serializes production models)
 
-3. Train Logistic Regression model and log evaluation metrics:
-   python src/models/train_model.py
-   (Saves models/sentiment_model.joblib and generates accuracy.txt)
+2. Launch the Interactive Web Dashboard & REST API:
+   python3 web/app.py
+   (Starts the production Flask server with pre-loaded models at http://127.0.0.1:5009)
 
-4. Generate full evaluation and text visual diagnostics:
-   python src/visualization/visualize.py
-   (Saves 8 figures to reports/figures/)
+3. Review the Publication-Grade Master Learning Report:
+   Open Sentiment_Report.pdf
+   (Comprehensive 12-chapter textbook detailing theory, math derivations,
+    and in-depth analysis of all 10 diagnostic figures)
 
-5. Test interactive sample sentiment classification via CLI:
-   python src/models/predict_model.py
-
-6. Run web application:
-   cd web && python app.py
-   Access in browser: http://127.0.0.1:5008
+4. Present Interactive Advanced Slides:
+   Open Sentiment_Presentation.html in your browser
+   (Interactive 13-slide stepper presentation for viva and defense)

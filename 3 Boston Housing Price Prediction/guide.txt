@@ -1,23 +1,25 @@
-BOSTON HOUSING PRICE PREDICTION - PROJECT GUIDE
-===============================================
+3 Boston Housing Price Prediction
+========================================================================
+Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
+Clean Architecture: Production Jupyter Notebook Pipeline + Flask Web API
 
-1. SETUP VIRTUAL ENVIRONMENT
-   python -m venv venv
-   source venv/bin/activate  (For Mac/Linux)
-   venv\Scripts\activate     (For Windows)
-   pip install -r requirements.txt
+End-to-End Execution & Reproduction Guide:
+------------------------------------------
 
-2. RUN DATA PIPELINE
-   python src/data/make_dataset.py
-   python src/features/build_features.py
+1. Run the Full Machine Learning Pipeline (Interactive Jupyter Notebook):
+   jupyter notebook notebooks/Boston_Housing_Pipeline.ipynb
+   (Executes end-to-end data ingestion, exploratory data analysis, zero-leakage 
+    scaling, model training, cross-validation, and serializes production models)
 
-3. TRAIN MODEL
-   python src/models/train_model.py
+2. Launch the Interactive Web Dashboard & REST API:
+   python3 web/app.py
+   (Starts the production Flask server with pre-loaded models at http://127.0.0.1:5003)
 
-4. GENERATE ALL EDA AND EVALUATION GRAPHS
-   python src/visualization/visualize.py
+3. Review the Publication-Grade Master Learning Report:
+   Open Boston_Housing_Report.pdf
+   (Comprehensive 12-chapter textbook detailing theory, math derivations,
+    and in-depth analysis of all 10 diagnostic figures)
 
-5. RUN WEB APP
-   cd web
-   python app.py
-   Open browser to http://127.0.0.1:5002
+4. Present Interactive Advanced Slides:
+   Open Boston_Housing_Presentation.html in your browser
+   (Interactive 13-slide stepper presentation for viva and defense)

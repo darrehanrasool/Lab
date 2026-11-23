@@ -7,28 +7,28 @@ Hidden Layer 2: 64 Units (ReLU)
 Output Layer: 10 Units (Softmax)
 Optimizer: Adam (Adaptive Moment Estimation)
 
-Validation Set Accuracy: 0.8578 (85.78%)
-Test Set Accuracy:       0.8582 (85.82%)
+Validation Set Accuracy: 0.8520 (85.20%)
+Test Set Accuracy:       0.8511 (85.11%)
 
 Detailed Classification Report:
               precision    recall  f1-score   support
 
- T-shirt/top     0.7733    0.7733    0.7733       225
-     Trouser     0.9697    0.9956    0.9825       225
-    Pullover     0.7686    0.7822    0.7753       225
-       Dress     0.9282    0.8622    0.8940       225
-        Coat     0.7788    0.7822    0.7805       225
-      Sandal     0.9021    0.9422    0.9217       225
-       Shirt     0.6213    0.6489    0.6348       225
-     Sneaker     0.9095    0.9378    0.9234       225
-         Bag     0.9815    0.9422    0.9615       225
-  Ankle boot     0.9717    0.9156    0.9428       225
+ T-shirt/top     0.7731    0.7422    0.7574       225
+     Trouser     0.9778    0.9778    0.9778       225
+    Pullover     0.7792    0.8311    0.8043       225
+       Dress     0.9100    0.8533    0.8807       225
+        Coat     0.7840    0.7422    0.7626       225
+      Sandal     0.9318    0.9111    0.9213       225
+       Shirt     0.5976    0.6533    0.6242       225
+     Sneaker     0.9071    0.9111    0.9091       225
+         Bag     0.9770    0.9422    0.9593       225
+  Ankle boot     0.9025    0.9467    0.9241       225
 
-    accuracy                         0.8582      2250
-   macro avg     0.8605    0.8582    0.8590      2250
-weighted avg     0.8605    0.8582    0.8590      2250
+    accuracy                         0.8511      2250
+   macro avg     0.8540    0.8511    0.8521      2250
+weighted avg     0.8540    0.8511    0.8521      2250
 
 
 5-Fold Cross-Validation Accuracy:
-  - Fold Scores: [0.8367, 0.8283, 0.8167, 0.7983, 0.8417]
-  - Mean Accuracy: 0.8243 (+/- 0.0155)
+  - Fold Scores: [0.8133, 0.8283, 0.8117, 0.7983, 0.8417]
+  - Mean Accuracy: 0.8187 (+/- 0.0149)

@@ -1,29 +1,9 @@
-Sentiment Analysis of Text Model Performance
-==============================================
-Algorithm: Logistic Regression (C=1.0) with Sublinear TF-IDF (4,000 features, n-grams=(1,2))
+Sentiment Analysis of Text Model Performance\n==============================================\nAlgorithm: Logistic Regression (C=1.0) with Sublinear TF-IDF (4,000 features, n-grams=(1,2))\n\nValidation Set Metrics:\n  - Accuracy: 0.8700 (87.00%)\n  - F1-Score: 0.8716\n\nTest Set Evaluation:\n  - Accuracy:  0.8689 (86.89%)\n  - Precision: 0.8550\n  - Recall:    0.8857\n  - F1-Score:  0.8700\n  - ROC-AUC:   0.9426\n\nDetailed Classification Report:\n              precision    recall  f1-score   support
 
-Validation Set Metrics:
-  - Accuracy: 0.8700 (87.00%)
-  - F1-Score: 0.8716
+    Negative     0.8836    0.8524    0.8677       454
+    Positive     0.8550    0.8857    0.8700       446
 
-Test Set Evaluation:
-  - Accuracy:  0.8689 (86.89%)
-  - Precision: 0.8550
-  - Recall:    0.8857
-  - F1-Score:  0.8700
-  - ROC-AUC:   0.9426
-
-Detailed Classification Report:
-              precision    recall  f1-score   support
-
-    Negative       0.88      0.85      0.87       454
-    Positive       0.85      0.89      0.87       446
-
-    accuracy                           0.87       900
-   macro avg       0.87      0.87      0.87       900
-weighted avg       0.87      0.87      0.87       900
-
-
-5-Fold Cross-Validation Accuracy on Training Data:
-  - Fold Scores: [0.8571, 0.8595, 0.8393, 0.8452, 0.8595]
-  - Mean Accuracy: 0.8521 (+/- 0.0083)
+    accuracy                         0.8689       900
+   macro avg     0.8693    0.8690    0.8689       900
+weighted avg     0.8694    0.8689    0.8689       900
+\n\n5-Fold Cross-Validation Accuracy on Training Data:\n  - Fold Scores: [0.8571, 0.8595, 0.8393, 0.8452, 0.8595]\n  - Mean Accuracy: 0.8521 (+/- 0.0083)

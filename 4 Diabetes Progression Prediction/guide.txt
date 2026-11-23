@@ -1,29 +1,25 @@
-Project 4: Diabetes Progression Prediction via Multiple Linear Regression
+4 Diabetes Progression Prediction
 ========================================================================
 Course: CAI504C Machine Learning Lab • Semester I • IUST Kashmir
-Dataset: Efron et al. (2004) Authentic Clinical Diabetes Cohort (N = 442 Patients)
+Clean Architecture: Production Jupyter Notebook Pipeline + Flask Web API
+
 End-to-End Execution & Reproduction Guide:
+------------------------------------------
 
-1. Ingest and defensively validate raw clinical dataset:
-   python3 src/data/make_dataset.py
-   (Validates human physiological ranges and saves clean data/raw/diabetes.csv)
+1. Run the Full Machine Learning Pipeline (Interactive Jupyter Notebook):
+   jupyter notebook notebooks/Diabetes_Progression_Pipeline.ipynb
+   (Executes end-to-end data ingestion, exploratory data analysis, zero-leakage 
+    scaling, model training, cross-validation, and serializes production models)
 
-2. Preprocess features, quantile-stratify, and standardize with zero data leakage:
-   python3 src/features/build_features.py
-   (Partitions into 70% Train [309], 20% Val [88], 10% Test [45], and fits StandardScaler exclusively on Train)
-
-3. Train Multiple Linear Regression (OLS) & Balanced Logistic Triage Model:
-   python3 src/models/train_model.py
-   (Computes VIFs, analytical Normal Equation weights, 5-fold CV, cost-sensitive triage, and writes accuracy.txt)
-
-4. Generate publication-grade Exploratory Data Analysis & Diagnostic Figures:
-   python3 src/visualization/visualize.py
-   (Renders 14 high-resolution 300 DPI analytical figures to reports/figures/)
-
-5. Run real-time single-patient CLI prognosis & linear biomarker decomposition:
-   python3 src/models/predict_model.py
-   (Computes continuous prediction, exact beta*z contributions, and severe triage alert)
-
-6. Launch the interactive web user interface & REST API:
+2. Launch the Interactive Web Dashboard & REST API:
    python3 web/app.py
-   (Starts production Flask server at http://127.0.0.1:5003 with zero cold-start latency)
+   (Starts the production Flask server with pre-loaded models at http://127.0.0.1:5004)
+
+3. Review the Publication-Grade Master Learning Report:
+   Open Diabetes_Report.pdf
+   (Comprehensive 12-chapter textbook detailing theory, math derivations,
+    and in-depth analysis of all 10 diagnostic figures)
+
+4. Present Interactive Advanced Slides:
+   Open Diabetes_Presentation.html in your browser
+   (Interactive 13-slide stepper presentation for viva and defense)
