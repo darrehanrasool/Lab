@@ -84,7 +84,8 @@
 
     /* ---------- fixed 16:9 canvas, scaled to any screen ---------- */
     transform: translate(-50%, -50%);
-      #deck {
+
+    #deck {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -1801,7 +1802,7 @@
       $("deck").style.setProperty("--sc", ACV[acOf(S[cur])]);
       $("pv").disabled = cur === 0; $("nx").disabled = cur === S.length - 1;
       $("notes-t").textContent = S[cur].say || "";
-      try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) {}
+      try { history.replaceState(null, "", "#" + (cur + 1)); } catch (e) { }
     }
     sp.forEach(e => e.onclick = () => go(S.findIndex(s => s.st === +e.dataset.i)));
     $("nx").onclick = () => go(cur + 1); $("pv").onclick = () => go(cur - 1);
